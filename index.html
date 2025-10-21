@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Open Commerce Standard (OCS)</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/dist/themes/light.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/dist/shoelace.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -32,6 +34,9 @@
         }
         .container section:last-child {
             margin-bottom: 0;
+        }
+        .card-section {
+            margin-bottom: 20px;
         }
         .toc {
             background-color: #f8f9fa;
@@ -180,12 +185,15 @@
     </nav>
 
     <div class="container">
+    <sl-card class="card-section">
         <section id="introduction">
             <h2>Introduction</h2>
             <p>The Open Commerce Standard (OCS) is an open specification for digital commerce. It enables any client application to connect seamlessly to any OCS-compliant server, whether it's a simple restaurant menu or a complex e-commerce platform. By using standard HTTP, dynamic capability discovery, structured metadata, and web3-native payments, OCS supports physical goods, digital services, and in-store pickup orders while providing developers with complete freedom in implementation.</p>
             <p>Originally developed for restaurant ordering systems, OCS has evolved to generalize across all forms of commerce. It provides a lean core API that adapts to business needs through extensible metadata, without imposing rigid structures or vendor lock-in.</p>
-        </section>
+            </section>
+    </sl-card>
 
+    <sl-card class="card-section">
         <section id="why-choose-ocs">
             <h2>Why Choose OCS?</h2>
             <p>Traditional e-commerce APIs are fragmented and tied to vendors. OCS solves this with:</p>
@@ -195,9 +203,11 @@
                 <li><strong>Cost Savings:</strong> Web3 payments cut fees by removing middlemen and high processing costs.</li>
                 <li><strong>Future-Proofing:</strong> Extensible design enables AI agents, micropayments, and new commerce ideas.</li>
                 <li><strong>Open & Collaborative:</strong> MIT-licensed, with community contributions for new features.</li>
-            </ul>
-        </section>
+                </ul>
+                </section>
+    </sl-card>
 
+    <sl-card class="card-section">
         <section id="key-features">
             <h2>Key Features</h2>
             <ul>
