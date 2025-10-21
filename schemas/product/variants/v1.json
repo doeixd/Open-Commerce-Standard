@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for product variants capability (dev.ocs.product.variants@1.0)",
+  "properties": {
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of selectable option names (e.g., ['Size', 'Color'])"
+    },
+    "variants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Variant"
+      },
+      "description": "Array of available variants"
+    }
+  },
+  "required": ["options", "variants"],
+  "$defs": {
+    "Variant": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this variant (used in cart items)"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Values corresponding to the options array"
+        },
+        "price": {
+          "$ref": "#/$defs/Money"
+        },
+        "stock": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Available stock quantity"
+        }
+      },
+      "required": ["id", "values", "price", "stock"]
+    },
+    "Money": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Monetary amount as string (e.g., '25.00')"
+        },
+        "currency": {
+          "type": "string",
+          "description": "ISO 4217 currency code (e.g., 'USD')"
+        }
+      },
+      "required": ["amount", "currency"]
+    }
+  }
+}

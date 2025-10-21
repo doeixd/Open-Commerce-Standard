@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for product physical properties capability (dev.ocs.product.physical_properties@1.0)",
+  "properties": {
+    "weight": {
+      "$ref": "#/$defs/Weight",
+      "description": "Weight of the product"
+    },
+    "dimensions": {
+      "$ref": "#/$defs/Dimensions",
+      "description": "Dimensions of the product"
+    }
+  },
+  "$defs": {
+    "Weight": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Weight value"
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["g", "kg", "lb", "oz"],
+          "description": "Unit of measurement"
+        }
+      },
+      "required": ["value", "unit"]
+    },
+    "Dimensions": {
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "number",
+          "description": "Length dimension"
+        },
+        "width": {
+          "type": "number",
+          "description": "Width dimension"
+        },
+        "height": {
+          "type": "number",
+          "description": "Height dimension"
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["mm", "cm", "m", "in", "ft"],
+          "description": "Unit of measurement"
+        }
+      },
+      "required": ["length", "width", "height", "unit"]
+    }
+  }
+}

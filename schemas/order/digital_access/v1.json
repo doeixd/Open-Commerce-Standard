@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "description": "Schema for order digital access capability (dev.ocs.order.digital_access@1.0)",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "enum": ["download", "license", "access_code", "other"],
+        "description": "Type of digital access"
+      },
+      "name": {
+        "type": "string",
+        "description": "Human-readable name for the access item"
+      },
+      "description": {
+        "type": "string",
+        "description": "Description of what this access provides"
+      },
+      "url": {
+        "type": "string",
+        "format": "uri",
+        "description": "URL for download or access (if applicable)"
+      },
+      "code": {
+        "type": "string",
+        "description": "Access code, license key, or token (if applicable)"
+      },
+      "expiresAt": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Expiration date for the access (if applicable)"
+      }
+    },
+    "required": ["type", "name"]
+  }
+}

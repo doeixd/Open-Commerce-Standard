@@ -1,0 +1,727 @@
+openapi: 3.0.3
+info:
+  title: Open Commerce Standard (OCS)
+  version: 1.0.0
+  description: |
+    An open, minimal, and extensible standard for all forms of digital commerce.
+
+    **Core Philosophy:**
+    This standard defines the absolute minimum required for interoperable digital commerce. It achieves flexibility by delegating complex, domain-specific data to a structured `metadata` field. The nature and schema of this metadata are made discoverable through a capabilities endpoint.
+
+    **Key Systems:**
+    1.  **Capability & Metadata Discovery:** A server advertises its features and metadata schemas via the `/capabilities` endpoint. This allows clients to adapt to different product types (physical, digital) and features (shipment tracking, product variants) on the fly.
+    2.  **Minimalist Commerce Core:** The standard generalizes the `Cart` -> `Order` flow. A single `fulfillmentType` field on products is the only mandatory addition, enabling clients to handle physical, digital, and pickup goods.
+    3.  **HTTP-Native Design:** The standard uses core HTTP principles, including RESTful resources, standard verbs and status codes, and Server-Sent Events (SSE) for real-time updates.
+
+servers:
+  - url: https://{domain}/api/v1
+    variables:
+      domain:
+        default: example.com
+        description: The domain name of the API server.
+
+tags:
+  - name: Discovery
+    description: Endpoints for discovering vendors, products, and server capabilities.
+  - name: Cart Management
+    description: Operations for creating and managing a shopping cart.
+  - name: Ordering
+    description: Endpoints for placing and managing orders, including real-time updates.
+
+paths:
+  /capabilities:
+    get:
+      tags: [Discovery]
+      summary: Discover Server Capabilities
+      description: |
+        Returns a list of all OCS Capability Modules supported by this server.
+        Clients can use this information to understand which optional features are enabled,
+        what metadata schemas to expect, and how to adapt their UI and behavior accordingly.
+      responses:
+        '200':
+          description: A list of supported capabilities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilitiesResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /restaurants:
+    get:
+      tags: [Discovery]
+      summary: List available vendors/restaurants
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: A paginated list of restaurants.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurant'
+                  nextCursor:
+                    type: string
+                    nullable: true
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /menus:
+    get:
+      tags: [Discovery]
+      summary: List available catalogs/menus
+      parameters:
+        - name: restaurantId
+          in: query
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: A paginated list of menu summaries.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MenuSummary'
+                  nextCursor:
+                    type: string
+                    nullable: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /menus/{menuId}:
+    get:
+      tags: [Discovery]
+      summary: Get a full catalog/menu by ID
+      parameters:
+        - name: menuId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The complete menu object.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Menu'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /carts:
+    post:
+      tags: [Cart Management]
+      summary: Create a new cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: '#/components/schemas/CreateCartRequest'
+      responses:
+        '201':
+          description: The cart was created successfully.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /carts/{cartId}:
+    get:
+      tags: [Cart Management]
+      summary: Get a cart by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The cart object.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /carts/{cartId}/items:
+    post:
+      tags: [Cart Management]
+      summary: Add an item to a cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+      responses:
+        '200':
+          description: The item was added and the updated cart is returned.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /carts/{cartId}/items/{cartItemId}:
+    delete:
+      tags: [Cart Management]
+      summary: Remove an item from a cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cartItemId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: The item was removed and the updated cart is returned.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags: [Cart Management]
+      summary: Update an item in a cart
+      security:
+        - bearerAuth: []
+      description: Partially update a cart item, e.g., to change its quantity or notes.
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cartItemId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: '#/components/schemas/UpdateCartItemRequest'
+      responses:
+        '200':
+          description: The item was updated and the updated cart is returned.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /orders:
+    post:
+      tags: [Ordering]
+      summary: Place an order from a cart
+      security:
+        - bearerAuth: []
+      description: This endpoint initiates the order process. It may return a 402 if payment is required.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - name: X-PAYMENT
+          in: header
+          schema:
+            type: string
+          description: "Base64-encoded JSON `PaymentPayload`, provided in a retry after a 402 response."
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: The order was successfully created.
+          headers:
+            X-PAYMENT-RESPONSE:
+              schema:
+                type: string
+              description: Base64-encoded JSON `SettlementResponse` containing payment settlement details.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          description: Payment is required to proceed. The body contains payment requirements as per the x402 protocol.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/X402PaymentRequiredResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /orders/{orderId}:
+    get:
+      tags: [Ordering]
+      summary: Get an order by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The order object.
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /orders/{orderId}/updates:
+    get:
+      tags: [Ordering]
+      summary: Subscribe to real-time order updates (SSE)
+      security:
+        - bearerAuth: []
+      description: |
+        Establishes a Server-Sent Events (SSE) connection to receive real-time updates for an order.
+        The client should handle a `text/event-stream` response.
+
+        **Events:**
+        - `order.patch`: The `data` field will contain a JSON array of patch operations conforming to RFC 6902 (JSON Patch). This event is sent whenever the order object is updated.
+        - `close`: Indicates the order has reached a terminal state (`delivered`, `cancelled`). The server will close the connection after sending this event.
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An active SSE stream. The connection will remain open until the order is in a terminal state.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    # --- Capability Discovery Schemas ---
+    CapabilitiesResponse:
+      type: object
+      properties:
+        capabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Capability'
+    Capability:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "The unique, versioned identifier for the capability."
+          example: "dev.ocs.product.variants@1.0"
+        schemaUrl:
+          type: string
+          format: uri
+          description: "The URL pointing to the JSON Schema that defines the structure for this capability's metadata."
+          example: "https://schemas.ocs.dev/product/variants/v1.json"
+
+    # --- OCS Core Schemas ---
+    Money:
+      type: object
+      properties:
+        amount: { type: string, description: "Monetary amount as a string.", example: "12.99" }
+        currency: { type: string, description: "ISO 4217 currency code.", example: "USD" }
+      required: [amount, currency]
+
+    Location:
+      type: object
+      properties:
+        address: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+      required: [address]
+
+    Restaurant:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        location: { $ref: '#/components/schemas/Location' }
+        menuIds: { type: array, items: { type: string } }
+      required: [id, name, location]
+
+    MenuSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        version: { type: string, description: "Version identifier for the menu." }
+      required: [id, name, version]
+
+    Menu:
+      allOf:
+        - $ref: '#/components/schemas/MenuSummary'
+        - type: object
+          properties:
+            items: { type: array, items: { $ref: '#/components/schemas/MenuItem' } }
+          required: [items]
+
+    MenuItem:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        price: { $ref: '#/components/schemas/Money' }
+        available: { type: boolean, default: true }
+        fulfillmentType:
+          type: string
+          enum: [pickup, physical, digital]
+          description: "The fulfillment method for this item, which dictates the required information for an order."
+        addOns: { type: array, items: { $ref: '#/components/schemas/AddOn' } }
+        metadata:
+          type: object
+          description: |
+            Namespaced key-value pairs. The structure of this object may be defined
+            by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
+            will use their ID as a key (e.g., "dev.ocs.product.variants@1.0").
+      required: [id, name, price, available, fulfillmentType]
+
+    AddOn:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        price: { $ref: '#/components/schemas/Money' }
+      required: [id, name, price]
+
+    CreateCartRequest:
+      type: object
+      properties:
+        restaurantId: { type: string, format: uuid }
+      required: [restaurantId]
+
+    CartItemRequest:
+      type: object
+      properties:
+        itemId: { type: string }
+        quantity: { type: integer, minimum: 1 }
+        addOnIds: { type: array, items: { type: string } }
+        notes: { type: string }
+      required: [itemId, quantity]
+
+    UpdateCartItemRequest:
+      type: object
+      properties:
+        quantity: { type: integer, minimum: 1 }
+        notes: { type: string, nullable: true }
+        addOnIds: { type: array, items: { type: string } }
+
+    Cart:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
+        subtotal: { $ref: '#/components/schemas/Money' }
+        tax: { $ref: '#/components/schemas/Money' }
+        total: { $ref: '#/components/schemas/Money' }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required: [id, items, subtotal, tax, total, createdAt, updatedAt]
+
+    CartItem:
+      allOf:
+        - $ref: '#/components/schemas/CartItemRequest'
+        - type: object
+          properties:
+            cartItemId: { type: string, format: uuid, description: "Unique identifier for this item instance in the cart." }
+            price: { $ref: '#/components/schemas/Money' }
+            metadata: { type: object, description: "Namespaced key-value pairs." }
+          required: [cartItemId, price]
+
+    CreateOrderRequest:
+      type: object
+      properties:
+        cartId: { type: string, format: uuid }
+        orderType: { type: string, enum: [pickup, delivery] }
+        deliveryAddress:
+          $ref: '#/components/schemas/Location'
+          description: "Required if the cart contains any items with a fulfillmentType of 'physical'."
+        notes: { type: string }
+        promotions: { type: array, items: { type: string }, description: "Array of promotion codes." }
+      required: [cartId, orderType]
+
+    Order:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        status: { type: string, enum: [placed, confirmed, preparing, ready_for_pickup, out_for_delivery, delivered, cancelled, shipped] }
+        items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
+        total: { $ref: '#/components/schemas/Money' }
+        orderType: { type: string, enum: [pickup, delivery] }
+        deliveryAddress: { $ref: '#/components/schemas/Location' }
+        promotions: { type: array, items: { type: string }, description: "Successfully applied promotion codes." }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        metadata:
+          type: object
+          description: |
+            Namespaced key-value pairs. The structure of this object may be defined
+            by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
+            will use their ID as a key (e.g., "dev.ocs.order.shipment_tracking@1.0").
+      required: [id, status, items, total, orderType, createdAt, updatedAt]
+
+    JsonPatchOperation:
+      type: object
+      description: "A single JSON Patch operation, as defined by RFC 6902."
+      required: [op, path]
+      properties:
+        op: { type: string, enum: [add, remove, replace, move, copy, test] }
+        path: { type: string, description: "A JSON Pointer path." }
+        value: { description: "The value for the operation." }
+        from: { type: string, description: "A JSON Pointer path. Used in 'move' and 'copy' ops." }
+
+    # --- X402 Protocol Schemas ---
+    X402PaymentRequiredResponse:
+      type: object
+      description: "The response body for a 402 Payment Required status. See x402 spec section 5.1."
+      properties:
+        x402Version: { type: number, description: "Protocol version identifier." }
+        error: { type: string, description: "Human-readable error message explaining why payment is required." }
+        accepts: { type: array, items: { $ref: '#/components/schemas/X402PaymentRequirements' } }
+      required: [x402Version, error, accepts]
+
+    X402PaymentRequirements:
+      type: object
+      description: "Details a single payment method accepted by the server. See x402 spec section 5.1.2."
+      properties:
+        scheme: { type: string, example: "exact" }
+        network: { type: string, example: "base-sepolia" }
+        maxAmountRequired: { type: string, example: "10000" }
+        asset: { type: string }
+        payTo: { type: string }
+        resource: { type: string, format: uri }
+        description: { type: string }
+        mimeType: { type: string, example: "application/json" }
+        outputSchema: { type: object }
+        maxTimeoutSeconds: { type: number }
+        extra: { type: object }
+      required: [scheme, network, maxAmountRequired, asset, payTo, resource, description, maxTimeoutSeconds]
+
+    X402PaymentPayload:
+      type: object
+      description: "The JSON payload sent in the X-PAYMENT header (base64-encoded). See x402 spec section 5.2."
+      properties:
+        x402Version: { type: number, example: 1 }
+        scheme: { type: string, example: "exact" }
+        network: { type: string, example: "base-sepolia" }
+        payload: { oneOf: [ { $ref: '#/components/schemas/X402ExactSchemePayload' } ] }
+      required: [x402Version, scheme, network, payload]
+
+    X402ExactSchemePayload:
+      type: object
+      description: "The payload for the 'exact' payment scheme. See x402 spec section 5.2.2."
+      properties:
+        signature: { type: string }
+        authorization: { $ref: '#/components/schemas/X402Authorization' }
+      required: [signature, authorization]
+
+    X402Authorization:
+      type: object
+      description: "EIP-3009 authorization parameters. See x402 spec section 5.2.2."
+      properties:
+        from: { type: string }
+        to: { type: string }
+        value: { type: string }
+        validAfter: { type: string }
+        validBefore: { type: string }
+        nonce: { type: string }
+      required: [from, to, value, validAfter, validBefore, nonce]
+
+    X402SettlementResponse:
+      type: object
+      description: "The JSON payload in the X-PAYMENT-RESPONSE header (base64-encoded). See x402 spec section 5.3."
+      properties:
+        success: { type: boolean }
+        errorReason: { type: string }
+        transaction: { type: string }
+        network: { type: string }
+        payer: { type: string }
+      required: [success, transaction, network, payer]
+
+    Error:
+      type: object
+      properties:
+        code: { type: string, enum: [bad_request, unauthorized, forbidden, not_found, conflict, idempotency_key_reused, product_unavailable, delivery_address_invalid, payment_failed, server_error] }
+        message: { type: string }
+        details: { type: array, items: { type: object, properties: { field: { type: string }, issue: { type: string } } } }
+      required: [code, message]
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Enter the Bearer token. The specific method of acquiring the token (e.g., API Key, OAuth2, SIWE) is determined by the server implementation and may be discoverable via the /capabilities endpoint."
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+      description: A unique key to prevent duplicate requests.
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      description: The maximum number of results to return.
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+      description: The cursor for the next page of results.
+
+  responses:
+    BadRequest:
+      description: The request was malformed or invalid.
+      content:
+        application/ocs+json; version=1.0:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: Authentication credentials are required and are missing or invalid.
+      content:
+        application/ocs+json; version=1.0:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: The client is not authorized to perform this action.
+      content:
+        application/ocs+json; version=1.0:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: The requested resource could not be found.
+      content:
+        application/ocs+json; version=1.0:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: A conflict occurred, such as a reused idempotency key with a different request body.
+      content:
+        application/ocs+json; version=1.0:
+          schema: { $ref: '#/components/schemas/Error' }
+    ServerError:
+      description: An unexpected server error occurred.
+      content:
+        application/ocs+json; version=1.0:
+          schema: { $ref: '#/components/schemas/Error' }

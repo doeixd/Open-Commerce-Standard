@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "description": "Schema for order shipment tracking capability (dev.ocs.order.shipment_tracking@1.0)",
+  "items": {
+    "type": "object",
+    "properties": {
+      "carrier": {
+        "type": "string",
+        "description": "Shipping carrier name (e.g., 'UPS', 'FedEx')"
+      },
+      "trackingNumber": {
+        "type": "string",
+        "description": "Tracking number for the shipment"
+      },
+      "trackingUrl": {
+        "type": "string",
+        "format": "uri",
+        "description": "URL to track the shipment online"
+      }
+    },
+    "required": ["carrier", "trackingNumber", "trackingUrl"]
+  }
+}

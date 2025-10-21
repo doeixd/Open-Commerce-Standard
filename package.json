@@ -1,0 +1,45 @@
+{
+  "name": "Open-Commerce-Standard",
+  "version": "1.0.0",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "keywords": [
+    "pridepack"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "pridepack": "2.6.4",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "scripts": {
+    "prepublishOnly": "pridepack clean && pridepack build",
+    "build": "pridepack build",
+    "type-check": "pridepack check",
+    "clean": "pridepack clean",
+    "watch": "pridepack watch",
+    "start": "pridepack start",
+    "dev": "pridepack dev",
+    "test": "vitest"
+  },
+  "private": false,
+  "description": "Open Commerce Standard (OCS) - HTTP-native API for digital commerce",
+  "repository": {
+    "url": "",
+    "type": "git"
+  },
+  "homepage": "",
+  "bugs": {
+    "url": ""
+  },
+  "author": "",
+  "publishConfig": {
+    "access": "public"
+  }
+}
