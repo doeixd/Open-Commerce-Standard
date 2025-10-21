@@ -4,6 +4,10 @@
 | :--- | :--- | :--- |
 | **1.0.0** | **Active & Ready for Implementation** | **MIT** |
 
+## 📖 Introduction
+
+The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. It integrates web3-native payments via the x402 Protocol for instant, low-fee blockchain transactions.
+
 ## ❓ Overview & Common Questions
 
 **What is OCS?**  
