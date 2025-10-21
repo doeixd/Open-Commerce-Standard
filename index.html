@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Commerce Standard (OCS) Documentation</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <title>Open Commerce Standard (OCS) - Documentation</title>
     <style>
         * {
             margin: 0;
@@ -13,14 +12,20 @@
         }
 
         :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-            --bg-gray: #f9fafb;
-            --bg-white: #ffffff;
-            --code-bg: #1e1e1e;
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --bg-main: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-dark: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
             --sidebar-width: 280px;
         }
 
@@ -28,10 +33,10 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
             color: var(--text-primary);
-            background-color: var(--bg-white);
+            background: var(--bg-secondary);
         }
 
-        .layout {
+        .container {
             display: flex;
             min-height: 100vh;
         }
@@ -39,8 +44,8 @@
         /* Sidebar Navigation */
         .sidebar {
             width: var(--sidebar-width);
-            background-color: var(--bg-gray);
-            border-right: 1px solid var(--border-color);
+            background: var(--bg-main);
+            border-right: 1px solid var(--border);
             position: fixed;
             height: 100vh;
             overflow-y: auto;
@@ -49,12 +54,12 @@
 
         .sidebar-header {
             padding: 0 1.5rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border);
             margin-bottom: 1.5rem;
         }
 
         .sidebar-header h1 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 0.5rem;
@@ -63,6 +68,18 @@
         .sidebar-header p {
             font-size: 0.875rem;
             color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
         }
 
         .nav-section {
@@ -71,10 +88,10 @@
 
         .nav-section-title {
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             padding: 0 1.5rem;
             margin-bottom: 0.5rem;
         }
@@ -86,19 +103,19 @@
             text-decoration: none;
             font-size: 0.875rem;
             transition: all 0.2s;
+            border-left: 3px solid transparent;
         }
 
         .nav-link:hover {
-            background-color: var(--bg-white);
-            color: var(--primary-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
         }
 
         .nav-link.active {
-            background-color: var(--bg-white);
-            color: var(--primary-color);
-            font-weight: 500;
-            border-left: 3px solid var(--primary-color);
-            padding-left: calc(1.5rem - 3px);
+            background: var(--bg-secondary);
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 600;
         }
 
         /* Main Content */
@@ -109,1154 +126,1207 @@
             max-width: 1200px;
         }
 
-        .content-section {
-            background-color: var(--bg-white);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+        /* Typography */
+        h1, h2, h3, h4 {
+            color: var(--text-primary);
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
         }
 
         h2 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid var(--border-color);
+            font-size: 2rem;
+            margin-top: 3rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
         }
 
         h3 {
             font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
             margin-top: 2rem;
-            margin-bottom: 1rem;
         }
 
         h4 {
             font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
             margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
         }
 
         p {
             margin-bottom: 1rem;
             color: var(--text-secondary);
-            line-height: 1.7;
         }
 
-        ul, ol {
+        /* Cards */
+        .card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
             margin-bottom: 1rem;
-            padding-left: 1.5rem;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0.25rem;
+        }
+
+        .info-box.warning {
+            border-left-color: var(--warning);
+            background: #fef3c7;
+        }
+
+        .info-box.success {
+            border-left-color: var(--success);
+            background: #d1fae5;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .inline-code {
+            background: var(--bg-tertiary);
+            color: var(--primary-dark);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875em;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-main);
+        }
+
+        th {
+            background: var(--bg-secondary);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
         }
 
         li {
             margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
         }
 
-        strong {
-            color: var(--text-primary);
-            font-weight: 600;
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
 
-        code {
-            background-color: var(--bg-gray);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.875em;
-            font-family: 'Courier New', Courier, monospace;
-            color: var(--primary-color);
-        }
-
-        pre {
-            background-color: var(--code-bg);
-            border-radius: 8px;
+        .feature-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
             padding: 1.5rem;
-            overflow-x: auto;
-            margin-bottom: 1.5rem;
-        }
-
-        pre code {
-            background-color: transparent;
-            padding: 0;
-            color: #f8f8f2;
-            font-size: 0.875rem;
-        }
-
-        a {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        a:hover {
-            color: var(--primary-hover);
-            text-decoration: underline;
-        }
-
-        dl {
-            margin-bottom: 1rem;
-        }
-
-        dt {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-top: 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        dd {
-            color: var(--text-secondary);
-            margin-left: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .toc {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .toc li {
-            margin-bottom: 0.75rem;
-        }
-
-        .toc a {
-            display: block;
-            padding: 0.5rem 1rem;
-            background-color: var(--bg-gray);
-            border-radius: 6px;
             transition: all 0.2s;
         }
 
-        .toc a:hover {
-            background-color: var(--primary-color);
-            color: var(--bg-white);
-            text-decoration: none;
+        .feature-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
         }
 
-        footer {
-            margin-left: var(--sidebar-width);
-            padding: 2rem 3rem;
-            border-top: 1px solid var(--border-color);
-            background-color: var(--bg-gray);
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-description {
+            font-size: 0.875rem;
             color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Step Cards */
+        .step-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 4rem;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 1.5rem;
+            top: 1.5rem;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
             font-size: 0.875rem;
         }
 
-        footer a {
-            color: var(--text-secondary);
-            margin: 0 0.5rem;
+        .step-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
         }
 
-        footer a:hover {
-            color: var(--primary-color);
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .badge-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--warning);
+            color: white;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
-                display: none;
+                transform: translateX(-100%);
             }
 
-            .main-content,
-            footer {
+            .main-content {
                 margin-left: 0;
                 padding: 1.5rem;
             }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
-        /* Scrollbar styling */
-        .sidebar::-webkit-scrollbar {
-            width: 6px;
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
         }
 
-        .sidebar::-webkit-scrollbar-track {
-            background: transparent;
+        /* Section Spacing */
+        section {
+            margin-bottom: 4rem;
         }
 
-        .sidebar::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 3px;
+        /* Endpoint Cards */
+        .endpoint-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
         }
 
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
+        .endpoint-header {
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .http-method {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 700;
+            font-size: 0.75rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .http-get {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .http-post {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .http-patch {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .http-delete {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .endpoint-path {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .endpoint-body {
+            padding: 1.5rem;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            margin: 2rem 0;
+        }
+
+        .comparison-table th:first-child {
+            width: 30%;
         }
     </style>
 </head>
 <body>
-    <div class="layout">
+    <div class="container">
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <h1>OCS Documentation</h1>
-                <p>Open Commerce Standard v1.0</p>
+                <h1>OCS</h1>
+                <p>Open Commerce Standard</p>
+                <span class="version-badge">v1.0.0</span>
             </div>
 
             <div class="nav-section">
                 <div class="nav-section-title">Getting Started</div>
                 <a href="#introduction" class="nav-link">Introduction</a>
-                <a href="#why-choose-ocs" class="nav-link">Why Choose OCS?</a>
-                <a href="#key-features" class="nav-link">Key Features</a>
+                <a href="#overview" class="nav-link">Overview & FAQ</a>
                 <a href="#getting-started" class="nav-link">Getting Started</a>
-                <a href="#guide" class="nav-link">Step-by-Step Guide</a>
+                <a href="#key-features" class="nav-link">Key Features</a>
             </div>
 
             <div class="nav-section">
                 <div class="nav-section-title">Core Concepts</div>
-                <a href="#technical-overview" class="nav-link">Technical Overview</a>
-                <a href="#how-it-works" class="nav-link">How It Works</a>
-                <a href="#use-cases" class="nav-link">Use Cases</a>
-                <a href="#capabilities" class="nav-link">Standard Capabilities</a>
+                <a href="#x402-protocol" class="nav-link">X402 Protocol</a>
+                <a href="#core-concepts" class="nav-link">Core Concepts</a>
+                <a href="#universal-client" class="nav-link">Universal Client Example</a>
+                <a href="#capabilities" class="nav-link">Capabilities Reference</a>
             </div>
 
             <div class="nav-section">
                 <div class="nav-section-title">API Reference</div>
-                <a href="#sample-api" class="nav-link">Sample API Calls</a>
-                <a href="#api-reference" class="nav-link">API Reference</a>
+                <a href="#endpoints" class="nav-link">Endpoints</a>
+                <a href="#authentication" class="nav-link">Authentication</a>
+                <a href="#content-type" class="nav-link">Content Type</a>
                 <a href="#schemas" class="nav-link">Schemas</a>
-                <a href="#error-handling" class="nav-link">Error Handling</a>
             </div>
 
             <div class="nav-section">
                 <div class="nav-section-title">Implementation</div>
-                <a href="#authentication" class="nav-link">Authentication</a>
-                <a href="#x402-integration" class="nav-link">x402 Integration</a>
-                <a href="#implementation-guide" class="nav-link">Implementation Guide</a>
+                <a href="#implementation-notes" class="nav-link">Implementation Notes</a>
                 <a href="#best-practices" class="nav-link">Best Practices</a>
-                <a href="#troubleshooting" class="nav-link">Troubleshooting</a>
+                <a href="#error-handling" class="nav-link">Error Handling</a>
             </div>
 
             <div class="nav-section">
                 <div class="nav-section-title">Resources</div>
-                <a href="#documentation" class="nav-link">Reference & Docs</a>
-                <a href="#tools-libraries" class="nav-link">Tools & Libraries</a>
-                <a href="#glossary" class="nav-link">Glossary</a>
-                <a href="#resources" class="nav-link">External Resources</a>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">Community</div>
-                <a href="#version-history" class="nav-link">Version History</a>
-                <a href="#roadmap" class="nav-link">Roadmap</a>
+                <a href="#future-direction" class="nav-link">Future Direction</a>
                 <a href="#contributing" class="nav-link">Contributing</a>
-                <a href="#faq" class="nav-link">FAQ</a>
-                <a href="#community" class="nav-link">Community</a>
+                <a href="#license" class="nav-link">License</a>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="main-content">
-            <div class="content-section">
-                <section id="introduction">
-                    <h2>Introduction</h2>
-                    <p>The Open Commerce Standard (OCS) is an open specification for digital commerce. It enables any client application to connect seamlessly to any OCS-compliant server, whether it's a simple restaurant menu or a complex e-commerce platform. By using standard HTTP, dynamic capability discovery, structured metadata, and web3-native payments, OCS supports physical goods, digital services, and in-store pickup orders while providing developers with complete freedom in implementation.</p>
-                    <p>Originally developed for restaurant ordering systems, OCS has evolved to generalize across all forms of commerce. It provides a lean core API that adapts to business needs through extensible metadata, without imposing rigid structures or vendor lock-in.</p>
-                </section>
-            </div>
+            <!-- Introduction -->
+            <section id="introduction">
+                <h1>Open Commerce Standard (OCS)</h1>
+                
+                <div class="card">
+                    <table>
+                        <tr>
+                            <th>Spec Version</th>
+                            <th>Status</th>
+                            <th>License</th>
+                        </tr>
+                        <tr>
+                            <td><strong>1.0.0</strong></td>
+                            <td><span class="badge badge-success">Active & Ready for Implementation</span></td>
+                            <td><strong>MIT</strong></td>
+                        </tr>
+                    </table>
+                </div>
 
-            <div class="content-section">
-                <section id="why-choose-ocs">
-                    <h2>Why Choose OCS?</h2>
-                    <p>Traditional e-commerce APIs are fragmented and tied to vendors. OCS solves this with:</p>
-                    <ul>
-                        <li><strong>Interoperability:</strong> Build once, run anywhere—clients automatically adapt to any server.</li>
-                        <li><strong>Scalability:</strong> Begin simply, add features through metadata without API changes.</li>
-                        <li><strong>Cost Savings:</strong> Web3 payments cut fees by removing middlemen and high processing costs.</li>
-                        <li><strong>Future-Proofing:</strong> Extensible design enables AI agents, micropayments, and new commerce ideas.</li>
-                        <li><strong>Open & Collaborative:</strong> MIT-licensed, with community contributions for new features.</li>
-                    </ul>
-                </section>
-            </div>
+                <p>The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. It integrates web3-native payments via the x402 Protocol for instant, low-fee blockchain transactions.</p>
+            </section>
 
-            <div class="content-section">
-                <section id="key-features">
-                    <h2>Key Features</h2>
-                    <ul>
-                        <li><strong>Universal Commerce Model:</strong> Handles all order types—physical goods (shipping), digital services (downloads), and in-store pickup—with a single <code>fulfillmentType</code> field, simplifying client logic.</li>
-                        <li><strong>Dynamic Capability Discovery:</strong> Clients query <code>GET /capabilities</code> to discover server features, enabling adaptive UIs that work across different implementations without hardcoding.</li>
-                        <li><strong>Real-Time Order Tracking:</strong> Server-Sent Events (SSE) provide live updates on order status using efficient JSON Patch operations, reducing polling and improving user experience.</li>
-                        <li><strong>Extensible Metadata System:</strong> Custom data resides in a <code>metadata</code> object linked to JSON Schemas, allowing servers to add features like variants or tracking without API changes.</li>
-                        <li><strong>Web3-Native Payments:</strong> Integrates the x402 Protocol for instant, low-fee blockchain transactions using stablecoins like USDC, supporting micropayments and programmable commerce.</li>
-                        <li><strong>Implementation Freedom:</strong> OCS is unopinionated about internal business logic, pricing models, or data storage, letting developers build as they see fit.</li>
-                    </ul>
-                </section>
+            <!-- Overview & FAQ -->
+            <section id="overview">
+                <h2>Overview & Common Questions</h2>
 
-                <section id="technical-overview">
-                    <h2>Technical Overview</h2>
-                    <p>OCS builds on HTTP basics:</p>
-                    <ul>
-                        <li><strong>Content Type:</strong> All requests use <code>application/ocs+json; version=1.0</code>.</li>
-                        <li><strong>Authentication:</strong> Bearer tokens protect endpoints; discovery is open.</li>
-                        <li><strong>Idempotency:</strong> Prevents duplicates with keys on state changes.</li>
-                        <li><strong>Schemas:</strong> API in OpenAPI 3.0; metadata follows JSON Schemas.</li>
-                        <li><strong>Payments:</strong> x402 manages auth, settlement, and 402 errors.</li>
-                    </ul>
-                    <p>See the <a href="./src/spec.yaml">full spec</a> for details.</p>
-                </section>
-            </div>
+                <div class="card">
+                    <h4>What is OCS?</h4>
+                    <p>An open, minimal, and extensible standard for digital commerce. It defines a universal HTTP API for the entire transaction lifecycle: product discovery, cart management, ordering, and real-time updates—supporting physical goods, digital services, and in-store pickup.</p>
+                </div>
 
-            <div class="content-section">
-                <section id="sample-api">
-                    <h2>Sample API Calls</h2>
+                <div class="card">
+                    <h4>Why OCS?</h4>
+                    <p>Traditional e-commerce APIs are fragmented and vendor-specific. OCS provides a consistent, extensible framework that adapts to any business model—from simple menus to complex apparel stores—without dictating internal logic. It prioritizes implementer freedom while enabling universal, adaptive clients.</p>
+                </div>
+
+                <div class="card">
+                    <h4>How does OCS work?</h4>
+                    <p>Clients begin by discovering server capabilities (<span class="inline-code">GET /capabilities</span>), then browse catalogs/menus, manage carts, and place orders. Real-time updates stream via Server-Sent Events. Complexity is delegated to structured <span class="inline-code">metadata</span> linked to JSON Schemas, allowing clients to adapt dynamically without hardcoding features.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Why X402 for payments?</h4>
+                    <p>OCS integrates the x402 Protocol for web3-native payments, enabling instant, low-fee blockchain transactions with stablecoins like USDC. Unlike credit cards (high fees, slow settlement, chargebacks), X402 supports micropayments, AI agents, and programmable commerce.</p>
+                </div>
+
+                <div class="card">
+                    <h4>How does authentication work?</h4>
+                    <p>OCS uses Bearer token authentication (<span class="inline-code">Authorization: Bearer &lt;token&gt;</span>). Token formats (e.g., JWT, API keys) are implementation-specific and may be discoverable via capabilities. Discovery endpoints are public; others require auth.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Who is OCS for?</h4>
+                    <p>API providers monetizing digital commerce, client developers building universal shopping apps, and AI agents requiring autonomous transactions.</p>
+                </div>
+            </section>
+
+            <!-- Getting Started -->
+            <section id="getting-started">
+                <h2>Getting Started</h2>
+
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Review the Specification</div>
+                    <p>Read the OpenAPI spec for the full API details. The specification defines all endpoints, schemas, and behaviors.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Implement Core Endpoints</div>
+                    <p>Start with discovery (<span class="inline-code">/capabilities</span>, <span class="inline-code">/restaurants</span>, <span class="inline-code">/menus</span>) and cart/order flows.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Add Capabilities</div>
+                    <p>Implement optional features like variants or tracking via standard schemas.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Build Clients</div>
+                    <p>Use capability discovery for adaptive apps compatible with any OCS server.</p>
+                </div>
+            </section>
+
+            <!-- Key Features -->
+            <section id="key-features">
+                <h2>Key Features</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <div class="feature-title">Universal Commerce Model</div>
+                        <div class="feature-description">A single, elegant model handles physical goods, digital goods/services, and in-store pickup using a simple <span class="inline-code">fulfillmentType</span> flag.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">Dynamic Capability Discovery</div>
+                        <div class="feature-description">The <span class="inline-code">GET /capabilities</span> endpoint allows a client to understand a server's full feature set, enabling truly adaptive applications.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-title">Real-time Order Updates</div>
+                        <div class="feature-description">A built-in Server-Sent Events (SSE) endpoint provides efficient, real-time order status changes using standardized JSON Patch.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📦</div>
+                        <div class="feature-title">Structured, Extensible Metadata</div>
+                        <div class="feature-description">Go beyond simple key-value pairs. OCS provides a system for servers to link to official JSON Schemas that define the structure of their metadata.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">💎</div>
+                        <div class="feature-title">Web3-Native Payments</div>
+                        <div class="feature-description">Includes a complete, protocol-compliant implementation for handling payments via the x402 Protocol.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-title">Formal Security Model</div>
+                        <div class="feature-description">Recommends and formalizes a Bearer token authentication scheme for all protected resources.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- X402 Protocol -->
+            <section id="x402-protocol">
+                <h2>X402 Protocol Compliance</h2>
+
+                <p>OCS integrates the <a href="https://github.com/coinbase/x402" target="_blank">x402 Protocol</a>, Coinbase's open standard for internet-native payments, to enable seamless, blockchain-based transactions within the order lifecycle. This makes OCS "web3-native," allowing for instant, programmable payments using stablecoins like USDC.</p>
+
+                <h3>Why X402?</h3>
+
+                <div class="table-container">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Traditional Payments</th>
+                                <th>X402 Protocol</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Transaction Fees</strong></td>
+                                <td>2-3% + processing costs</td>
+                                <td>Near-zero costs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Settlement Time</strong></td>
+                                <td>Days</td>
+                                <td>Seconds</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Micropayments</strong></td>
+                                <td>Not economical</td>
+                                <td>Fully supported</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI/Agent Friendly</strong></td>
+                                <td>Requires human intervention</td>
+                                <td>Autonomous payments</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Chargebacks</strong></td>
+                                <td>High risk</td>
+                                <td>Minimal risk</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Programmability</strong></td>
+                                <td>Limited</td>
+                                <td>Fully programmable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>How OCS Uses X402</h3>
+
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Client places order</div>
+                    <p>Client sends <span class="inline-code">POST /orders</span> request.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Payment required</div>
+                    <p>Server responds with <span class="inline-code">402 Payment Required</span>, including x402 payment requirements (amount, asset, network, etc.).</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Client authorizes payment</div>
+                    <p>Signs a blockchain authorization and retries the request with the <span class="inline-code">X-PAYMENT</span> header containing the base64-encoded payment payload.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Server verifies & settles</div>
+                    <p>Forwards to an x402 facilitator for onchain verification and settlement.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Order completes</div>
+                    <p>Server returns the order details with a <span class="inline-code">X-PAYMENT-RESPONSE</span> header confirming the transaction.</p>
+                </div>
+
+                <div class="info-box success">
+                    <strong>Universal Support</strong>
+                    This integration supports physical goods (shipping), digital goods (access keys), and in-store pickup, all with web3 payments.
+                </div>
+            </section>
+
+            <!-- Core Concepts -->
+            <section id="core-concepts">
+                <h2>Core Concepts</h2>
+
+                <p>OCS's power lies in <strong>delegating complexity to <span class="inline-code">metadata</span> and making it discoverable</strong>.</p>
+
+                <div class="card">
+                    <p>Core schemas stay lean—no endless optional fields for variants, sizes, or weights. Domain-specific data resides in a generic <span class="inline-code">metadata</span> object.</p>
                     
-                    <h3>Discover Capabilities</h3>
-                    <pre><code class="language-json">GET /capabilities
+                    <p>To avoid chaos, <span class="inline-code">GET /capabilities</span> provides a "table of contents" for metadata, linking to standardized JSON Schemas. Clients adapt dynamically, creating a system that's simple by default, complex by choice.</p>
+                </div>
 
-Response:
+                <div class="info-box">
+                    <strong>Key Principle</strong>
+                    Instead of bloating core schemas with every possible field, OCS uses structured metadata with discoverable schemas. This keeps the API minimal while supporting unlimited extensibility.
+                </div>
+            </section>
 
-{
+            <!-- Universal Client Example -->
+            <section id="universal-client">
+                <h2>Example: A Universal Client Buys a T-Shirt</h2>
+
+                <p>This narrative demonstrates how a client uses the full power of OCS to interact with an apparel store.</p>
+
+                <h3>Step 1: Discover Server Capabilities</h3>
+                <p>The client's first action is to understand the server's features.</p>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/capabilities</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <strong>Response:</strong>
+                        <div class="code-block"><pre>{
   "capabilities": [
     {
       "id": "dev.ocs.product.variants@1.0",
       "schemaUrl": "https://schemas.ocs.dev/product/variants/v1.json"
-    }
-  ]
-}</code></pre>
-
-                    <h3>Get Menu Items</h3>
-                    <pre><code class="language-json">GET /menus/123
-
-Response:
-
-{
-  "id": "menu_123",
-  "name": "Main Menu",
-  "items": [
+    },
     {
-      "id": "item_1",
-      "name": "Burger",
-      "price": {
-        "amount": "10.00",
-        "currency": "USD"
-      },
-      "fulfillmentType": "pickup"
+      "id": "dev.ocs.order.shipment_tracking@1.0",
+      "schemaUrl": "https://schemas.ocs.dev/order/shipment_tracking/v1.json"
     }
   ]
-}</code></pre>
+}</pre></div>
+                        <div class="info-box">
+                            <strong>Client Insight:</strong>
+                            "Okay, this server supports products with variants (like size and color) and will provide shipment tracking details for orders. I can now enable the UI for these features."
+                        </div>
+                    </div>
+                </div>
 
-                    <h3>Place Order</h3>
-                    <pre><code class="language-json">POST /orders
+                <h3>Step 2: View a Product with Structured Metadata</h3>
+                <p>The client fetches a catalog (<span class="inline-code">/menus/{id}</span>) and gets a product (<span class="inline-code">MenuItem</span>).</p>
 
-{
-  "cartId": "cart_abc",
-  "orderType": "pickup"
-}
-
-Response (Success):
-
-{
-  "id": "order_456",
-  "status": "confirmed",
-  "items": [...],
-  "total": {
-    "amount": "10.00",
-    "currency": "USD"
-  },
-  "orderType": "pickup",
-  "createdAt": "2025-01-01T12:00:00Z"
-}
-
-Response (Payment Required - 402):
-
-{
-  "x402Version": 1,
-  "error": "Payment required",
-  "accepts": [...]
-}</code></pre>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="api-reference">
-                    <h2>API Reference</h2>
-                    <p>Detailed reference for all OCS endpoints. See the <a href="./src/spec.yaml">full OpenAPI spec</a> for complete details.</p>
-
-                    <h3>Discovery Endpoints</h3>
-
-                    <h4>GET /capabilities</h4>
-                    <p>Discover server capabilities and metadata schemas.</p>
-                    <p><strong>Parameters:</strong> None</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: CapabilitiesResponse</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h4>GET /restaurants</h4>
-                    <p>List available vendors/restaurants.</p>
-                    <p><strong>Parameters:</strong> limit, cursor</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: Paginated list of Restaurant</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h4>GET /menus</h4>
-                    <p>List available catalogs/menus for a restaurant.</p>
-                    <p><strong>Parameters:</strong> restaurantId (required), limit, cursor</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: Paginated list of MenuSummary</li>
-                        <li>400: BadRequest</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h4>GET /menus/{menuId}</h4>
-                    <p>Get a full catalog/menu by ID.</p>
-                    <p><strong>Parameters:</strong> menuId (path)</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: Menu</li>
-                        <li>404: NotFound</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h3>Cart Management Endpoints</h3>
-
-                    <h4>POST /carts</h4>
-                    <p>Create a new cart.</p>
-                    <p><strong>Security:</strong> Bearer token</p>
-                    <p><strong>Parameters:</strong> Idempotency-Key (header)</p>
-                    <p><strong>Request Body:</strong> CreateCartRequest</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>201: Cart</li>
-                        <li>400: BadRequest</li>
-                        <li>401: Unauthorized</li>
-                        <li>403: Forbidden</li>
-                        <li>409: Conflict</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h4>GET /carts/{cartId}</h4>
-                    <p>Get a cart by ID.</p>
-                    <p><strong>Security:</strong> Bearer token</p>
-                    <p><strong>Parameters:</strong> cartId (path)</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: Cart</li>
-                        <li>401: Unauthorized</li>
-                        <li>403: Forbidden</li>
-                        <li>404: NotFound</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h4>POST /carts/{cartId}/items</h4>
-                    <p>Add an item to a cart.</p>
-                    <p><strong>Security:</strong> Bearer token</p>
-                    <p><strong>Parameters:</strong> cartId (path), Idempotency-Key (header)</p>
-                    <p><strong>Request Body:</strong> CartItemRequest</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: Cart</li>
-                        <li>400: BadRequest</li>
-                        <li>401: Unauthorized</li>
-                        <li>403: Forbidden</li>
-                        <li>404: NotFound</li>
-                        <li>409: Conflict</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h4>PATCH /carts/{cartId}/items/{cartItemId}</h4>
-                    <p>Update an item in a cart.</p>
-                    <p><strong>Security:</strong> Bearer token</p>
-                    <p><strong>Parameters:</strong> cartId (path), cartItemId (path), Idempotency-Key (header)</p>
-                    <p><strong>Request Body:</strong> UpdateCartItemRequest</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: Cart</li>
-                        <li>400: BadRequest</li>
-                        <li>401: Unauthorized</li>
-                        <li>403: Forbidden</li>
-                        <li>404: NotFound</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h4>DELETE /carts/{cartId}/items/{cartItemId}</h4>
-                    <p>Remove an item from a cart.</p>
-                    <p><strong>Security:</strong> Bearer token</p>
-                    <p><strong>Parameters:</strong> cartId (path), cartItemId (path), Idempotency-Key (header)</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: Cart</li>
-                        <li>401: Unauthorized</li>
-                        <li>403: Forbidden</li>
-                        <li>404: NotFound</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h3>Ordering Endpoints</h3>
-
-                    <h4>POST /orders</h4>
-                    <p>Place an order from a cart.</p>
-                    <p><strong>Security:</strong> Bearer token</p>
-                    <p><strong>Parameters:</strong> Idempotency-Key (header), X-PAYMENT (header, optional)</p>
-                    <p><strong>Request Body:</strong> CreateOrderRequest</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>201: Order (with X-PAYMENT-RESPONSE header)</li>
-                        <li>400: BadRequest</li>
-                        <li>401: Unauthorized</li>
-                        <li>402: X402PaymentRequiredResponse</li>
-                        <li>403: Forbidden</li>
-                        <li>404: NotFound</li>
-                        <li>409: Conflict</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h4>GET /orders/{orderId}</h4>
-                    <p>Get an order by ID.</p>
-                    <p><strong>Security:</strong> Bearer token</p>
-                    <p><strong>Parameters:</strong> orderId (path)</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: Order</li>
-                        <li>401: Unauthorized</li>
-                        <li>403: Forbidden</li>
-                        <li>404: NotFound</li>
-                        <li>500: ServerError</li>
-                    </ul>
-
-                    <h4>GET /orders/{orderId}/updates</h4>
-                    <p>Subscribe to real-time order updates via SSE.</p>
-                    <p><strong>Security:</strong> Bearer token</p>
-                    <p><strong>Parameters:</strong> orderId (path)</p>
-                    <p><strong>Responses:</strong></p>
-                    <ul>
-                        <li>200: text/event-stream</li>
-                        <li>401: Unauthorized</li>
-                        <li>403: Forbidden</li>
-                        <li>404: NotFound</li>
-                        <li>500: ServerError</li>
-                    </ul>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="schemas">
-                    <h2>Schemas</h2>
-                    <p>Key JSON schema definitions from the OCS spec. See the <a href="./src/spec.yaml">full spec</a> for all schemas.</p>
-
-                    <h3>Money</h3>
-                    <pre><code class="language-json">{
-  "type": "object",
-  "properties": {
-    "amount": {
-      "type": "string",
-      "description": "Monetary amount as a string.",
-      "example": "12.99"
-    },
-    "currency": {
-      "type": "string",
-      "description": "ISO 4217 currency code.",
-      "example": "USD"
-    }
-  },
-  "required": ["amount", "currency"]
-}</code></pre>
-
-                    <h3>MenuItem</h3>
-                    <pre><code class="language-json">{
-  "type": "object",
-  "properties": {
-    "id": { "type": "string" },
-    "name": { "type": "string" },
-    "description": { "type": "string" },
-    "price": { "$ref": "#/components/schemas/Money" },
-    "available": { "type": "boolean", "default": true },
-    "fulfillmentType": {
-      "type": "string",
-      "enum": ["pickup", "physical", "digital"]
-    },
-    "addOns": {
-      "type": "array",
-      "items": { "$ref": "#/components/schemas/AddOn" }
-    },
-    "metadata": { "type": "object" }
-  },
-  "required": ["id", "name", "price", "available", "fulfillmentType"]
-}</code></pre>
-
-                    <h3>Order</h3>
-                    <pre><code class="language-json">{
-  "type": "object",
-  "properties": {
-    "id": { "type": "string", "format": "uuid" },
-    "status": {
-      "type": "string",
-      "enum": [
-        "placed", "confirmed", "preparing",
-        "ready_for_pickup", "out_for_delivery",
-        "delivered", "cancelled", "shipped"
+                <div class="code-block"><pre>{
+  "id": "prod_123",
+  "name": "Classic OCS Tee",
+  "price": { "amount": "25.00", "currency": "USD" },
+  "fulfillmentType": "physical",
+  "available": true,
+  "metadata": {
+    "x-vendor-style-code": "FW25-TEE-01",
+    "dev.ocs.product.variants@1.0": {
+      "options": ["Size", "Color"],
+      "variants": [
+        {
+          "id": "var_large_black",
+          "values": ["Large", "Black"],
+          "price": { "amount": "25.00", "currency": "USD" },
+          "stock": 42
+        },
+        {
+          "id": "var_large_white",
+          "values": ["Large", "White"],
+          "price": { "amount": "25.00", "currency": "USD" },
+          "stock": 0
+        }
       ]
-    },
-    "items": {
-      "type": "array",
-      "items": { "$ref": "#/components/schemas/CartItem" }
-    },
-    "total": { "$ref": "#/components/schemas/Money" },
-    "orderType": {
-      "type": "string",
-      "enum": ["pickup", "delivery"]
-    },
-    "deliveryAddress": { "$ref": "#/components/schemas/Location" },
-    "promotions": { "type": "array", "items": { "type": "string" } },
-    "createdAt": { "type": "string", "format": "date-time" },
-    "updatedAt": { "type": "string", "format": "date-time" },
-    "metadata": { "type": "object" }
-  },
-  "required": [
-    "id", "status", "items", "total",
-    "orderType", "createdAt", "updatedAt"
-  ]
-}</code></pre>
-
-                    <h3>CapabilitiesResponse</h3>
-                    <pre><code class="language-json">{
-  "type": "object",
-  "properties": {
-    "capabilities": {
-      "type": "array",
-      "items": { "$ref": "#/components/schemas/Capability" }
     }
   }
-}</code></pre>
+}</pre></div>
 
-                    <h3>Capability</h3>
-                    <pre><code class="language-json">{
-  "type": "object",
-  "properties": {
-    "id": {
-      "type": "string",
-      "example": "dev.ocs.product.variants@1.0"
-    },
-    "schemaUrl": {
-      "type": "string",
-      "format": "uri",
-      "example": "https://schemas.ocs.dev/product/variants/v1.json"
+                <div class="info-box">
+                    <strong>Client Insight:</strong>
+                    The client sees the <span class="inline-code">dev.ocs.product.variants@1.0</span> key. It now knows it can confidently parse the data within to build a size/color selection UI and disable the "White" option because its stock is 0.
+                </div>
+
+                <h3>Step 3: Place the Order</h3>
+                <p>The user adds <span class="inline-code">var_large_black</span> to the cart. During checkout, the client places the order.</p>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-post">POST</span>
+                        <span class="endpoint-path">/orders</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <strong>Request:</strong>
+                        <div class="code-block"><pre>{
+  "cartId": "cart_abc",
+  "orderType": "delivery",
+  "deliveryAddress": {
+    "address": "123 OCS Lane, Protocol City, 1337"
+  }
+}</pre></div>
+                    </div>
+                </div>
+
+                <h3>Step 4: Track the Order in Real-Time</h3>
+                <p>The client immediately opens a connection to the SSE endpoint.</p>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/orders/{orderId}/updates</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <strong>Response Stream:</strong>
+                        <div class="code-block"><pre>event: order.patch
+data: [{"op": "replace", "path": "/status", "value": "confirmed"}]
+
+event: order.patch
+data: [
+  {"op": "replace", "path": "/status", "value": "shipped"},
+  {"op": "add", "path": "/metadata/dev.ocs.order.shipment_tracking@1.0", "value": [
+    {
+      "carrier": "UPS",
+      "trackingNumber": "1Z999ABCDEFG",
+      "trackingUrl": "https://www.ups.com/track?tracknum=1Z999ABCDEFG"
     }
-  },
-  "required": ["id", "schemaUrl"]
-}</code></pre>
-                </section>
-            </div>
+  ]}
+]</pre></div>
+                        <div class="info-box">
+                            <strong>Client Insight:</strong>
+                            The client's UI updates the status to "Shipped." Because it saw the <span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span> capability in Step 1, it knows to look for that key in the metadata and can now display a "Track Your Shipment" button that links to the <span class="inline-code">trackingUrl</span>.
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            <div class="content-section">
-                <section id="error-handling">
-                    <h2>Error Handling</h2>
-                    <p>OCS uses standard HTTP status codes and a consistent error response format.</p>
+            <!-- Capabilities Reference -->
+            <section id="capabilities">
+                <h2>Capabilities Reference</h2>
 
-                    <h3>Error Response Format</h3>
-                    <pre><code class="language-json">{
-  "code": "bad_request",
-  "message": "The request was malformed.",
+                <p>Capabilities are the heart of OCS's extensibility. The following standard capabilities are defined:</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Capability ID</th>
+                                <th>Applies To</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.product.variants@1.0</span></td>
+                                <td>Product (MenuItem)</td>
+                                <td>Defines user-selectable options (e.g., size, color) and their corresponding variants, each with its own ID, price, and stock.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span></td>
+                                <td>Order</td>
+                                <td>Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.order.digital_access@1.0</span></td>
+                                <td>Order</td>
+                                <td>Provides an array of objects containing access details for digital goods, such as download URLs or license keys.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.product.physical_properties@1.0</span></td>
+                                <td>Product (MenuItem)</td>
+                                <td>Defines physical properties like weight and dimensions, primarily for shipping estimation.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Endpoints -->
+            <section id="endpoints">
+                <h2>API Endpoints</h2>
+
+                <h3>Discovery Endpoints</h3>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/capabilities</span>
+                        <span class="badge badge-success">Public</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Discover server features and metadata schemas.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/restaurants</span>
+                        <span class="badge badge-success">Public</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>List available vendors/stores.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/menus</span>
+                        <span class="badge badge-success">Public</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>List available catalogs/menus.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/menus/{id}</span>
+                        <span class="badge badge-success">Public</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get a full product catalog/menu.</p>
+                    </div>
+                </div>
+
+                <h3>Cart Management</h3>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-post">POST</span>
+                        <span class="endpoint-path">/carts</span>
+                        <span class="badge badge-warning">Auth Required</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Create a new shopping cart.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/carts/{id}</span>
+                        <span class="badge badge-warning">Auth Required</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get a cart by ID.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-post">POST</span>
+                        <span class="endpoint-path">/carts/{id}/items</span>
+                        <span class="badge badge-warning">Auth Required</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Add an item to the cart.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-patch">PATCH</span>
+                        <span class="endpoint-path">/carts/{id}/items/{itemId}</span>
+                        <span class="badge badge-warning">Auth Required</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Update an item in the cart.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-delete">DELETE</span>
+                        <span class="endpoint-path">/carts/{id}/items/{itemId}</span>
+                        <span class="badge badge-warning">Auth Required</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Remove an item from the cart.</p>
+                    </div>
+                </div>
+
+                <h3>Ordering</h3>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-post">POST</span>
+                        <span class="endpoint-path">/orders</span>
+                        <span class="badge badge-warning">Auth Required</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Place an order from a cart. May return 402 if payment is required.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/orders/{id}</span>
+                        <span class="badge badge-warning">Auth Required</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get the current state of an order.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/orders/{id}/updates</span>
+                        <span class="badge badge-warning">Auth Required</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Subscribe to real-time order updates via Server-Sent Events (SSE).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Authentication -->
+            <section id="authentication">
+                <h2>Authentication</h2>
+
+                <p>OCS uses Bearer token authentication for all protected endpoints.</p>
+
+                <div class="code-block"><pre>Authorization: Bearer &lt;token&gt;</pre></div>
+
+                <div class="info-box">
+                    <strong>Implementation Note</strong>
+                    Token formats (e.g., JWT, API keys, OAuth2) are implementation-specific and may be discoverable via the capabilities endpoint. Discovery endpoints (<span class="inline-code">/capabilities</span>, <span class="inline-code">/restaurants</span>, <span class="inline-code">/menus</span>) are public; all other endpoints require authentication.
+                </div>
+            </section>
+
+            <!-- Content Type -->
+            <section id="content-type">
+                <h2>Content Type</h2>
+
+                <p>All API requests and responses use the custom media type <span class="inline-code">application/ocs+json; version=1.0</span>. Clients should set the <span class="inline-code">Accept</span> and <span class="inline-code">Content-Type</span> headers accordingly:</p>
+
+                <div class="code-block"><pre>Accept: application/ocs+json; version=1.0
+Content-Type: application/ocs+json; version=1.0</pre></div>
+            </section>
+
+            <!-- Schemas -->
+            <section id="schemas">
+                <h2>Core Schemas</h2>
+
+                <h3>Money</h3>
+                <div class="code-block"><pre>{
+  "amount": "12.99",
+  "currency": "USD"
+}</pre></div>
+
+                <h3>Location</h3>
+                <div class="code-block"><pre>{
+  "address": "123 Main St, City, State 12345",
+  "latitude": 37.7749,
+  "longitude": -122.4194
+}</pre></div>
+
+                <h3>MenuItem</h3>
+                <div class="code-block"><pre>{
+  "id": "item_123",
+  "name": "Product Name",
+  "description": "Product description",
+  "price": { "amount": "29.99", "currency": "USD" },
+  "available": true,
+  "fulfillmentType": "physical",
+  "metadata": {}
+}</pre></div>
+
+                <h3>Order</h3>
+                <div class="code-block"><pre>{
+  "id": "order_123",
+  "status": "confirmed",
+  "items": [...],
+  "total": { "amount": "59.98", "currency": "USD" },
+  "orderType": "delivery",
+  "deliveryAddress": {...},
+  "createdAt": "2025-01-15T10:30:00Z",
+  "updatedAt": "2025-01-15T10:35:00Z",
+  "metadata": {}
+}</pre></div>
+            </section>
+
+            <!-- Implementation Notes -->
+            <section id="implementation-notes">
+                <h2>Implementation Notes</h2>
+
+                <div class="card">
+                    <h4>Always discover capabilities first</h4>
+                    <p>Call <span class="inline-code">GET /capabilities</span> to adapt dynamically—never hardcode features.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Use full Capability IDs as metadata keys</h4>
+                    <p>E.g., <span class="inline-code">"dev.ocs.product.variants@1.0"</span> to link to schemas.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Handle missing capabilities gracefully</h4>
+                    <p>Fall back to basic representations if optional features aren't supported.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Require idempotency</h4>
+                    <p>Include <span class="inline-code">Idempotency-Key</span> in all state-changing requests to prevent duplicates.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Support all fulfillment types</h4>
+                    <p>Design checkout for <span class="inline-code">physical</span> (shipping), <span class="inline-code">digital</span>, and <span class="inline-code">pickup</span> items in any cart.</p>
+                </div>
+            </section>
+
+            <!-- Best Practices -->
+            <section id="best-practices">
+                <h2>Best Practices</h2>
+
+                <ul>
+                    <li><strong>Start with capabilities:</strong> Always call <span class="inline-code">/capabilities</span> before making assumptions about server features.</li>
+                    <li><strong>Use idempotency keys:</strong> Include unique <span class="inline-code">Idempotency-Key</span> headers for all POST, PATCH, and DELETE requests.</li>
+                    <li><strong>Handle SSE gracefully:</strong> Implement reconnection logic for Server-Sent Events connections.</li>
+                    <li><strong>Validate metadata schemas:</strong> Use the provided JSON Schema URLs to validate metadata structure.</li>
+                    <li><strong>Support mixed carts:</strong> Allow users to purchase physical, digital, and pickup items in a single order.</li>
+                    <li><strong>Implement proper error handling:</strong> Handle all standard HTTP error codes and OCS-specific error responses.</li>
+                    <li><strong>Cache capabilities:</strong> Cache the capabilities response to reduce unnecessary API calls.</li>
+                </ul>
+            </section>
+
+            <!-- Error Handling -->
+            <section id="error-handling">
+                <h2>Error Handling</h2>
+
+                <p>OCS uses standard HTTP status codes and provides detailed error responses:</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Status Code</th>
+                                <th>Error Code</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>400</td>
+                                <td><span class="inline-code">bad_request</span></td>
+                                <td>The request was malformed or invalid</td>
+                            </tr>
+                            <tr>
+                                <td>401</td>
+                                <td><span class="inline-code">unauthorized</span></td>
+                                <td>Authentication credentials are missing or invalid</td>
+                            </tr>
+                            <tr>
+                                <td>402</td>
+                                <td>N/A</td>
+                                <td>Payment is required (x402 protocol)</td>
+                            </tr>
+                            <tr>
+                                <td>403</td>
+                                <td><span class="inline-code">forbidden</span></td>
+                                <td>The client is not authorized to perform this action</td>
+                            </tr>
+                            <tr>
+                                <td>404</td>
+                                <td><span class="inline-code">not_found</span></td>
+                                <td>The requested resource could not be found</td>
+                            </tr>
+                            <tr>
+                                <td>409</td>
+                                <td><span class="inline-code">conflict</span></td>
+                                <td>A conflict occurred (e.g., reused idempotency key)</td>
+                            </tr>
+                            <tr>
+                                <td>500</td>
+                                <td><span class="inline-code">server_error</span></td>
+                                <td>An unexpected server error occurred</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Error Response Format</h3>
+                <div class="code-block"><pre>{
+  "code": "product_unavailable",
+  "message": "The requested product is currently out of stock",
   "details": [
     {
-      "field": "restaurantId",
-      "issue": "Must be a valid UUID."
+      "field": "itemId",
+      "issue": "Product 'prod_123' has 0 stock remaining"
     }
   ]
-}</code></pre>
+}</pre></div>
+            </section>
 
-                    <h3>Error Codes</h3>
-                    <ul>
-                        <li><strong>bad_request:</strong> The request was malformed or invalid (400).</li>
-                        <li><strong>unauthorized:</strong> Authentication required (401).</li>
-                        <li><strong>forbidden:</strong> Not authorized (403).</li>
-                        <li><strong>not_found:</strong> Resource not found (404).</li>
-                        <li><strong>conflict:</strong> Conflict, e.g., reused idempotency key (409).</li>
-                        <li><strong>idempotency_key_reused:</strong> Idempotency key already used.</li>
-                        <li><strong>product_unavailable:</strong> Item not available.</li>
-                        <li><strong>delivery_address_invalid:</strong> Invalid address for delivery.</li>
-                        <li><strong>payment_failed:</strong> Payment processing failed.</li>
-                        <li><strong>server_error:</strong> Unexpected server error (500).</li>
-                    </ul>
-                </section>
-            </div>
+            <!-- Future Direction -->
+            <section id="future-direction">
+                <h2>Future Direction</h2>
 
-            <div class="content-section">
-                <section id="authentication">
-                    <h2>Authentication</h2>
-                    <p>OCS uses Bearer token authentication for protected endpoints.</p>
+                <p>OCS is a living standard. The future direction includes:</p>
 
-                    <h3>Bearer Tokens</h3>
-                    <p>Include the token in the Authorization header:</p>
-                    <pre><code>Authorization: Bearer &lt;token&gt;</code></pre>
-                    <p>Token formats (JWT, API keys, etc.) are server-specific. Discovery endpoints are public; others require auth.</p>
+                <ul>
+                    <li><strong>A Richer Capability Library:</strong> Developing more standard schemas for concepts like <span class="inline-code">product.reviews</span>, <span class="inline-code">order.returns</span>, and <span class="inline-code">service.bookings</span>.</li>
+                    <li><strong>Alternative Transport Layers:</strong> Exploring implementations over transports beyond HTTP, such as asynchronous message queues or other protocols.</li>
+                    <li><strong>Tooling and SDKs:</strong> Fostering a community to build server middleware and client libraries that make implementing OCS trivial.</li>
+                    <li><strong>Authentication Capabilities:</strong> Defining standard capabilities for advertising supported authentication methods (e.g., <span class="inline-code">dev.ocs.auth.oauth2.pkce@1.0</span>).</li>
+                </ul>
+            </section>
 
-                    <h3>Token Acquisition</h3>
-                    <p>The method to obtain tokens is implementation-dependent. It may be discoverable via capabilities (e.g., dev.ocs.auth.oauth2.pkce@1.0).</p>
+            <!-- Contributing -->
+            <section id="contributing">
+                <h2>Contributing</h2>
 
-                    <h3>Security</h3>
-                    <p>Use HTTPS for all requests. Tokens should be kept secure and not logged.</p>
-                </section>
-            </div>
+                <p>This is an open standard, and contributions are welcome. Please open an issue or pull request to suggest changes, propose new standard capability modules, or report any issues.</p>
 
-            <div class="content-section">
-                <section id="x402-integration">
-                    <h2>x402 Integration Guide</h2>
-                    <p>OCS integrates the x402 Protocol for web3-native payments.</p>
+                <div class="info-box">
+                    <strong>Get Involved</strong>
+                    Join the community in building the future of open commerce. Your feedback and contributions help make OCS better for everyone.
+                </div>
+            </section>
 
-                    <h3>Payment Flow</h3>
-                    <ol>
-                        <li>Client places order (POST /orders).</li>
-                        <li>If payment required, server responds 402 with payment requirements.</li>
-                        <li>Client authorizes payment, signs, and retries with X-PAYMENT header.</li>
-                        <li>Server verifies and settles; returns order with X-PAYMENT-RESPONSE.</li>
-                    </ol>
+            <!-- License -->
+            <section id="license">
+                <h2>License</h2>
 
-                    <h3>Key Headers</h3>
-                    <ul>
-                        <li><strong>X-PAYMENT:</strong> Base64-encoded PaymentPayload</li>
-                        <li><strong>X-PAYMENT-RESPONSE:</strong> Base64-encoded SettlementResponse</li>
-                    </ul>
+                <p>The Open Commerce Standard is open-source and available under the <strong>MIT License</strong>.</p>
 
-                    <h3>Schemes</h3>
-                    <p>Supports 'exact' scheme for direct payments.</p>
-
-                    <p>See <a href="https://github.com/coinbase/x402">x402 Protocol</a> for details.</p>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="glossary">
-                    <h2>Glossary</h2>
-                    <dl>
-                        <dt>Capability</dt>
-                        <dd>A feature or extension supported by the server, discoverable via /capabilities.</dd>
-                        
-                        <dt>Fulfillment Type</dt>
-                        <dd>How an item is delivered: pickup, physical, or digital.</dd>
-                        
-                        <dt>Idempotency Key</dt>
-                        <dd>A unique key to prevent duplicate requests.</dd>
-                        
-                        <dt>Metadata</dt>
-                        <dd>Extensible key-value pairs for custom data, validated by schemas.</dd>
-                        
-                        <dt>SSE</dt>
-                        <dd>Server-Sent Events for real-time updates.</dd>
-                        
-                        <dt>x402</dt>
-                        <dd>Protocol for web3 payments integrated into OCS.</dd>
-                    </dl>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="best-practices">
-                    <h2>Best Practices</h2>
-                    <ul>
-                        <li>Always call /capabilities first to discover features.</li>
-                        <li>Use Idempotency-Key for all state-changing requests.</li>
-                        <li>Handle metadata dynamically based on schemas.</li>
-                        <li>Implement graceful degradation for missing capabilities.</li>
-                        <li>Use HTTPS and secure token storage.</li>
-                        <li>Subscribe to SSE for order updates.</li>
-                        <li>Validate responses against schemas.</li>
-                    </ul>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="version-history">
-                    <h2>Version History</h2>
-                    <h3>1.0.0 (Active)</h3>
-                    <p>Initial release of OCS 1.0.0.</p>
-                    <ul>
-                        <li>Core API for discovery, carts, orders.</li>
-                        <li>Capability discovery and metadata system.</li>
-                        <li>x402 payment integration.</li>
-                        <li>SSE for real-time updates.</li>
-                    </ul>
-                    <p>Future versions will add more capabilities and features.</p>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="implementation-guide">
-                    <h2>Implementation Guide</h2>
-                    
-                    <h3>Building an OCS Server</h3>
-                    <p>To implement OCS on the server side:</p>
-                    <ol>
-                        <li><strong>Set up core endpoints:</strong> Implement /capabilities, /restaurants, /menus, /carts, and /orders with proper schemas.</li>
-                        <li><strong>Add capability discovery:</strong> Define supported capabilities in /capabilities with schema URLs for metadata.</li>
-                        <li><strong>Handle metadata:</strong> Use structured metadata for custom data, linked to JSON Schemas.</li>
-                        <li><strong>Integrate payments:</strong> Use x402 for web3 payments, handling 402 responses.</li>
-                        <li><strong>Enable real-time updates:</strong> Implement SSE on /orders/{id}/updates for order status changes.</li>
-                        <li><strong>Ensure security:</strong> Use Bearer auth, HTTPS, and idempotency keys.</li>
-                    </ol>
-
-                    <h3>Building an OCS Client</h3>
-                    <p>To build a client that works with any OCS server:</p>
-                    <ol>
-                        <li><strong>Discover capabilities:</strong> Always start with GET /capabilities to learn what the server supports.</li>
-                        <li><strong>Adapt to features:</strong> Use capability IDs to enable UI elements and parse metadata.</li>
-                        <li><strong>Manage state:</strong> Handle carts, items, and orders with proper error handling.</li>
-                        <li><strong>Process payments:</strong> Implement x402 flow for seamless transactions.</li>
-                        <li><strong>Subscribe to updates:</strong> Use SSE for real-time order tracking.</li>
-                        <li><strong>Validate data:</strong> Check responses against schemas for reliability.</li>
-                    </ol>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="troubleshooting">
-                    <h2>Troubleshooting</h2>
-                    
-                    <h3>Common Issues and Solutions</h3>
-                    <ul>
-                        <li><strong>Client can't adapt:</strong> Ensure GET /capabilities is called first and responses are parsed correctly.</li>
-                        <li><strong>Metadata errors:</strong> Validate metadata against the schema URL from capabilities.</li>
-                        <li><strong>Payment failures:</strong> Check x402 implementation; ensure correct payload and headers.</li>
-                        <li><strong>SSE not connecting:</strong> Verify server sends 'text/event-stream' and proper event format.</li>
-                        <li><strong>Idempotency conflicts:</strong> Use unique keys for retries; avoid reusing for different requests.</li>
-                        <li><strong>Authentication issues:</strong> Confirm Bearer token format and server auth method.</li>
-                    </ul>
-
-                    <h3>Debugging Tips</h3>
-                    <ul>
-                        <li>Use tools like Postman for API testing.</li>
-                        <li>Check server logs for errors.</li>
-                        <li>Refer to the OpenAPI spec for exact schemas.</li>
-                        <li>Join the community for help.</li>
-                    </ul>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="resources">
-                    <h2>Resources</h2>
-                    <ul>
-                        <li><strong>OpenAPI Spec:</strong> <a href="./src/spec.yaml">Full API definition</a></li>
-                        <li><strong>README:</strong> <a href="./README.md">Detailed guide</a></li>
-                        <li><strong>x402 Protocol:</strong> <a href="https://github.com/coinbase/x402">Web3 payments</a></li>
-                        <li><strong>GitHub Repo:</strong> <a href="https://github.com/doeixd/Open-Commerce-Standard">Source and issues</a></li>
-                        <li><strong>JSON Schema:</strong> <a href="https://json-schema.org">Metadata validation</a></li>
-                        <li><strong>HTTP Standards:</strong> <a href="https://tools.ietf.org/html/rfc7231">Core protocols</a></li>
-                    </ul>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="how-it-works">
-                    <h2>How It Works</h2>
-                    <p>OCS uses a straightforward process:</p>
-                    <ol>
-                        <li><strong>Discover:</strong> Call <code>GET /capabilities</code> to learn server features.</li>
-                        <li><strong>Shop:</strong> Browse catalogs, build carts, and order.</li>
-                        <li><strong>Track:</strong> Get real-time updates via SSE.</li>
-                        <li><strong>Pay:</strong> Process with x402 for smooth, programmable payments.</li>
-                    </ol>
-                    <p>Extra details go in <code>metadata</code>, keeping the core simple and expandable.</p>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="use-cases">
-                    <h2>Use Cases</h2>
-                    <ul>
-                        <li><strong>E-Commerce Platforms:</strong> Build adaptive shopping apps that work with any vendor's API.</li>
-                        <li><strong>AI Agents:</strong> Enable autonomous purchasing and service access without human intervention.</li>
-                        <li><strong>Micropayments:</strong> Charge per API call, content access, or data query at blockchain speed.</li>
-                        <li><strong>Marketplaces:</strong> Create interoperable ecosystems where clients discover and transact with multiple providers.</li>
-                        <li><strong>Subscription Alternatives:</strong> Offer usage-based models with instant, reversible payments.</li>
-                    </ul>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="capabilities">
-                    <h2>Standard Capabilities</h2>
-                    <p>OCS defines optional capabilities for enhanced functionality:</p>
-                    <ul>
-                        <li><strong>Product Variants:</strong> User-selectable options like size and color (<a href="./schemas/product/variants/v1.json">Schema</a>).</li>
-                        <li><strong>Shipment Tracking:</strong> Real-time tracking details for orders (<a href="./schemas/order/shipment_tracking/v1.json">Schema</a>).</li>
-                        <li><strong>Digital Access:</strong> Download links and access codes for digital goods (<a href="./schemas/order/digital_access/v1.json">Schema</a>).</li>
-                        <li><strong>Physical Properties:</strong> Weight and dimensions for shipping (<a href="./schemas/product/physical_properties/v1.json">Schema</a>).</li>
-                    </ul>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="documentation">
-                    <h2>Reference & Documentation</h2>
-                    <p>Explore the full OCS ecosystem:</p>
-                    <ul>
-                        <li><strong>README:</strong> Comprehensive guide with examples and implementation notes (<a href="./README.md">View</a>).</li>
-                        <li><strong>OpenAPI Specification:</strong> Complete API reference in YAML format (<a href="./src/spec.yaml">View</a>).</li>
-                        <li><strong>Capability Schemas:</strong> JSON Schemas for metadata validation (see <a href="#capabilities">above</a> for links).</li>
-                        <li><strong>x402 Protocol:</strong> External docs for web3 payment integration (<a href="https://github.com/coinbase/x402">GitHub</a>).</li>
-                        <li><strong>Package Info:</strong> NPM package details and scripts (<a href="./package.json">View</a>).</li>
-                        <li><strong>License:</strong> MIT license for open use (<a href="./LICENSE">View</a>).</li>
-                    </ul>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="getting-started">
-                    <h2>Getting Started</h2>
-                    <p>Ready to implement OCS?</p>
-                    <ol>
-                        <li><strong>Review the Spec:</strong> Start with the <a href="./src/spec.yaml">OpenAPI Specification</a> for endpoint details.</li>
-                        <li><strong>Learn the Basics:</strong> Read the <a href="./README.md">README</a> for guides, examples, and best practices.</li>
-                        <li><strong>Implement Core:</strong> Begin with discovery and cart/order endpoints.</li>
-                        <li><strong>Add Payments:</strong> Integrate x402 via <a href="https://github.com/coinbase/x402">Coinbase's docs</a>.</li>
-                        <li><strong>Extend with Capabilities:</strong> Use metadata and schemas for advanced features.</li>
-                    </ol>
-                    <p>Join the community for support and contributions!</p>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="guide">
-                    <h2>Step-by-Step Guide</h2>
-                    <p>This guide walks you through OCS from basics to advanced implementation. Start simple and build up.</p>
-                    
-                    <ul class="toc">
-                        <li><a href="#step1">Step 1: Understand the Basics</a></li>
-                        <li><a href="#step2">Step 2: Discover Server Capabilities</a></li>
-                        <li><a href="#step3">Step 3: Browse Catalogs</a></li>
-                        <li><a href="#step4">Step 4: Manage Carts</a></li>
-                        <li><a href="#step5">Step 5: Place Orders</a></li>
-                        <li><a href="#step6">Step 6: Handle Metadata & Capabilities</a></li>
-                        <li><a href="#step7">Step 7: Integrate Payments (Advanced)</a></li>
-                        <li><a href="#step8">Step 8: Build Adaptive Clients (Advanced)</a></li>
-                        <li><a href="#step9">Step 9: Extend & Contribute</a></li>
-                    </ul>
-
-                    <h3 id="step1">Step 1: Understand the Basics</h3>
-                    <p>OCS is an HTTP API for commerce. Key concepts:</p>
-                    <ul>
-                        <li><strong>Vendors & Menus:</strong> Vendors have menus with items (products).</li>
-                        <li><strong>Carts & Orders:</strong> Add items to carts, then place orders.</li>
-                        <li><strong>Fulfillment Types:</strong> Items are <code>physical</code>, <code>digital</code>, or <code>pickup</code>.</li>
-                        <li><strong>Metadata:</strong> Extra data lives here, validated by schemas.</li>
-                    </ul>
-                    <p>Read the <a href="#introduction">Introduction</a> and <a href="./README.md">README</a> for more.</p>
-
-                    <h3 id="step2">Step 2: Discover Server Capabilities</h3>
-                    <p>Always start with <code>GET /capabilities</code>. This endpoint lists supported features and schema URLs.</p>
-                    <p>Example response:</p>
-                    <pre><code class="language-json">{
-  "capabilities": [
-    {
-      "id": "dev.ocs.product.variants@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/product/variants/v1.json"
-    }
-  ]
-}</code></pre>
-                    <p>This tells clients what metadata to expect. Without it, clients can't adapt.</p>
-
-                    <h3 id="step3">Step 3: Browse Catalogs</h3>
-                    <p>Use <code>GET /restaurants</code> to list vendors, then <code>GET /menus?restaurantId=...</code> for catalogs.</p>
-                    <p>Each menu item has <code>id</code>, <code>name</code>, <code>price</code>, <code>fulfillmentType</code>, and optional <code>metadata</code>.</p>
-                    <p>Tip: Check <code>available</code> flag before adding to cart.</p>
-
-                    <h3 id="step4">Step 4: Manage Carts</h3>
-                    <p>Create a cart with <code>POST /carts</code> (provide <code>restaurantId</code>).</p>
-                    <p>Add items: <code>POST /carts/{cartId}/items</code> with <code>itemId</code>, <code>quantity</code>, etc.</p>
-                    <p>Update or remove via <code>PATCH/DELETE /carts/{cartId}/items/{itemId}</code>.</p>
-                    <p>Get cart state anytime with <code>GET /carts/{cartId}</code>.</p>
-
-                    <h3 id="step5">Step 5: Place Orders</h3>
-                    <p>When ready, <code>POST /orders</code> with <code>cartId</code>, <code>orderType</code> (pickup/delivery), and address if needed.</p>
-                    <p>For payments: If 402 returned, retry with x402 payload in <code>X-PAYMENT</code> header.</p>
-                    <p>Success returns order details; subscribe to <code>GET /orders/{id}/updates</code> for SSE updates.</p>
-
-                    <h3 id="step6">Step 6: Handle Metadata & Capabilities</h3>
-                    <p>For variants: Use <code>dev.ocs.product.variants@1.0</code> metadata to show options.</p>
-                    <p>Example: Display size/color selectors based on <code>options</code> and <code>variants</code> arrays.</p>
-                    <p>Validate metadata against schemas to ensure compatibility.</p>
-
-                    <h3 id="step7">Step 7: Integrate Payments (Advanced)</h3>
-                    <p>Set up x402: Use a facilitator (e.g., Coinbase's) to verify and settle payments.</p>
-                    <p>Handle 402 responses: Prompt user for payment, sign authorization, retry.</p>
-                    <p>Supports USDC on Base/Ethereum; gasless for clients.</p>
-
-                    <h3 id="step8">Step 8: Build Adaptive Clients (Advanced)</h3>
-                    <p>Don't hardcode features. Always check capabilities and handle missing ones gracefully.</p>
-                    <p>Example: If no variants, show basic product; if no tracking, skip update subscription.</p>
-                    <p>Use Bearer auth for protected endpoints.</p>
-
-                    <h3 id="step9">Step 9: Extend & Contribute</h3>
-                    <p>Propose new capabilities via GitHub issues. Define JSON schemas and add to the standard.</p>
-                    <p>Test with multiple servers to ensure interoperability.</p>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="roadmap">
-                    <h2>Roadmap</h2>
-                    <p>OCS is growing fast. Here's the plan:</p>
-                    
-                    <h3>Q1 2025: Core Improvements</h3>
-                    <ul>
-                        <li>Capabilities for reviews, ratings, returns, and service bookings</li>
-                    </ul>
-                    
-                    <h3>Q2 2025: Developer Tools</h3>
-                    <ul>
-                        <li>SDKs for Node.js and Python</li>
-                        <li>Middleware for Express and Django</li>
-                        <li>Libraries for React and Vue</li>
-                    </ul>
-                    
-                    <h3>Q3 2025: Advanced Options</h3>
-                    <ul>
-                        <li>WebSocket for updates, GraphQL support, AI guides</li>
-                    </ul>
-                    
-                    <h3>Q4 2025: Community Expansion</h3>
-                    <ul>
-                        <li>Hackathons, certifications, and showcases</li>
-                    </ul>
-                    
-                    <p>Check back for progress!</p>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="contributing">
-                    <h2>Contributing</h2>
-                    <p>OCS is an open standard. Contributions are welcome! Open issues or pull requests on <a href="https://github.com/doeixd/Open-Commerce-Standard">GitHub</a> to propose new capabilities or improvements.</p>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="faq">
-                    <h2>Frequently Asked Questions</h2>
-                    
-                    <h3>What makes OCS different from existing APIs like Stripe or Shopify?</h3>
-                    <p>OCS is a standard, not a platform. It defines how clients and servers communicate, allowing interoperability. Unlike proprietary APIs, OCS enables universal clients that work with any compliant server.</p>
-                    
-                    <h3>Is OCS only for restaurants?</h3>
-                    <p>No, OCS evolved from restaurant standards but generalizes to all commerce: physical goods, digital services, and in-store pickup.</p>
-                    
-                    <h3>How do I handle authentication?</h3>
-                    <p>Use Bearer tokens. Servers may support JWT, API keys, etc. Discover via capabilities if needed.</p>
-                    
-                    <h3>What if a server doesn't support a capability I need?</h3>
-                    <p>Fall back to basic features. OCS is designed for graceful degradation.</p>
-                    
-                    <h3>Can I use OCS for micropayments?</h3>
-                    <p>Yes, with x402 integration, OCS supports instant, low-fee payments for any transaction size.</p>
-                    
-                    <h3>How do I contribute to OCS?</h3>
-                    <p>Open issues or PRs on GitHub. Propose new capabilities with JSON schemas.</p>
-                    
-                    <h3>How does OCS handle different currencies?</h3>
-                    <p>Prices use the Money schema with amount (string) and currency (ISO code). Clients handle conversions.</p>
-                    
-                    <h3>Can OCS support subscriptions or recurring payments?</h3>
-                    <p>Not in core, but metadata can extend for subscriptions via custom capabilities.</p>
-                    
-                    <h3>What if my business needs custom features?</h3>
-                    <p>Use metadata and define new capabilities with schemas for extensibility.</p>
-                    
-                    <h3>How secure is OCS?</h3>
-                    <p>Uses HTTPS, Bearer tokens, and standard practices. Security depends on implementation.</p>
-                    
-                    <h3>Can I use OCS for non-commerce apps?</h3>
-                    <p>Possible, but designed for commerce; adapt metadata for other uses.</p>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="community">
-                    <h2>Community</h2>
-                    <p>Join the OCS community to discuss, contribute, and stay updated.</p>
-                    <ul>
-                        <li><strong>GitHub:</strong> <a href="https://github.com/doeixd/Open-Commerce-Standard">Repository and Issues</a></li>
-                        <li><strong>Discussions:</strong> <a href="https://github.com/doeixd/Open-Commerce-Standard/discussions">GitHub Discussions</a></li>
-                        <li><strong>Slack:</strong> Join our Slack workspace (link TBD)</li>
-                        <li><strong>Newsletter:</strong> Subscribe for updates (coming soon)</li>
-                    </ul>
-                </section>
-            </div>
-
-            <div class="content-section">
-                <section id="tools-libraries">
-                    <h2>Tools and Libraries</h2>
-                    <p>Accelerate your OCS implementation with these tools:</p>
-                    
-                    <h3>Official SDKs</h3>
-                    <ul>
-                        <li><strong>ocs-js:</strong> Node.js SDK for server and client development (Coming soon)</li>
-                        <li><strong>ocs-python:</strong> Python SDK with async support (Coming soon)</li>
-                    </ul>
-                    
-                    <h3>Middleware</h3>
-                    <ul>
-                        <li><strong>ocs-express:</strong> Express.js middleware for quick server setup (Coming soon)</li>
-                        <li><strong>ocs-django:</strong> Django integration package (Coming soon)</li>
-                    </ul>
-                    
-                    <h3>Client Libraries</h3>
-                    <ul>
-                        <li><strong>ocs-react:</strong> React hooks for building adaptive clients (Coming soon)</li>
-                        <li><strong>ocs-vue:</strong> Vue.js composables for OCS integration (Coming soon)</li>
-                    </ul>
-                    
-                    <p>More coming soon. Check the <a href="#community">Community</a> section for updates.</p>
-                </section>
-            </div>
+                <div class="card">
+                    <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.</p>
+                </div>
+            </section>
         </main>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Open Commerce Standard. Licensed under <a href="./LICENSE">MIT</a>. | <a href="./README.md">README</a> | <a href="./src/spec.yaml">API Spec</a> | <a href="https://github.com/doeixd/Open-Commerce-Standard">View on GitHub</a> | <a href="https://github.com/coinbase/x402">x402 Protocol</a></p>
-    </footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
     <script>
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     
-                    // Update active nav link
-                    document.querySelectorAll('.nav-link').forEach(link => {
-                        link.classList.remove('active');
-                    });
-                    
-                    const navLink = document.querySelector(`.nav-link[href="${this.getAttribute('href')}"]`);
-                    if (navLink) {
-                        navLink.classList.add('active');
-                    }
+                    // Update active state
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
                 }
             });
         });
 
-        // Highlight active section on scroll
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.getAttribute('id');
-                    document.querySelectorAll('.nav-link').forEach(link => {
-                        link.classList.remove('active');
-                    });
-                    const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
-                    if (activeLink) {
-                        activeLink.classList.add('active');
-                    }
+        // Update active navigation on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
                 }
             });
-        }, { threshold: 0.5 });
 
-        document.querySelectorAll('section[id]').forEach(section => {
-            observer.observe(section);
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
 </body>
