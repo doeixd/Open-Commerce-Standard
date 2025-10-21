@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Open Commerce Standard (OCS) - Documentation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
     <style>
         * {
             margin: 0;
@@ -160,7 +161,8 @@
             margin-left: var(--sidebar-width);
             flex: 1;
             padding: 3rem;
-            max-width: 1200px;
+            max-width: 88ch;
+            margin-inline: auto;
         }
 
         /* Typography */
@@ -184,7 +186,7 @@
         }
 
         h3 {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             margin-top: 2rem;
         }
 
@@ -1823,7 +1825,7 @@ data: [
                 <p>OCS uses Bearer token authentication for all protected endpoints.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>Authorization: Bearer &lt;token&gt;</pre></div>
+                <div class="code-block"><pre><code class="language-text">Authorization: Bearer &lt;token&gt;</code></pre></div>
                 </div>
 
                 <div class="info-box">
@@ -1839,8 +1841,8 @@ data: [
                 <p>All API requests and responses use the custom media type <span class="inline-code">application/ocs+json; version=1.0</span>. Clients should set the <span class="inline-code">Accept</span> and <span class="inline-code">Content-Type</span> headers accordingly:</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>Accept: application/ocs+json; version=1.0
-Content-Type: application/ocs+json; version=1.0</pre></div>
+                <div class="code-block"><pre><code class="language-text">Accept: application/ocs+json; version=1.0
+Content-Type: application/ocs+json; version=1.0</code></pre></div>
                 </div>
             </section>
 
@@ -1850,47 +1852,47 @@ Content-Type: application/ocs+json; version=1.0</pre></div>
 
                 <h3>Money</h3>
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>{
-  "amount": "12.99",
-  "currency": "USD"
-}</pre></div>
+                <div class="code-block"><pre><code class="language-json">{
+                "amount": "12.99",
+                "currency": "USD"
+}</code></pre></div>
                 </div>
 
                 <h3>Location</h3>
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>{
-  "address": "123 Main St, City, State 12345",
-  "latitude": 37.7749,
-  "longitude": -122.4194
-}</pre></div>
+                <div class="code-block"><pre><code class="language-json">{
+                "address": "123 Main St, City, State 12345",
+                "latitude": 37.7749,
+                "longitude": -122.4194
+}</code></pre></div>
                 </div>
 
                 <h3>MenuItem</h3>
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>{
-  "id": "item_123",
-  "name": "Product Name",
-  "description": "Product description",
-  "price": { "amount": "29.99", "currency": "USD" },
-  "available": true,
-  "fulfillmentType": "physical",
-  "metadata": {}
-}</pre></div>
+                <div class="code-block"><pre><code class="language-json">{
+                "id": "item_123",
+                "name": "Product Name",
+                "description": "Product description",
+                "price": { "amount": "29.99", "currency": "USD" },
+                "available": true,
+                "fulfillmentType": "physical",
+                "metadata": {}
+}</code></pre></div>
                 </div>
 
                 <h3>Order</h3>
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>{
-  "id": "order_123",
-  "status": "confirmed",
-  "items": [...],
-  "total": { "amount": "59.98", "currency": "USD" },
-  "orderType": "delivery",
-  "deliveryAddress": {...},
-  "createdAt": "2025-01-15T10:30:00Z",
-  "updatedAt": "2025-01-15T10:35:00Z",
-  "metadata": {}
-}</pre></div>
+                <div class="code-block"><pre><code class="language-json">{
+                "id": "order_123",
+                "status": "confirmed",
+                "items": [...],
+                "total": { "amount": "59.98", "currency": "USD" },
+                "orderType": "delivery",
+                "deliveryAddress": {...},
+                "createdAt": "2025-01-15T10:30:00Z",
+                "updatedAt": "2025-01-15T10:35:00Z",
+                "metadata": {}
+}</code></pre></div>
                 </div>
             </section>
 
@@ -1996,16 +1998,16 @@ Content-Type: application/ocs+json; version=1.0</pre></div>
 
                 <h3>Error Response Format</h3>
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>{
-  "code": "product_unavailable",
-  "message": "The requested product is currently out of stock",
-  "details": [
-    {
-      "field": "itemId",
-      "issue": "Product 'prod_123' has 0 stock remaining"
-    }
-  ]
-}</pre></div>
+                <div class="code-block"><pre><code class="language-json">{
+                "code": "product_unavailable",
+                "message": "The requested product is currently out of stock",
+                "details": [
+                {
+                "field": "itemId",
+                "issue": "Product 'prod_123' has 0 stock remaining"
+                }
+                ]
+}</code></pre></div>
                 </div>
             </section>
 
@@ -2119,7 +2121,9 @@ Content-Type: application/ocs+json; version=1.0</pre></div>
                     link.classList.add('active');
                 }
             });
-        });
-    </script>
+            });
+            </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>
 </html>
