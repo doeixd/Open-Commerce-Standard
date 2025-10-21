@@ -489,6 +489,7 @@
                 <div class="nav-section-title">Getting Started</div>
                 <a href="#introduction" class="nav-link">Introduction</a>
                 <a href="#overview" class="nav-link">Overview & FAQ</a>
+                <a href="#philosophy" class="nav-link">Philosophy</a>
                 <a href="#getting-started" class="nav-link">Getting Started</a>
                 <a href="#key-features" class="nav-link">Key Features</a>
             </div>
@@ -582,6 +583,410 @@
                     <p>API providers monetizing digital commerce, client developers building universal shopping apps, and AI agents requiring autonomous transactions.</p>
                 </div>
             </section>
+
+            <!-- Philosophy Section -->
+            <section id="philosophy">
+                <h2>Understanding OCS: The Philosophy Behind a Minimal Commerce Standard</h2>
+
+                <div class="card">
+                    <p style="font-size: 1.125rem; line-height: 1.8; color: var(--text-primary);">
+                        Let's talk about why OCS exists and why it works the way it does. If you've ever tried to integrate with multiple e-commerce APIs, you know the pain: every platform has its own way of doing things, its own quirks, its own special fields. Building a universal shopping app? Good luck—you'll be writing custom code for every single vendor.
+                    </p>
+                </div>
+
+                <h3>The Problem: Commerce APIs Are a Mess</h3>
+
+                <p>Here's the thing: commerce is actually pretty simple at its core. You have <strong>products</strong>, customers put them in a <strong>cart</strong>, and then they place an <strong>order</strong>. That's it. But somehow, every API makes this complicated in its own special way.</p>
+
+                <p>Some APIs have 47 fields on a product object "just in case." Others require you to make 6 API calls just to figure out if something is in stock. And don't even get me started on trying to build a client that works with multiple vendors—it's a nightmare of if-statements and special cases.</p>
+
+                <h3>The OCS Philosophy: Minimal by Default, Complex by Choice</h3>
+
+                <p>OCS takes a different approach. Instead of trying to predict every possible feature you might need and cramming it all into the core API, we keep the core <em>ridiculously simple</em>. Then we give you a way to discover and extend it when you need more.</p>
+
+                <div class="info-box">
+                    <strong>Core Principle</strong>
+                    The base API should be so simple that you can understand it in 10 minutes. Everything else should be discoverable and optional.
+                </div>
+
+                <p>This means:</p>
+                <ul>
+                    <li>A product is just a product—name, price, availability. That's it.</li>
+                    <li>Need variants (sizes, colors)? That's in <span class="inline-code">metadata</span>, and you discover it via capabilities.</li>
+                    <li>Need shipping tracking? Also in <span class="inline-code">metadata</span>, also discoverable.</li>
+                    <li>Building a simple client? You can ignore all the fancy stuff and just work with the basics.</li>
+                    <li>Building a sophisticated client? You can discover and adapt to every feature the server supports.</li>
+                </ul>
+
+                <h3>Let's Build Something: Your First OCS Client</h3>
+
+                <p>Enough theory. Let's write some code. I'm going to walk you through building a simple client that browses a menu and places an order. We'll use plain JavaScript and <span class="inline-code">fetch</span>—no frameworks, no magic.</p>
+
+                <h4>Step 1: Discover What the Server Can Do</h4>
+
+                <p>Every OCS interaction starts the same way: ask the server what it supports. This is like walking into a restaurant and asking for the menu before you order.</p>
+
+                <div class="code-block"><pre>// First, let's see what this server can do
+const API_BASE = 'https://api.example.com';
+const AUTH_TOKEN = 'your_token_here'; // You'd get this from your auth flow
+
+async function discoverCapabilities() {
+  const response = await fetch(`${API_BASE}/capabilities`, {
+    headers: {
+      'Accept': 'application/ocs+json; version=1.0'
+    }
+  });
+  
+  const data = await response.json();
+  console.log('Server capabilities:', data.capabilities);
+  return data.capabilities;
+}
+
+// Let's call it
+const capabilities = await discoverCapabilities();
+
+// Output might look like:
+// [
+//   { id: "dev.ocs.product.variants@1.0", schemaUrl: "..." },
+//   { id: "dev.ocs.order.shipment_tracking@1.0", schemaUrl: "..." }
+// ]</pre></div>
+
+                <p>See what we did there? We now know this server supports product variants and shipment tracking. We can use this information to enable features in our UI. No hardcoding, no guessing.</p>
+
+                <h4>Step 2: Browse the Menu</h4>
+
+                <p>Now let's get the actual products. In OCS, products live in "menus" (we use restaurant terminology because it's universal, but this works for any kind of commerce).</p>
+
+                <div class="code-block"><pre>// First, let's see what menus are available
+async function getMenus() {
+  const response = await fetch(`${API_BASE}/menus`, {
+    headers: {
+      'Accept': 'application/ocs+json; version=1.0'
+    }
+  });
+  
+  return await response.json();
+}
+
+// Get the first menu's details
+async function getMenu(menuId) {
+  const response = await fetch(`${API_BASE}/menus/${menuId}`, {
+    headers: {
+      'Accept': 'application/ocs+json; version=1.0'
+    }
+  });
+  
+  return await response.json();
+}
+
+// Let's use it
+const menus = await getMenus();
+const menu = await getMenu(menus[0].id);
+
+console.log('Products:', menu.items);
+
+// Each item looks like:
+// {
+//   id: "item_123",
+//   name: "Classic T-Shirt",
+//   price: { amount: "25.00", currency: "USD" },
+//   available: true,
+//   fulfillmentType: "physical"
+// }</pre></div>
+
+                <p>Notice how clean this is? A product is just a product. Name, price, availability. If you're building a simple client, you're done—just show these to the user.</p>
+
+                <h4>Step 3: Understanding Items and Metadata</h4>
+
+                <p>But what if a product has variants, like different sizes? This is where OCS gets clever. Instead of adding a <span class="inline-code">variants</span> field to every product (even ones that don't need it), we use <span class="inline-code">metadata</span>.</p>
+
+                <div class="code-block"><pre>// A product with variants looks like this:
+const tshirt = {
+  id: "prod_123",
+  name: "Classic T-Shirt",
+  price: { amount: "25.00", currency: "USD" },
+  available: true,
+  fulfillmentType: "physical",
+  metadata: {
+    // This key matches a capability we discovered earlier!
+    "dev.ocs.product.variants@1.0": {
+      options: ["Size", "Color"],
+      variants: [
+        {
+          id: "var_large_black",
+          values: ["Large", "Black"],
+          price: { amount: "25.00", currency: "USD" },
+          stock: 42
+        },
+        {
+          id: "var_medium_white",
+          values: ["Medium", "White"],
+          price: { amount: "25.00", currency: "USD" },
+          stock: 15
+        }
+      ]
+    }
+  }
+};
+
+// In your client, you check if the capability exists:
+function hasVariants(item, capabilities) {
+  const variantCapability = capabilities.find(
+    cap => cap.id === "dev.ocs.product.variants@1.0"
+  );
+  
+  return variantCapability && 
+         item.metadata?.["dev.ocs.product.variants@1.0"];
+}
+
+// Then render accordingly:
+if (hasVariants(tshirt, capabilities)) {
+  // Show size/color picker
+  const variants = tshirt.metadata["dev.ocs.product.variants@1.0"];
+  console.log('Available options:', variants.options);
+  console.log('Available variants:', variants.variants);
+} else {
+  // Just show a simple "Add to Cart" button
+  console.log('Simple product, no variants');
+}</pre></div>
+
+                <p>This is the magic of OCS. Your client adapts to what the server supports. If variants exist, you show them. If not, you don't. No special cases, no brittle code.</p>
+
+                <h4>Step 4: Creating a Cart and Adding Items</h4>
+
+                <p>Alright, the user wants to buy something. Let's create a cart and add an item to it.</p>
+
+                <div class="code-block"><pre>// Create a new cart
+async function createCart() {
+  const response = await fetch(`${API_BASE}/carts`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AUTH_TOKEN}`,
+      'Content-Type': 'application/ocs+json; version=1.0',
+      'Accept': 'application/ocs+json; version=1.0'
+    },
+    body: JSON.stringify({
+      restaurantId: 'store_123' // Which store/vendor
+    })
+  });
+  
+  return await response.json();
+}
+
+// Add an item to the cart
+async function addToCart(cartId, itemId, quantity = 1, variantId = null) {
+  const body = {
+    itemId: itemId,
+    quantity: quantity
+  };
+  
+  // If the user selected a variant, include it
+  if (variantId) {
+    body.variantId = variantId;
+  }
+  
+  const response = await fetch(`${API_BASE}/carts/${cartId}/items`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AUTH_TOKEN}`,
+      'Content-Type': 'application/ocs+json; version=1.0',
+      'Accept': 'application/ocs+json; version=1.0',
+      'Idempotency-Key': crypto.randomUUID() // Prevent duplicate adds
+    },
+    body: JSON.stringify(body)
+  });
+  
+  return await response.json();
+}
+
+// Let's use it
+const cart = await createCart();
+console.log('Created cart:', cart.id);
+
+// Add a specific variant to the cart
+await addToCart(cart.id, 'prod_123', 1, 'var_large_black');
+console.log('Added item to cart!');</pre></div>
+
+                <p>Notice the <span class="inline-code">Idempotency-Key</span> header? This is important. If the network hiccups and you retry the request, the server won't add the item twice. This is the kind of detail OCS gets right.</p>
+
+                <h4>Step 5: Placing an Order</h4>
+
+                <p>The user is ready to check out. Let's place the order.</p>
+
+                <div class="code-block"><pre>// Place an order
+async function placeOrder(cartId, orderType, deliveryAddress = null) {
+  const body = {
+    cartId: cartId,
+    orderType: orderType // "delivery", "pickup", or "digital"
+  };
+  
+  // If it's a delivery order, include the address
+  if (orderType === 'delivery' && deliveryAddress) {
+    body.deliveryAddress = deliveryAddress;
+  }
+  
+  const response = await fetch(`${API_BASE}/orders`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AUTH_TOKEN}`,
+      'Content-Type': 'application/ocs+json; version=1.0',
+      'Accept': 'application/ocs+json; version=1.0',
+      'Idempotency-Key': crypto.randomUUID()
+    },
+    body: JSON.stringify(body)
+  });
+  
+  // Check if payment is required
+  if (response.status === 402) {
+    // Server needs payment via x402 protocol
+    const paymentInfo = await response.json();
+    console.log('Payment required:', paymentInfo);
+    // Handle x402 payment flow here...
+    return null;
+  }
+  
+  return await response.json();
+}
+
+// Place a delivery order
+const order = await placeOrder(cart.id, 'delivery', {
+  address: '123 Main St, City, State 12345',
+  latitude: 37.7749,
+  longitude: -122.4194
+});
+
+console.log('Order placed!', order);
+// {
+//   id: "order_123",
+//   status: "pending",
+//   items: [...],
+//   total: { amount: "25.00", currency: "USD" },
+//   createdAt: "2025-01-15T10:30:00Z"
+// }</pre></div>
+
+                <h4>Step 6: Tracking the Order in Real-Time</h4>
+
+                <p>Here's where it gets cool. OCS supports real-time order updates via Server-Sent Events (SSE). This means you can show the user live updates as their order progresses.</p>
+
+                <div class="code-block"><pre>// Subscribe to order updates
+function subscribeToOrderUpdates(orderId, onUpdate) {
+  const eventSource = new EventSource(
+    `${API_BASE}/orders/${orderId}/updates`,
+    {
+      headers: {
+        'Authorization': `Bearer ${AUTH_TOKEN}`
+      }
+    }
+  );
+  
+  eventSource.addEventListener('order.patch', (event) => {
+    // The server sends JSON Patch operations
+    const patches = JSON.parse(event.data);
+    console.log('Order updated:', patches);
+    
+    // Apply the patches to your local order object
+    patches.forEach(patch => {
+      if (patch.op === 'replace' && patch.path === '/status') {
+        console.log('New status:', patch.value);
+        onUpdate({ status: patch.value });
+      }
+      
+      // Check for tracking info
+      if (patch.path.includes('shipment_tracking')) {
+        console.log('Tracking info available!', patch.value);
+        onUpdate({ tracking: patch.value });
+      }
+    });
+  });
+  
+  eventSource.onerror = (error) => {
+    console.error('SSE error:', error);
+    eventSource.close();
+  };
+  
+  return eventSource;
+}
+
+// Use it
+const subscription = subscribeToOrderUpdates(order.id, (update) => {
+  if (update.status) {
+    console.log(`Order is now: ${update.status}`);
+    // Update your UI: "Your order is being prepared!"
+  }
+  
+  if (update.tracking) {
+    console.log('Track your package:', update.tracking);
+    // Show tracking link in UI
+  }
+});
+
+// When you're done, clean up
+// subscription.close();</pre></div>
+
+                <h3>Why This Approach Works</h3>
+
+                <p>Let's step back and think about what we just built. With less than 200 lines of code, we created a client that can:</p>
+
+                <ul>
+                    <li>Discover what any OCS server supports</li>
+                    <li>Browse products with or without variants</li>
+                    <li>Manage a shopping cart</li>
+                    <li>Place orders for physical, digital, or pickup items</li>
+                    <li>Track orders in real-time</li>
+                </ul>
+
+                <p>And here's the kicker: <strong>this same code works with any OCS-compliant server</strong>. A restaurant, a clothing store, a digital goods marketplace—doesn't matter. The API is the same.</p>
+
+                <div class="info-box success">
+                    <strong>The OCS Promise</strong>
+                    Write your client once, work with any vendor. Write your server once, work with any client. That's the power of a minimal, extensible standard.
+                </div>
+
+                <h3>What Makes OCS Different</h3>
+
+                <p>So why does OCS succeed where other standards fail? A few key decisions:</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-title">1. Minimal Core</div>
+                        <div class="feature-description">The base API is tiny. You can implement a basic OCS server in an afternoon. This means people actually adopt it.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-title">2. Discoverable Extensions</div>
+                        <div class="feature-description">Instead of version hell, features are discoverable. Clients adapt to what servers support. No breaking changes, no API versions to juggle.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-title">3. Structured Metadata</div>
+                        <div class="feature-description">Metadata isn't a dumping ground. It's structured, validated, and linked to schemas. This prevents the chaos of "just put it in metadata."</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-title">4. Real-Time by Default</div>
+                        <div class="feature-description">SSE for order updates is built in, not bolted on. Real-time isn't a premium feature—it's how the API works.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-title">5. Web3-Native Payments</div>
+                        <div class="feature-description">X402 integration means instant, low-fee payments with stablecoins. Perfect for micropayments, AI agents, and global commerce.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-title">6. Implementation Freedom</div>
+                        <div class="feature-description">OCS doesn't dictate your business logic. It's a transport layer, not a framework. Use any database, any auth system, any payment processor.</div>
+                    </div>
+                </div>
+
+                <h3>The Bottom Line</h3>
+
+                <p>OCS exists because commerce APIs shouldn't be hard. The core flow—browse, cart, order—is universal. The details—variants, tracking, fulfillment—should be discoverable and optional.</p>
+
+                <p>By keeping the core minimal and making extensions discoverable, OCS gives you the best of both worlds: simplicity when you need it, power when you want it.</p>
+
+                <p>Now go build something cool. The API is simple, the docs are here, and the community is growing. Welcome to open commerce.</p>
+            </section>
+
 
             <!-- Getting Started -->
             <section id="getting-started">
