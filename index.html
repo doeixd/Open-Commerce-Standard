@@ -162,6 +162,9 @@
                 <li><a href="#glossary">Glossary</a></li>
                 <li><a href="#best-practices">Best Practices</a></li>
                 <li><a href="#version-history">Version History</a></li>
+                <li><a href="#implementation-guide">Implementation Guide</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                <li><a href="#resources">Resources</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#use-cases">Use Cases</a></li>
                 <li><a href="#capabilities">Capabilities</a></li>
@@ -180,8 +183,8 @@
     <div class="container">
         <section id="introduction">
             <h2>Introduction</h2>
-            <p>The Open Commerce Standard (OCS) is an open specification for digital commerce. It lets any client connect to any OCS-compliant server, from simple menus to complex e-commerce sites. Using HTTP, capability discovery, structured metadata, and web3 payments, OCS handles physical goods, digital services, and in-store pickup while giving developers flexibility.</p>
-            <p>Originally from restaurant ordering, OCS now covers all commerce. It offers a minimal core API that grows with your needs without forcing specific designs.</p>
+            <p>The Open Commerce Standard (OCS) is an open specification for digital commerce. It enables any client application to connect seamlessly to any OCS-compliant server, whether it's a simple restaurant menu or a complex e-commerce platform. By using standard HTTP, dynamic capability discovery, structured metadata, and web3-native payments, OCS supports physical goods, digital services, and in-store pickup orders while providing developers with complete freedom in implementation.</p>
+            <p>Originally developed for restaurant ordering systems, OCS has evolved to generalize across all forms of commerce. It provides a lean core API that adapts to business needs through extensible metadata, without imposing rigid structures or vendor lock-in.</p>
         </section>
 
         <section id="why-choose-ocs">
@@ -199,12 +202,12 @@
         <section id="key-features">
             <h2>Key Features</h2>
             <ul>
-                <li><strong>Universal Model:</strong> Supports physical goods, digital services, and pickup with one <code>fulfillmentType</code> flag.</li>
-                <li><strong>Capability Discovery:</strong> Clients learn server features via <code>GET /capabilities</code> for smart adaptation.</li>
-                <li><strong>Real-Time Updates:</strong> Server-Sent Events (SSE) deliver live order changes with JSON Patch.</li>
-                <li><strong>Structured Metadata:</strong> Extensible data linked to JSON Schemas for flexible, validated structures.</li>
-                <li><strong>Web3 Payments:</strong> x402 Protocol enables instant, low-fee blockchain payments with USDC.</li>
-                <li><strong>Developer Freedom:</strong> No opinions on business logic, pricing, or data—customize as needed.</li>
+                <li><strong>Universal Commerce Model:</strong> Handles all order types—physical goods (shipping), digital services (downloads), and in-store pickup—with a single <code>fulfillmentType</code> field, simplifying client logic.</li>
+                <li><strong>Dynamic Capability Discovery:</strong> Clients query <code>GET /capabilities</code> to discover server features, enabling adaptive UIs that work across different implementations without hardcoding.</li>
+                <li><strong>Real-Time Order Tracking:</strong> Server-Sent Events (SSE) provide live updates on order status using efficient JSON Patch operations, reducing polling and improving user experience.</li>
+                <li><strong>Extensible Metadata System:</strong> Custom data resides in a <code>metadata</code> object linked to JSON Schemas, allowing servers to add features like variants or tracking without API changes.</li>
+                <li><strong>Web3-Native Payments:</strong> Integrates the x402 Protocol for instant, low-fee blockchain transactions using stablecoins like USDC, supporting micropayments and programmable commerce.</li>
+                <li><strong>Implementation Freedom:</strong> OCS is unopinionated about internal business logic, pricing models, or data storage, letting developers build as they see fit.</li>
             </ul>
         </section>
 
@@ -276,7 +279,7 @@ Response:
 
 }
 
-Response:
+Response (Success):
 
 {
 
@@ -284,7 +287,25 @@ Response:
 
   "status": "confirmed",
 
-  "total": {"amount": "10.00", "currency": "USD"}
+  "items": [...],
+
+  "total": {"amount": "10.00", "currency": "USD"},
+
+  "orderType": "pickup",
+
+  "createdAt": "2025-01-01T12:00:00Z"
+
+}
+
+Response (Payment Required - 402):
+
+{
+
+  "x402Version": 1,
+
+  "error": "Payment required",
+
+  "accepts": [...]
 
 }</code></pre>
          </section>
@@ -635,6 +656,62 @@ Response:
              <p>Future versions will add more capabilities and features.</p>
          </section>
 
+         <section id="implementation-guide">
+             <h2>Implementation Guide</h2>
+             <h3>Building an OCS Server</h3>
+             <p>To implement OCS on the server side:</p>
+             <ol>
+                 <li><strong>Set up core endpoints:</strong> Implement /capabilities, /restaurants, /menus, /carts, and /orders with proper schemas.</li>
+                 <li><strong>Add capability discovery:</strong> Define supported capabilities in /capabilities with schema URLs for metadata.</li>
+                 <li><strong>Handle metadata:</strong> Use structured metadata for custom data, linked to JSON Schemas.</li>
+                 <li><strong>Integrate payments:</strong> Use x402 for web3 payments, handling 402 responses.</li>
+                 <li><strong>Enable real-time updates:</strong> Implement SSE on /orders/{id}/updates for order status changes.</li>
+                 <li><strong>Ensure security:</strong> Use Bearer auth, HTTPS, and idempotency keys.</li>
+             </ol>
+             <h3>Building an OCS Client</h3>
+             <p>To build a client that works with any OCS server:</p>
+             <ol>
+                 <li><strong>Discover capabilities:</strong> Always start with GET /capabilities to learn what the server supports.</li>
+                 <li><strong>Adapt to features:</strong> Use capability IDs to enable UI elements and parse metadata.</li>
+                 <li><strong>Manage state:</strong> Handle carts, items, and orders with proper error handling.</li>
+                 <li><strong>Process payments:</strong> Implement x402 flow for seamless transactions.</li>
+                 <li><strong>Subscribe to updates:</strong> Use SSE for real-time order tracking.</li>
+                 <li><strong>Validate data:</strong> Check responses against schemas for reliability.</li>
+             </ol>
+         </section>
+
+         <section id="troubleshooting">
+             <h2>Troubleshooting</h2>
+             <h3>Common Issues and Solutions</h3>
+             <ul>
+                 <li><strong>Client can't adapt:</strong> Ensure GET /capabilities is called first and responses are parsed correctly.</li>
+                 <li><strong>Metadata errors:</strong> Validate metadata against the schema URL from capabilities.</li>
+                 <li><strong>Payment failures:</strong> Check x402 implementation; ensure correct payload and headers.</li>
+                 <li><strong>SSE not connecting:</strong> Verify server sends 'text/event-stream' and proper event format.</li>
+                 <li><strong>Idempotency conflicts:</strong> Use unique keys for retries; avoid reusing for different requests.</li>
+                 <li><strong>Authentication issues:</strong> Confirm Bearer token format and server auth method.</li>
+             </ul>
+             <h3>Debugging Tips</h3>
+             <ul>
+                 <li>Use tools like Postman for API testing.</li>
+                 <li>Check server logs for errors.</li>
+                 <li>Refer to the OpenAPI spec for exact schemas.</li>
+                 <li>Join the community for help.</li>
+             </ul>
+         </section>
+
+         <section id="resources">
+             <h2>Resources</h2>
+             <ul>
+                 <li><strong>OpenAPI Spec:</strong> <a href="./src/spec.yaml">Full API definition</a></li>
+                 <li><strong>README:</strong> <a href="./README.md">Detailed guide</a></li>
+                 <li><strong>x402 Protocol:</strong> <a href="https://github.com/coinbase/x402">Web3 payments</a></li>
+                 <li><strong>GitHub Repo:</strong> <a href="https://github.com/doeixd/Open-Commerce-Standard">Source and issues</a></li>
+                 <li><strong>JSON Schema:</strong> <a href="https://json-schema.org">Metadata validation</a></li>
+                 <li><strong>HTTP Standards:</strong> <a href="https://tools.ietf.org/html/rfc7231">Core protocols</a></li>
+             </ul>
+         </section>
+
         <section id="how-it-works">
             <h2>How It Works</h2>
             <p>OCS uses a straightforward process:</p>
@@ -809,6 +886,16 @@ Response:
             <p>Yes, with x402 integration, OCS supports instant, low-fee payments for any transaction size.</p>
             <h3>How do I contribute to OCS?</h3>
             <p>Open issues or PRs on GitHub. Propose new capabilities with JSON schemas.</p>
+            <h3>How does OCS handle different currencies?</h3>
+            <p>Prices use the Money schema with amount (string) and currency (ISO code). Clients handle conversions.</p>
+            <h3>Can OCS support subscriptions or recurring payments?</h3>
+            <p>Not in core, but metadata can extend for subscriptions via custom capabilities.</p>
+            <h3>What if my business needs custom features?</h3>
+            <p>Use metadata and define new capabilities with schemas for extensibility.</p>
+            <h3>How secure is OCS?</h3>
+            <p>Uses HTTPS, Bearer tokens, and standard practices. Security depends on implementation.</p>
+            <h3>Can I use OCS for non-commerce apps?</h3>
+            <p>Possible, but designed for commerce; adapt metadata for other uses.</p>
         </section>
 
         <section id="community">
