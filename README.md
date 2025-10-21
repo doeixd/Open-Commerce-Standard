@@ -4,11 +4,11 @@
 | :--- | :--- | :--- |
 | **1.0.0** | **Active & Ready for Implementation** | **MIT** |
 
-## 📖 Introduction
+## Introduction
 
 The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. It integrates web3-native payments via the x402 Protocol for instant, low-fee blockchain transactions.
 
-## ❓ Overview & Common Questions
+## Overview & Common Questions
 
 **What is OCS?**  
 An open, minimal, and extensible standard for digital commerce. It defines a universal HTTP API for the entire transaction lifecycle: product discovery, cart management, ordering, and real-time updates—supporting physical goods, digital services, and in-store pickup.
@@ -32,25 +32,25 @@ The full OpenAPI 3.0 specification is available in [`spec.yaml`](./src/spec.yaml
 
 <br />
 
-## 🚀 Getting Started
+## Getting Started
 
 1. **Review the Specification:** Read the [OpenAPI spec](./src/spec.yaml) for the full API details.
 2. **Implement Core Endpoints:** Start with discovery (`/capabilities`, `/restaurants`, `/menus`) and cart/order flows.
 3. **Add Capabilities:** Implement optional features like variants or tracking via standard schemas.
 4. **Build Clients:** Use capability discovery for adaptive apps compatible with any OCS server.
 
-## ✨ Key Features
+## Key Features
 
-*   🌐 **Universal Commerce Model:** A single, elegant model handles **physical goods**, **digital goods/services**, and **in-store pickup** using a simple `fulfillmentType` flag.
-*   🛰️ **Dynamic Capability Discovery:** The `GET /capabilities` endpoint allows a client to understand a server's full feature set, enabling truly adaptive applications.
-*   ⚡ **Real-time Order Updates:** A built-in Server-Sent Events (SSE) endpoint (`/orders/{id}/updates`) provides efficient, real-time order status changes using standardized JSON Patch.
-*   🧩 **Structured, Extensible Metadata:** Go beyond simple key-value pairs. OCS provides a system for servers to link to official JSON Schemas that define the structure of their `metadata`.
-*   💳 **Web3-Native Payments:** Includes a complete, protocol-compliant implementation for handling payments via the [x402 Protocol](https://github.com/coinbase/x402).
-*   🛡️ **Formal Security Model:** Recommends and formalizes a `Bearer` token authentication scheme for all protected resources.
+*   **Universal Commerce Model:** A single, elegant model handles **physical goods**, **digital goods/services**, and **in-store pickup** using a simple `fulfillmentType` flag.
+*   **Dynamic Capability Discovery:** The `GET /capabilities` endpoint allows a client to understand a server's full feature set, enabling truly adaptive applications.
+*   **Real-time Order Updates:** A built-in Server-Sent Events (SSE) endpoint (`/orders/{id}/updates`) provides efficient, real-time order status changes using standardized JSON Patch.
+*   **Structured, Extensible Metadata:** Go beyond simple key-value pairs. OCS provides a system for servers to link to official JSON Schemas that define the structure of their `metadata`.
+*   **Web3-Native Payments:** Includes a complete, protocol-compliant implementation for handling payments via the [x402 Protocol](https://github.com/coinbase/x402).
+*   **Formal Security Model:** Recommends and formalizes a `Bearer` token authentication scheme for all protected resources.
 
 <br />
 
-## 💳 X402 Protocol Compliance
+## X402 Protocol Compliance
 
 OCS integrates the [x402 Protocol](https://github.com/coinbase/x402), Coinbase's open standard for internet-native payments, to enable seamless, blockchain-based transactions within the order lifecycle. This makes OCS "web3-native," allowing for instant, programmable payments using stablecoins like USDC.
 
@@ -78,7 +78,7 @@ This integration supports physical goods (shipping), digital goods (access keys)
 
 <br />
 
-## 🔬 Core Concepts
+## Core Concepts
 
 OCS's power lies in **delegating complexity to `metadata` and making it discoverable**.
 
@@ -88,7 +88,7 @@ To avoid chaos, `GET /capabilities` provides a "table of contents" for metadata,
 
 <br />
 
-## 💡 Example: A Universal Client Buys a T-Shirt
+## Example: A Universal Client Buys a T-Shirt
 
 This narrative demonstrates how a client uses the full power of OCS to interact with an apparel store.
 
@@ -201,7 +201,7 @@ data: [
 
 <br />
 
-## 🛰️ Capabilities Reference
+## Capabilities Reference
 
 Capabilities are the heart of OCS's extensibility. The following standard capabilities are defined:
 
@@ -214,7 +214,7 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 
 <br />
 
-## 🗺️ Future Direction
+## Future Direction
 
 OCS is a living standard. The future direction includes:
 *   **A Richer Capability Library:** Developing more standard schemas for concepts like `product.reviews`, `order.returns`, and `service.bookings`.
@@ -224,7 +224,7 @@ OCS is a living standard. The future direction includes:
 
 <br />
 
-## ⚠️ Implementation Notes
+## Implementation Notes
 
 - **Always discover capabilities first:** Call `GET /capabilities` to adapt dynamically—never hardcode features.
 - **Use full Capability IDs as metadata keys:** E.g., `"dev.ocs.product.variants@1.0"` to link to schemas.
@@ -234,7 +234,7 @@ OCS is a living standard. The future direction includes:
 
 <br />
 
-## 📘 Quick Reference
+## Quick Reference
 
 | Endpoint | Verb | Description | Auth |
 | :--- | :--- | :--- | :--- |
@@ -252,7 +252,7 @@ OCS is a living standard. The future direction includes:
 
 <br />
 
-## 📋 Content Type
+## Content Type
 
 All API requests and responses use the custom media type `application/ocs+json; version=1.0`. Clients should set the `Accept` and `Content-Type` headers accordingly:
 
@@ -263,10 +263,10 @@ Content-Type: application/ocs+json; version=1.0
 
 <br />
 
-## 🤝 Contributing
+## Contributing
 
 This is an open standard, and contributions are welcome. Please open an issue or pull request to suggest changes, propose new standard capability modules, or report any issues.
 
-## 📜 License
+## License
 
 The Open Commerce Standard is open-source and available under the **[MIT License](./LICENSE)**.
