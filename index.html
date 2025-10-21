@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Commerce Standard (OCS)</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 100px 0 0 0;
+            background: linear-gradient(135deg, #f4f4f4 0%, #e9ecef 100%);
+            color: #333;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .container section {
+            margin-bottom: 40px;
+        }
+        .container section:last-child {
+            margin-bottom: 0;
+        }
+        .toc {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        .toc li {
+            margin-bottom: 5px;
+        }
+        .toc a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        h1, h2 {
+            color: #007bff;
+            font-weight: 600;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        nav#main-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-container h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .nav-container p {
+            margin: 0;
+            font-size: 0.9em;
+            flex: 1;
+            text-align: center;
+        }
+        .nav-container ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 15px;
+        }
+        .nav-container li {
+            display: inline;
+        }
+        .nav-container a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav-container a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f4f4f4;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .nav-container ul {
+                display: none;
+            }
+            .nav-container p {
+                display: none;
+            }
+            .container {
+                margin: 20px;
+                padding: 15px;
+            }
+            body {
+                padding-top: 70px;
+            }
+            .nav-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav id="main-nav">
+        <div class="nav-container">
+            <h1>Open Commerce Standard (OCS)</h1>
+            <p>An open, extensible API specification for digital commerce</p>
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#why-choose-ocs">Why Choose OCS?</a></li>
+                <li><a href="#key-features">Key Features</a></li>
+                <li><a href="#technical-overview">Technical Overview</a></li>
+                <li><a href="#sample-api">Sample API</a></li>
+                <li><a href="#api-reference">API Reference</a></li>
+                <li><a href="#schemas">Schemas</a></li>
+                <li><a href="#error-handling">Error Handling</a></li>
+                <li><a href="#authentication">Authentication</a></li>
+                <li><a href="#x402-integration">x402 Integration</a></li>
+                <li><a href="#glossary">Glossary</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+                <li><a href="#version-history">Version History</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#use-cases">Use Cases</a></li>
+                <li><a href="#capabilities">Capabilities</a></li>
+                <li><a href="#documentation">Documentation</a></li>
+                <li><a href="#getting-started">Getting Started</a></li>
+                <li><a href="#guide">Guide</a></li>
+                <li><a href="#roadmap">Roadmap</a></li>
+                <li><a href="#contributing">Contributing</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#community">Community</a></li>
+                <li><a href="#tools-libraries">Tools & Libraries</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>The Open Commerce Standard (OCS) is an open specification for digital commerce. It lets any client connect to any OCS-compliant server, from simple menus to complex e-commerce sites. Using HTTP, capability discovery, structured metadata, and web3 payments, OCS handles physical goods, digital services, and in-store pickup while giving developers flexibility.</p>
+            <p>Originally from restaurant ordering, OCS now covers all commerce. It offers a minimal core API that grows with your needs without forcing specific designs.</p>
+        </section>
+
+        <section id="why-choose-ocs">
+            <h2>Why Choose OCS?</h2>
+            <p>Traditional e-commerce APIs are fragmented and tied to vendors. OCS solves this with:</p>
+            <ul>
+                <li><strong>Interoperability:</strong> Build once, run anywhere—clients automatically adapt to any server.</li>
+                <li><strong>Scalability:</strong> Begin simply, add features through metadata without API changes.</li>
+                <li><strong>Cost Savings:</strong> Web3 payments cut fees by removing middlemen and high processing costs.</li>
+                <li><strong>Future-Proofing:</strong> Extensible design enables AI agents, micropayments, and new commerce ideas.</li>
+                <li><strong>Open & Collaborative:</strong> MIT-licensed, with community contributions for new features.</li>
+            </ul>
+        </section>
+
+        <section id="key-features">
+            <h2>Key Features</h2>
+            <ul>
+                <li><strong>Universal Model:</strong> Supports physical goods, digital services, and pickup with one <code>fulfillmentType</code> flag.</li>
+                <li><strong>Capability Discovery:</strong> Clients learn server features via <code>GET /capabilities</code> for smart adaptation.</li>
+                <li><strong>Real-Time Updates:</strong> Server-Sent Events (SSE) deliver live order changes with JSON Patch.</li>
+                <li><strong>Structured Metadata:</strong> Extensible data linked to JSON Schemas for flexible, validated structures.</li>
+                <li><strong>Web3 Payments:</strong> x402 Protocol enables instant, low-fee blockchain payments with USDC.</li>
+                <li><strong>Developer Freedom:</strong> No opinions on business logic, pricing, or data—customize as needed.</li>
+            </ul>
+        </section>
+
+        <section id="technical-overview">
+            <h2>Technical Overview</h2>
+            <p>OCS builds on HTTP basics:</p>
+            <ul>
+                <li><strong>Content Type:</strong> All requests use <code>application/ocs+json; version=1.0</code>.</li>
+                <li><strong>Authentication:</strong> Bearer tokens protect endpoints; discovery is open.</li>
+                <li><strong>Idempotency:</strong> Prevents duplicates with keys on state changes.</li>
+                <li><strong>Schemas:</strong> API in OpenAPI 3.0; metadata follows JSON Schemas.</li>
+                <li><strong>Payments:</strong> x402 manages auth, settlement, and 402 errors.</li>
+            </ul>
+            <p>See the <a href="./src/spec.yaml">full spec</a> for details.</p>
+        </section>
+
+         <section id="sample-api">
+             <h2>Sample API Calls</h2>
+             <h3>Discover Capabilities</h3>
+             <pre><code class="language-json">GET /capabilities
+
+Response:
+
+{
+
+  "capabilities": [
+
+    {"id": "dev.ocs.product.variants@1.0", "schemaUrl": "https://schemas.ocs.dev/product/variants/v1.json"}
+
+  ]
+
+}</code></pre>
+             <h3>Get Menu Items</h3>
+             <pre><code class="language-json">GET /menus/123
+
+Response:
+
+{
+
+  "id": "menu_123",
+
+  "name": "Main Menu",
+
+  "items": [
+
+    {
+
+      "id": "item_1",
+
+      "name": "Burger",
+
+      "price": {"amount": "10.00", "currency": "USD"},
+
+      "fulfillmentType": "pickup"
+
+    }
+
+  ]
+
+}</code></pre>
+             <h3>Place Order</h3>
+             <pre><code class="language-json">POST /orders
+
+{
+
+  "cartId": "cart_abc",
+
+  "orderType": "pickup"
+
+}
+
+Response:
+
+{
+
+  "id": "order_456",
+
+  "status": "confirmed",
+
+  "total": {"amount": "10.00", "currency": "USD"}
+
+}</code></pre>
+         </section>
+
+         <section id="api-reference">
+             <h2>API Reference</h2>
+             <p>Detailed reference for all OCS endpoints. See the <a href="./src/spec.yaml">full OpenAPI spec</a> for complete details.</p>
+
+             <h3>Discovery Endpoints</h3>
+
+             <h4>GET /capabilities</h4>
+             <p>Discover server capabilities and metadata schemas.</p>
+             <p><strong>Parameters:</strong> None</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: CapabilitiesResponse</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h4>GET /restaurants</h4>
+             <p>List available vendors/restaurants.</p>
+             <p><strong>Parameters:</strong> limit, cursor</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: Paginated list of Restaurant</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h4>GET /menus</h4>
+             <p>List available catalogs/menus for a restaurant.</p>
+             <p><strong>Parameters:</strong> restaurantId (required), limit, cursor</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: Paginated list of MenuSummary</li>
+                 <li>400: BadRequest</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h4>GET /menus/{menuId}</h4>
+             <p>Get a full catalog/menu by ID.</p>
+             <p><strong>Parameters:</strong> menuId (path)</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: Menu</li>
+                 <li>404: NotFound</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h3>Cart Management Endpoints</h3>
+
+             <h4>POST /carts</h4>
+             <p>Create a new cart.</p>
+             <p><strong>Security:</strong> Bearer token</p>
+             <p><strong>Parameters:</strong> Idempotency-Key (header)</p>
+             <p><strong>Request Body:</strong> CreateCartRequest</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>201: Cart</li>
+                 <li>400: BadRequest</li>
+                 <li>401: Unauthorized</li>
+                 <li>403: Forbidden</li>
+                 <li>409: Conflict</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h4>GET /carts/{cartId}</h4>
+             <p>Get a cart by ID.</p>
+             <p><strong>Security:</strong> Bearer token</p>
+             <p><strong>Parameters:</strong> cartId (path)</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: Cart</li>
+                 <li>401: Unauthorized</li>
+                 <li>403: Forbidden</li>
+                 <li>404: NotFound</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h4>POST /carts/{cartId}/items</h4>
+             <p>Add an item to a cart.</p>
+             <p><strong>Security:</strong> Bearer token</p>
+             <p><strong>Parameters:</strong> cartId (path), Idempotency-Key (header)</p>
+             <p><strong>Request Body:</strong> CartItemRequest</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: Cart</li>
+                 <li>400: BadRequest</li>
+                 <li>401: Unauthorized</li>
+                 <li>403: Forbidden</li>
+                 <li>404: NotFound</li>
+                 <li>409: Conflict</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h4>PATCH /carts/{cartId}/items/{cartItemId}</h4>
+             <p>Update an item in a cart.</p>
+             <p><strong>Security:</strong> Bearer token</p>
+             <p><strong>Parameters:</strong> cartId (path), cartItemId (path), Idempotency-Key (header)</p>
+             <p><strong>Request Body:</strong> UpdateCartItemRequest</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: Cart</li>
+                 <li>400: BadRequest</li>
+                 <li>401: Unauthorized</li>
+                 <li>403: Forbidden</li>
+                 <li>404: NotFound</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h4>DELETE /carts/{cartId}/items/{cartItemId}</h4>
+             <p>Remove an item from a cart.</p>
+             <p><strong>Security:</strong> Bearer token</p>
+             <p><strong>Parameters:</strong> cartId (path), cartItemId (path), Idempotency-Key (header)</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: Cart</li>
+                 <li>401: Unauthorized</li>
+                 <li>403: Forbidden</li>
+                 <li>404: NotFound</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h3>Ordering Endpoints</h3>
+
+             <h4>POST /orders</h4>
+             <p>Place an order from a cart.</p>
+             <p><strong>Security:</strong> Bearer token</p>
+             <p><strong>Parameters:</strong> Idempotency-Key (header), X-PAYMENT (header, optional)</p>
+             <p><strong>Request Body:</strong> CreateOrderRequest</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>201: Order (with X-PAYMENT-RESPONSE header)</li>
+                 <li>400: BadRequest</li>
+                 <li>401: Unauthorized</li>
+                 <li>402: X402PaymentRequiredResponse</li>
+                 <li>403: Forbidden</li>
+                 <li>404: NotFound</li>
+                 <li>409: Conflict</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h4>GET /orders/{orderId}</h4>
+             <p>Get an order by ID.</p>
+             <p><strong>Security:</strong> Bearer token</p>
+             <p><strong>Parameters:</strong> orderId (path)</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: Order</li>
+                 <li>401: Unauthorized</li>
+                 <li>403: Forbidden</li>
+                 <li>404: NotFound</li>
+                 <li>500: ServerError</li>
+             </ul>
+
+             <h4>GET /orders/{orderId}/updates</h4>
+             <p>Subscribe to real-time order updates via SSE.</p>
+             <p><strong>Security:</strong> Bearer token</p>
+             <p><strong>Parameters:</strong> orderId (path)</p>
+             <p><strong>Responses:</strong></p>
+             <ul>
+                 <li>200: text/event-stream</li>
+                 <li>401: Unauthorized</li>
+                 <li>403: Forbidden</li>
+                 <li>404: NotFound</li>
+                 <li>500: ServerError</li>
+             </ul>
+         </section>
+
+         <section id="schemas">
+             <h2>Schemas</h2>
+             <p>Key JSON schema definitions from the OCS spec. See the <a href="./src/spec.yaml">full spec</a> for all schemas.</p>
+
+             <h3>Money</h3>
+             <pre><code class="language-json">{
+  "type": "object",
+  "properties": {
+    "amount": { "type": "string", "description": "Monetary amount as a string.", "example": "12.99" },
+    "currency": { "type": "string", "description": "ISO 4217 currency code.", "example": "USD" }
+  },
+  "required": ["amount", "currency"]
+}</code></pre>
+
+             <h3>MenuItem</h3>
+             <pre><code class="language-json">{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "price": { "$ref": "#/components/schemas/Money" },
+    "available": { "type": "boolean", "default": true },
+    "fulfillmentType": { "type": "string", "enum": ["pickup", "physical", "digital"] },
+    "addOns": { "type": "array", "items": { "$ref": "#/components/schemas/AddOn" } },
+    "metadata": { "type": "object" }
+  },
+  "required": ["id", "name", "price", "available", "fulfillmentType"]
+}</code></pre>
+
+             <h3>Order</h3>
+             <pre><code class="language-json">{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "status": { "type": "string", "enum": ["placed", "confirmed", "preparing", "ready_for_pickup", "out_for_delivery", "delivered", "cancelled", "shipped"] },
+    "items": { "type": "array", "items": { "$ref": "#/components/schemas/CartItem" } },
+    "total": { "$ref": "#/components/schemas/Money" },
+    "orderType": { "type": "string", "enum": ["pickup", "delivery"] },
+    "deliveryAddress": { "$ref": "#/components/schemas/Location" },
+    "promotions": { "type": "array", "items": { "type": "string" } },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "metadata": { "type": "object" }
+  },
+  "required": ["id", "status", "items", "total", "orderType", "createdAt", "updatedAt"]
+}</code></pre>
+
+             <h3>CapabilitiesResponse</h3>
+             <pre><code class="language-json">{
+  "type": "object",
+  "properties": {
+    "capabilities": {
+      "type": "array",
+      "items": { "$ref": "#/components/schemas/Capability" }
+    }
+  }
+}</code></pre>
+
+             <h3>Capability</h3>
+             <pre><code class="language-json">{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "example": "dev.ocs.product.variants@1.0" },
+    "schemaUrl": { "type": "string", "format": "uri", "example": "https://schemas.ocs.dev/product/variants/v1.json" }
+  },
+  "required": ["id", "schemaUrl"]
+}</code></pre>
+         </section>
+
+         <section id="error-handling">
+             <h2>Error Handling</h2>
+             <p>OCS uses standard HTTP status codes and a consistent error response format.</p>
+
+             <h3>Error Response Format</h3>
+             <pre><code class="language-json">{
+  "code": "bad_request",
+  "message": "The request was malformed.",
+  "details": [
+    { "field": "restaurantId", "issue": "Must be a valid UUID." }
+  ]
+}</code></pre>
+
+             <h3>Error Codes</h3>
+             <ul>
+                 <li><strong>bad_request:</strong> The request was malformed or invalid (400).</li>
+                 <li><strong>unauthorized:</strong> Authentication required (401).</li>
+                 <li><strong>forbidden:</strong> Not authorized (403).</li>
+                 <li><strong>not_found:</strong> Resource not found (404).</li>
+                 <li><strong>conflict:</strong> Conflict, e.g., reused idempotency key (409).</li>
+                 <li><strong>idempotency_key_reused:</strong> Idempotency key already used.</li>
+                 <li><strong>product_unavailable:</strong> Item not available.</li>
+                 <li><strong>delivery_address_invalid:</strong> Invalid address for delivery.</li>
+                 <li><strong>payment_failed:</strong> Payment processing failed.</li>
+                 <li><strong>server_error:</strong> Unexpected server error (500).</li>
+             </ul>
+         </section>
+
+         <section id="authentication">
+             <h2>Authentication</h2>
+             <p>OCS uses Bearer token authentication for protected endpoints.</p>
+
+             <h3>Bearer Tokens</h3>
+             <p>Include the token in the Authorization header:</p>
+             <pre><code>Authorization: Bearer &lt;token&gt;</code></pre>
+             <p>Token formats (JWT, API keys, etc.) are server-specific. Discovery endpoints are public; others require auth.</p>
+
+             <h3>Token Acquisition</h3>
+             <p>The method to obtain tokens is implementation-dependent. It may be discoverable via capabilities (e.g., dev.ocs.auth.oauth2.pkce@1.0).</p>
+
+             <h3>Security</h3>
+             <p>Use HTTPS for all requests. Tokens should be kept secure and not logged.</p>
+         </section>
+
+         <section id="x402-integration">
+             <h2>x402 Integration Guide</h2>
+             <p>OCS integrates the x402 Protocol for web3-native payments.</p>
+
+             <h3>Payment Flow</h3>
+             <ol>
+                 <li>Client places order (POST /orders).</li>
+                 <li>If payment required, server responds 402 with payment requirements.</li>
+                 <li>Client authorizes payment, signs, and retries with X-PAYMENT header.</li>
+                 <li>Server verifies and settles; returns order with X-PAYMENT-RESPONSE.</li>
+             </ol>
+
+             <h3>Key Headers</h3>
+             <ul>
+                 <li><strong>X-PAYMENT:</strong> Base64-encoded PaymentPayload</li>
+                 <li><strong>X-PAYMENT-RESPONSE:</strong> Base64-encoded SettlementResponse</li>
+             </ul>
+
+             <h3>Schemes</h3>
+             <p>Supports 'exact' scheme for direct payments.</p>
+
+             <p>See <a href="https://github.com/coinbase/x402">x402 Protocol</a> for details.</p>
+         </section>
+
+         <section id="glossary">
+             <h2>Glossary</h2>
+             <dl>
+                 <dt>Capability</dt>
+                 <dd>A feature or extension supported by the server, discoverable via /capabilities.</dd>
+                 <dt>Fulfillment Type</dt>
+                 <dd>How an item is delivered: pickup, physical, or digital.</dd>
+                 <dt>Idempotency Key</dt>
+                 <dd>A unique key to prevent duplicate requests.</dd>
+                 <dt>Metadata</dt>
+                 <dd>Extensible key-value pairs for custom data, validated by schemas.</dd>
+                 <dt>SSE</dt>
+                 <dd>Server-Sent Events for real-time updates.</dd>
+                 <dt>x402</dt>
+                 <dd>Protocol for web3 payments integrated into OCS.</dd>
+             </dl>
+         </section>
+
+         <section id="best-practices">
+             <h2>Best Practices</h2>
+             <ul>
+                 <li>Always call /capabilities first to discover features.</li>
+                 <li>Use Idempotency-Key for all state-changing requests.</li>
+                 <li>Handle metadata dynamically based on schemas.</li>
+                 <li>Implement graceful degradation for missing capabilities.</li>
+                 <li>Use HTTPS and secure token storage.</li>
+                 <li>Subscribe to SSE for order updates.</li>
+                 <li>Validate responses against schemas.</li>
+             </ul>
+         </section>
+
+         <section id="version-history">
+             <h2>Version History</h2>
+             <h3>1.0.0 (Active)</h3>
+             <p>Initial release of OCS 1.0.0.</p>
+             <ul>
+                 <li>Core API for discovery, carts, orders.</li>
+                 <li>Capability discovery and metadata system.</li>
+                 <li>x402 payment integration.</li>
+                 <li>SSE for real-time updates.</li>
+             </ul>
+             <p>Future versions will add more capabilities and features.</p>
+         </section>
+
+        <section id="how-it-works">
+            <h2>How It Works</h2>
+            <p>OCS uses a straightforward process:</p>
+            <ol>
+                <li><strong>Discover:</strong> Call <code>GET /capabilities</code> to learn server features.</li>
+                <li><strong>Shop:</strong> Browse catalogs, build carts, and order.</li>
+                <li><strong>Track:</strong> Get real-time updates via SSE.</li>
+                <li><strong>Pay:</strong> Process with x402 for smooth, programmable payments.</li>
+            </ol>
+            <p>Extra details go in <code>metadata</code>, keeping the core simple and expandable.</p>
+        </section>
+
+        <section id="use-cases">
+            <h2>Use Cases</h2>
+            <ul>
+                <li><strong>E-Commerce Platforms:</strong> Build adaptive shopping apps that work with any vendor's API.</li>
+                <li><strong>AI Agents:</strong> Enable autonomous purchasing and service access without human intervention.</li>
+                <li><strong>Micropayments:</strong> Charge per API call, content access, or data query at blockchain speed.</li>
+                <li><strong>Marketplaces:</strong> Create interoperable ecosystems where clients discover and transact with multiple providers.</li>
+                <li><strong>Subscription Alternatives:</strong> Offer usage-based models with instant, reversible payments.</li>
+            </ul>
+        </section>
+
+        <section id="capabilities">
+            <h2>Standard Capabilities</h2>
+            <p>OCS defines optional capabilities for enhanced functionality:</p>
+            <ul>
+                <li><strong>Product Variants:</strong> User-selectable options like size and color (<a href="./schemas/product/variants/v1.json">Schema</a>).</li>
+                <li><strong>Shipment Tracking:</strong> Real-time tracking details for orders (<a href="./schemas/order/shipment_tracking/v1.json">Schema</a>).</li>
+                <li><strong>Digital Access:</strong> Download links and access codes for digital goods (<a href="./schemas/order/digital_access/v1.json">Schema</a>).</li>
+                <li><strong>Physical Properties:</strong> Weight and dimensions for shipping (<a href="./schemas/product/physical_properties/v1.json">Schema</a>).</li>
+            </ul>
+        </section>
+
+        <section id="documentation">
+            <h2>Reference & Documentation</h2>
+            <p>Explore the full OCS ecosystem:</p>
+            <ul>
+                <li><strong>README:</strong> Comprehensive guide with examples and implementation notes (<a href="./README.md">View</a>).</li>
+                <li><strong>OpenAPI Specification:</strong> Complete API reference in YAML format (<a href="./src/spec.yaml">View</a>).</li>
+                <li><strong>Capability Schemas:</strong> JSON Schemas for metadata validation (see <a href="#capabilities">above</a> for links).</li>
+                <li><strong>x402 Protocol:</strong> External docs for web3 payment integration (<a href="https://github.com/coinbase/x402">GitHub</a>).</li>
+                <li><strong>Package Info:</strong> NPM package details and scripts (<a href="./package.json">View</a>).</li>
+                <li><strong>License:</strong> MIT license for open use (<a href="./LICENSE">View</a>).</li>
+            </ul>
+        </section>
+
+        <section id="getting-started">
+            <h2>Getting Started</h2>
+            <p>Ready to implement OCS?</p>
+            <ol>
+                <li><strong>Review the Spec:</strong> Start with the <a href="./src/spec.yaml">OpenAPI Specification</a> for endpoint details.</li>
+                <li><strong>Learn the Basics:</strong> Read the <a href="./README.md">README</a> for guides, examples, and best practices.</li>
+                <li><strong>Implement Core:</strong> Begin with discovery and cart/order endpoints.</li>
+                <li><strong>Add Payments:</strong> Integrate x402 via <a href="https://github.com/coinbase/x402">Coinbase's docs</a>.</li>
+                <li><strong>Extend with Capabilities:</strong> Use metadata and schemas for advanced features.</li>
+            </ol>
+            <p>Join the community for support and contributions!</p>
+        </section>
+
+        <section id="guide">
+            <h2>Step-by-Step Guide</h2>
+            <p>This guide walks you through OCS from basics to advanced implementation. Start simple and build up.</p>
+            <ul class="toc">
+                <li><a href="#step1">Step 1: Understand the Basics</a></li>
+                <li><a href="#step2">Step 2: Discover Server Capabilities</a></li>
+                <li><a href="#step3">Step 3: Browse Catalogs</a></li>
+                <li><a href="#step4">Step 4: Manage Carts</a></li>
+                <li><a href="#step5">Step 5: Place Orders</a></li>
+                <li><a href="#step6">Step 6: Handle Metadata & Capabilities</a></li>
+                <li><a href="#step7">Step 7: Integrate Payments (Advanced)</a></li>
+                <li><a href="#step8">Step 8: Build Adaptive Clients (Advanced)</a></li>
+                <li><a href="#step9">Step 9: Extend & Contribute</a></li>
+            </ul>
+
+            <h3 id="step1">Step 1: Understand the Basics</h3>
+            <p>OCS is an HTTP API for commerce. Key concepts:</p>
+            <ul>
+                <li><strong>Vendors & Menus:</strong> Vendors have menus with items (products).</li>
+                <li><strong>Carts & Orders:</strong> Add items to carts, then place orders.</li>
+                <li><strong>Fulfillment Types:</strong> Items are <code>physical</code>, <code>digital</code>, or <code>pickup</code>.</li>
+                <li><strong>Metadata:</strong> Extra data lives here, validated by schemas.</li>
+            </ul>
+            <p>Read the <a href="#introduction">Introduction</a> and <a href="./README.md">README</a> for more.</p>
+
+            <h3 id="step2">Step 2: Discover Server Capabilities</h3>
+            <p>Always start with <code>GET /capabilities</code>. This endpoint lists supported features and schema URLs.</p>
+            <p>Example response:</p>
+            <pre><code class="language-json">{
+  "capabilities": [
+    {"id": "dev.ocs.product.variants@1.0", "schemaUrl": "https://schemas.ocs.dev/product/variants/v1.json"}
+  ]
+}</code></pre>
+            <p>This tells clients what metadata to expect. Without it, clients can't adapt.</p>
+
+            <h3 id="step3">Step 3: Browse Catalogs</h3>
+            <p>Use <code>GET /restaurants</code> to list vendors, then <code>GET /menus?restaurantId=...</code> for catalogs.</p>
+            <p>Each menu item has <code>id</code>, <code>name</code>, <code>price</code>, <code>fulfillmentType</code>, and optional <code>metadata</code>.</p>
+            <p>Tip: Check <code>available</code> flag before adding to cart.</p>
+
+            <h3 id="step4">Step 4: Manage Carts</h3>
+            <p>Create a cart with <code>POST /carts</code> (provide <code>restaurantId</code>).</p>
+            <p>Add items: <code>POST /carts/{cartId}/items</code> with <code>itemId</code>, <code>quantity</code>, etc.</p>
+            <p>Update or remove via <code>PATCH/DELETE /carts/{cartId}/items/{itemId}</code>.</p>
+            <p>Get cart state anytime with <code>GET /carts/{cartId}</code>.</p>
+
+            <h3 id="step5">Step 5: Place Orders</h3>
+            <p>When ready, <code>POST /orders</code> with <code>cartId</code>, <code>orderType</code> (pickup/delivery), and address if needed.</p>
+            <p>For payments: If 402 returned, retry with x402 payload in <code>X-PAYMENT</code> header.</p>
+            <p>Success returns order details; subscribe to <code>GET /orders/{id}/updates</code> for SSE updates.</p>
+
+            <h3 id="step6">Step 6: Handle Metadata & Capabilities</h3>
+            <p>For variants: Use <code>dev.ocs.product.variants@1.0</code> metadata to show options.</p>
+            <p>Example: Display size/color selectors based on <code>options</code> and <code>variants</code> arrays.</p>
+            <p>Validate metadata against schemas to ensure compatibility.</p>
+
+            <h3 id="step7">Step 7: Integrate Payments (Advanced)</h3>
+            <p>Set up x402: Use a facilitator (e.g., Coinbase's) to verify and settle payments.</p>
+            <p>Handle 402 responses: Prompt user for payment, sign authorization, retry.</p>
+            <p>Supports USDC on Base/Ethereum; gasless for clients.</p>
+
+            <h3 id="step8">Step 8: Build Adaptive Clients (Advanced)</h3>
+            <p>Don't hardcode features. Always check capabilities and handle missing ones gracefully.</p>
+            <p>Example: If no variants, show basic product; if no tracking, skip update subscription.</p>
+            <p>Use Bearer auth for protected endpoints.</p>
+
+            <h3 id="step9">Step 9: Extend & Contribute</h3>
+            <p>Propose new capabilities via GitHub issues. Define JSON schemas and add to the standard.</p>
+            <p>Test with multiple servers to ensure interoperability.</p>
+        </section>
+
+        <section id="roadmap">
+            <h2>Roadmap</h2>
+            <p>OCS is growing fast. Here's the plan:</p>
+            <h3>Q1 2025: Core Improvements</h3>
+            <ul>
+                <li>Capabilities for reviews, ratings, returns, and service bookings</li>
+            </ul>
+            <h3>Q2 2025: Developer Tools</h3>
+            <ul>
+                <li>SDKs for Node.js and Python</li>
+                <li>Middleware for Express and Django</li>
+                <li>Libraries for React and Vue</li>
+            </ul>
+            <h3>Q3 2025: Advanced Options</h3>
+            <ul>
+                <li>WebSocket for updates, GraphQL support, AI guides</li>
+            </ul>
+            <h3>Q4 2025: Community Expansion</h3>
+            <ul>
+                <li>Hackathons, certifications, and showcases</li>
+            </ul>
+            <p>Check back for progress!</p>
+        </section>
+
+        <section id="contributing">
+            <h2>Contributing</h2>
+            <p>OCS is an open standard. Contributions are welcome! Open issues or pull requests on <a href="https://github.com/your-repo">GitHub</a> to propose new capabilities or improvements.</p>
+        </section>
+
+        <section id="faq">
+            <h2>Frequently Asked Questions</h2>
+            <h3>What makes OCS different from existing APIs like Stripe or Shopify?</h3>
+            <p>OCS is a standard, not a platform. It defines how clients and servers communicate, allowing interoperability. Unlike proprietary APIs, OCS enables universal clients that work with any compliant server.</p>
+            <h3>Is OCS only for restaurants?</h3>
+            <p>No, OCS evolved from restaurant standards but generalizes to all commerce: physical goods, digital services, and in-store pickup.</p>
+            <h3>How do I handle authentication?</h3>
+            <p>Use Bearer tokens. Servers may support JWT, API keys, etc. Discover via capabilities if needed.</p>
+            <h3>What if a server doesn't support a capability I need?</h3>
+            <p>Fall back to basic features. OCS is designed for graceful degradation.</p>
+            <h3>Can I use OCS for micropayments?</h3>
+            <p>Yes, with x402 integration, OCS supports instant, low-fee payments for any transaction size.</p>
+            <h3>How do I contribute to OCS?</h3>
+            <p>Open issues or PRs on GitHub. Propose new capabilities with JSON schemas.</p>
+        </section>
+
+        <section id="community">
+            <h2>Community</h2>
+            <p>Join the OCS community to discuss, contribute, and stay updated.</p>
+            <ul>
+                <li><strong>GitHub:</strong> <a href="https://github.com/your-repo">Repository and Issues</a></li>
+                <li><strong>Discussions:</strong> <a href="https://github.com/your-repo/discussions">GitHub Discussions</a></li>
+                <li><strong>Slack:</strong> Join our <a href="#">Slack workspace</a> (link TBD)</li>
+                <li><strong>Newsletter:</strong> Subscribe for updates (coming soon)</li>
+            </ul>
+        </section>
+
+        <section id="tools-libraries">
+            <h2>Tools and Libraries</h2>
+            <p>Accelerate your OCS implementation with these tools:</p>
+            <h3>Official SDKs</h3>
+            <ul>
+                <li><strong>ocs-js:</strong> Node.js SDK for server and client development (<a href="#">GitHub</a>)</li>
+                <li><strong>ocs-python:</strong> Python SDK with async support (<a href="#">GitHub</a>)</li>
+            </ul>
+            <h3>Middleware</h3>
+            <ul>
+                <li><strong>ocs-express:</strong> Express.js middleware for quick server setup (<a href="#">NPM</a>)</li>
+                <li><strong>ocs-django:</strong> Django integration package (<a href="#">PyPI</a>)</li>
+            </ul>
+            <h3>Client Libraries</h3>
+            <ul>
+                <li><strong>ocs-react:</strong> React hooks for building adaptive clients (<a href="#">NPM</a>)</li>
+                <li><strong>ocs-vue:</strong> Vue.js composables for OCS integration (<a href="#">NPM</a>)</li>
+            </ul>
+            <p>More coming soon. Check the <a href="#community">Community</a> section for updates.</p>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Open Commerce Standard. Licensed under <a href="./LICENSE">MIT</a>. | <a href="./README.md">README</a> | <a href="./src/spec.yaml">API Spec</a> | <a href="https://github.com/your-repo">View on GitHub</a> | <a href="https://github.com/coinbase/x402">x402 Protocol</a></p>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+</body>
+</html>
