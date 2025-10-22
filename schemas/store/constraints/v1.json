@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for advertising store-level constraints and business rules (dev.ocs.store.constraints@1.0).",
+  "properties": {
+    "maxCartItems": {
+      "type": "integer",
+      "description": "The maximum number of unique items allowed in a single cart."
+    },
+    "promotions": {
+      "type": "object",
+      "properties": {
+        "stackingPolicy": {
+          "type": "string",
+          "enum": ["none", "all"],
+          "description": "'none' means only one promotion can be applied; 'all' means multiple can be stacked."
+        }
+      }
+    },
+    "returns": {
+      "type": "object",
+      "properties": {
+        "returnWindowDays": {
+          "type": "integer",
+          "description": "The number of days after completion an order is eligible for return."
+        }
+      }
+    }
+  }
+}

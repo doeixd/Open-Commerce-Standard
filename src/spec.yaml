@@ -44,263 +44,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CapabilitiesResponse'
-        '500':
-          $ref: '#/components/responses/ServerError'
+         '500':
+           $ref: '#/components/responses/ServerError'
 
-  /stores:
-    get:
-      tags: [Discovery]
-      summary: List available vendors/stores
-      parameters:
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Cursor'
-      responses:
-        '200':
-          description: A paginated list of stores.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Store'
-                  nextCursor:
-                    type: string
-                    nullable: true
-        '500':
-          $ref: '#/components/responses/ServerError'
+   /orders/{orderId}/cancel:
+     post:
+       tags: [Ordering]
+       summary: Request to cancel an order
+       description: Initiates a request to cancel an order. This action is only available if advertised in the order's `actions` array.
+       security:
+         - bearerAuth: []
+       parameters:
+         - name: orderId
+           in: path
+           required: true
+           schema: { type: string }
+       requestBody:
+         content:
+           application/ocs+json; version=1.0:
+             schema:
+               type: object
+               properties:
+                 reason: { type: string }
+       responses:
+         '200':
+           description: The cancellation was successful. The updated Order object is returned with status 'cancelled'.
+           content:
+             application/ocs+json; version=1.0:
+               schema: { $ref: '#/components/schemas/Order' }
+         '403':
+           description: The order is not in a state where it can be cancelled.
+           content:
+             application/ocs+json; version=1.0:
+               schema: { $ref: '#/components/schemas/Error' }
 
-  /catalogs:
-    get:
-      tags: [Discovery]
-      summary: List available catalogs
-      parameters:
-        - name: storeId
-          in: query
-          required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Cursor'
-      responses:
-        '200':
-          description: A paginated list of catalog summaries.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CatalogSummary'
-                  nextCursor:
-                    type: string
-                    nullable: true
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /catalogs/{catalogId}:
-    get:
-      tags: [Discovery]
-      summary: Get a full catalog by ID
-      parameters:
-        - name: catalogId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The complete catalog object.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                $ref: '#/components/schemas/Catalog'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /carts:
-    post:
-      tags: [Cart Management]
-      summary: Create a new cart
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/ocs+json; version=1.0:
-            schema:
-              $ref: '#/components/schemas/CreateCartRequest'
-      responses:
-        '201':
-          description: The cart was created successfully.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                $ref: '#/components/schemas/Cart'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /carts/{cartId}:
-    get:
-      tags: [Cart Management]
-      summary: Get a cart by ID
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: cartId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The cart object.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                $ref: '#/components/schemas/Cart'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /carts/{cartId}/items:
-    post:
-      tags: [Cart Management]
-      summary: Add an item to a cart
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: cartId
-          in: path
-          required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/ocs+json; version=1.0:
-            schema:
-              $ref: '#/components/schemas/CartItemRequest'
-      responses:
-        '200':
-          description: The item was added and the updated cart is returned.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                $ref: '#/components/schemas/Cart'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /carts/{cartId}/items/{cartItemId}:
-    delete:
-      tags: [Cart Management]
-      summary: Remove an item from a cart
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: cartId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: cartItemId
-          in: path
-          required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          description: The item was removed and the updated cart is returned.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                $ref: '#/components/schemas/Cart'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-    patch:
-      tags: [Cart Management]
-      summary: Update an item in a cart
-      security:
-        - bearerAuth: []
-      description: Partially update a cart item, e.g., to change its quantity or notes.
-      parameters:
-        - name: cartId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: cartItemId
-          in: path
-          required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/ocs+json; version=1.0:
-            schema:
-              $ref: '#/components/schemas/UpdateCartItemRequest'
-      responses:
-        '200':
-          description: The item was updated and the updated cart is returned.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                $ref: '#/components/schemas/Cart'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /orders:
+   /orders:
     post:
       tags: [Ordering]
       summary: Place an order from a cart
@@ -321,17 +99,23 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateOrderRequest'
       responses:
-        '201':
-          description: The order was successfully created.
-          headers:
-            X-PAYMENT-RESPONSE:
-              schema:
-                type: string
-              description: Base64-encoded JSON `SettlementResponse` containing payment settlement details.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                $ref: '#/components/schemas/Order'
+         '201':
+           description: |
+             The order(s) were successfully created. The response will contain a single Order object by default.
+             If the `dev.ocs.order.fulfillment_intent@1.0` capability was used and resulted in multiple fulfillment groups, this response will contain an array of the created Order objects.
+           headers:
+             X-PAYMENT-RESPONSE:
+               schema:
+                 type: string
+               description: Base64-encoded JSON `SettlementResponse` containing payment settlement details.
+           content:
+             application/ocs+json; version=1.0:
+               schema:
+                 oneOf:
+                   - $ref: '#/components/schemas/Order'
+                   - type: array
+                     items:
+                       $ref: '#/components/schemas/Order'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -385,13 +169,16 @@ paths:
       summary: Subscribe to real-time order updates (SSE)
       security:
         - bearerAuth: []
-      description: |
-        Establishes a Server-Sent Events (SSE) connection to receive real-time updates for an order.
-        The client should handle a `text/event-stream` response.
+       description: |
+         Establishes a Server-Sent Events (SSE) connection to receive real-time updates for an order.
+         The client should handle a `text/event-stream` response.
 
-        **Events:**
-        - `order.patch`: The `data` field will contain a JSON array of patch operations conforming to RFC 6902 (JSON Patch). This event is sent whenever the order object is updated.
-        - `close`: Indicates the order has reached a terminal state (`delivered`, `cancelled`). The server will close the connection after sending this event.
+         **Events:**
+         - `order.patch`: The `data` field will contain a JSON array of patch operations conforming to RFC 6902 (JSON Patch). This event is sent whenever the order object is updated.
+           - Patches to the core `/status` field represent changes to the order's programmatic state category.
+           - Patches to `/metadata/dev.ocs.order.detailed_status@1.0` represent changes to the rich, human-readable status meant for display.
+           - The server will bundle related status changes into a single message to ensure atomic updates.
+         - `close`: Indicates the order has reached a terminal state (`completed`, `cancelled`). The server will close the connection after sending this event.
       parameters:
         - name: orderId
           in: path
@@ -411,8 +198,131 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+          '500':
+            $ref: '#/components/responses/ServerError'
+
+  /orders/{orderId}/ratings:
+    post:
+      tags: [Ordering]
+      summary: Submit ratings for a completed order
+      description: Allows customers to submit ratings and feedback for a completed order. This action is only available if advertised in the order's `actions` array.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: '#/components/schemas/RatingRequest'
+      responses:
+        '201':
+          description: The ratings were successfully submitted.
+          content:
+            application/ocs+json; version=1.0:
+              schema: { $ref: '#/components/schemas/Order' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/ServerError'
+
+  /carts/{cartId}/promotions:
+    post:
+      tags: [Cart Management]
+      summary: Apply or validate a promotion on a cart
+      description: Validates and applies a promotion (e.g., promo code, gift card) to the specified cart, updating the cart's totals accordingly.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: '#/components/schemas/PromotionRequest'
+      responses:
+        '200':
+          description: The promotion was successfully applied. The updated Cart object is returned.
+          content:
+            application/ocs+json; version=1.0:
+              schema: { $ref: '#/components/schemas/Cart' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    /returns:
+     post:
+       tags: [Ordering]
+       summary: Initiate a return for one or more items from an order
+       description: Creates a new Return object. This action is only available if advertised in the order's `actions` array.
+       security:
+         - bearerAuth: []
+       requestBody:
+         required: true
+         content:
+           application/ocs+json; version=1.0:
+             schema:
+               type: object
+               properties:
+                 orderId: { type: string, format: uuid }
+                 items:
+                   type: array
+                   items:
+                     type: object
+                     properties:
+                       cartItemId: { type: string }
+                       quantity: { type: integer }
+                 reason: { type: string }
+               required: [orderId, items]
+       responses:
+         '201':
+           description: The return request was successfully created.
+           content:
+             application/ocs+json; version=1.0:
+               schema: { $ref: '#/components/schemas/Return' }
+
+   /returns/{returnId}:
+     get:
+       tags: [Ordering]
+       summary: Get the status of a specific return
+       security:
+         - bearerAuth: []
+       parameters:
+         - name: returnId
+           in: path
+           required: true
+           schema: { type: string }
+       responses:
+         '200':
+           description: The Return object.
+           content:
+             application/ocs+json; version=1.0:
+               schema: { $ref: '#/components/schemas/Return' }
 
 components:
   schemas:
@@ -453,14 +363,23 @@ components:
         longitude: { type: number }
       required: [address]
 
-    Store:
-      type: object
-      properties:
-        id: { type: string, format: uuid }
-        name: { type: string }
-        location: { $ref: '#/components/schemas/Location' }
-        catalogIds: { type: array, items: { type: string } }
-      required: [id, name, location]
+     Store:
+       type: object
+       properties:
+         id: { type: string, format: uuid }
+         name: { type: string }
+         location: { $ref: '#/components/schemas/Location' }
+         catalogIds: { type: array, items: { type: string } }
+         metadata:
+           type: object
+           description: |
+             Namespaced key-value pairs. The structure of this object may be defined
+             by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
+             will use their ID as a key.
+             Examples:
+             - "dev.ocs.restaurant.profile@1.0"
+             - "dev.ocs.store.constraints@1.0"
+       required: [id, name, location]
 
     CatalogSummary:
       type: object
@@ -470,13 +389,21 @@ components:
         version: { type: string, description: "Version identifier for the catalog." }
       required: [id, name, version]
 
-    Catalog:
-      allOf:
-        - $ref: '#/components/schemas/CatalogSummary'
-        - type: object
-          properties:
-            items: { type: array, items: { $ref: '#/components/schemas/CatalogItem' } }
-          required: [items]
+     Catalog:
+       allOf:
+         - $ref: '#/components/schemas/CatalogSummary'
+         - type: object
+           properties:
+             items: { type: array, items: { $ref: '#/components/schemas/CatalogItem' } }
+             metadata:
+               type: object
+               description: |
+                 Namespaced key-value pairs. The structure of this object may be defined
+                 by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
+                 will use their ID as a key.
+                 Examples:
+                 - "dev.ocs.promotions.discoverable@1.0"
+           required: [items]
 
     CatalogItem:
       type: object
@@ -490,22 +417,18 @@ components:
           type: string
           enum: [pickup, physical, digital]
           description: "The fulfillment method for this item, which dictates the required information for an order."
-        addOns: { type: array, items: { $ref: '#/components/schemas/AddOn' } }
         metadata:
           type: object
           description: |
             Namespaced key-value pairs. The structure of this object may be defined
             by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
-            will use their ID as a key (e.g., "dev.ocs.product.variants@1.0").
+            will use their ID as a key.
+            Examples:
+            - "dev.ocs.product.variants@1.0"
+            - "dev.ocs.product.customization@1.0"
+            - "dev.ocs.product.addons@1.0"
+            - "dev.ocs.product.physical_properties@1.0"
       required: [id, name, price, available, fulfillmentType]
-
-    AddOn:
-      type: object
-      properties:
-        id: { type: string }
-        name: { type: string }
-        price: { $ref: '#/components/schemas/Money' }
-      required: [id, name, price]
 
     CreateCartRequest:
       type: object
@@ -520,6 +443,16 @@ components:
         quantity: { type: integer, minimum: 1 }
         addOnIds: { type: array, items: { type: string } }
         notes: { type: string }
+        customizations:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+          description: "Key-value map of selected customizations, where the key is the group ID and value is the selected option ID(s)."
+          example: {"group_size": "size_large", "group_toppings": ["topping_pepperoni", "topping_onions"]}
       required: [itemId, quantity]
 
     UpdateCartItemRequest:
@@ -528,6 +461,15 @@ components:
         quantity: { type: integer, minimum: 1 }
         notes: { type: string, nullable: true }
         addOnIds: { type: array, items: { type: string } }
+        customizations:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+          description: "Key-value map of selected customizations, where the key is the group ID and value is the selected option ID(s)."
 
     Cart:
       type: object
@@ -551,39 +493,150 @@ components:
             metadata: { type: object, description: "Namespaced key-value pairs." }
           required: [cartItemId, price]
 
-    CreateOrderRequest:
-      type: object
-      properties:
-        cartId: { type: string, format: uuid }
-        orderType: { type: string, enum: [pickup, delivery] }
-        deliveryAddress:
-          $ref: '#/components/schemas/Location'
-          description: "Required if the cart contains any items with a fulfillmentType of 'physical'."
-        notes: { type: string }
-        promotions: { type: array, items: { type: string }, description: "Array of promotion codes." }
-      required: [cartId, orderType]
+      CreateOrderRequest:
+        type: object
+        properties:
+          cartId: { type: string, format: uuid }
+          deliveryAddress:
+            $ref: '#/components/schemas/Location'
+            description: "A delivery address is required if, and only if, the referenced cart contains at least one item with a fulfillmentType of 'physical'."
+          notes: { type: string }
+          metadata: { type: object }
+        required: [cartId]
 
-    Order:
-      type: object
-      properties:
-        id: { type: string, format: uuid }
-        status: { type: string, enum: [placed, confirmed, preparing, ready_for_pickup, out_for_delivery, delivered, cancelled, shipped] }
-        items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
-        total: { $ref: '#/components/schemas/Money' }
-        orderType: { type: string, enum: [pickup, delivery] }
-        deliveryAddress: { $ref: '#/components/schemas/Location' }
-        promotions: { type: array, items: { type: string }, description: "Successfully applied promotion codes." }
-        createdAt: { type: string, format: date-time }
-        updatedAt: { type: string, format: date-time }
-        metadata:
-          type: object
-          description: |
-            Namespaced key-value pairs. The structure of this object may be defined
-            by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
-            will use their ID as a key (e.g., "dev.ocs.order.shipment_tracking@1.0").
-      required: [id, status, items, total, orderType, createdAt, updatedAt]
+      PromotionRequest:
+        type: object
+        description: A request to apply or validate a promotion on a cart.
+        properties:
+          type:
+            type: string
+            enum: [promo_code, gift_card, loyalty_points]
+            description: "The type of promotion being applied."
+          value:
+            type: string
+            description: "The value for the promotion (e.g., the code 'SUMMER10')."
+        required: [type, value]
 
-    JsonPatchOperation:
+      RatingRequest:
+        type: object
+        description: A request to submit ratings for a completed order.
+        properties:
+          food:
+            type: integer
+            minimum: 1
+            maximum: 5
+            description: "Rating for the food quality (1-5 stars)."
+          delivery:
+            type: integer
+            minimum: 1
+            maximum: 5
+            description: "Rating for the delivery service (1-5 stars)."
+          restaurant:
+            type: integer
+            minimum: 1
+            maximum: 5
+            description: "Overall rating for the restaurant (1-5 stars)."
+          comment:
+            type: string
+            description: "Optional text comment from the customer."
+
+      ValidationIssue:
+        type: object
+        description: "Details a failed validation rule on a specific field."
+        properties:
+          type: { type: string, enum: ["validation"] }
+          field: { type: string, description: "A JSON Pointer to the invalid field in the request body." }
+          value: { description: "The invalid value that was provided by the client." }
+          reason: { type: string, description: "A description of the validation rule that failed (e.g., 'String must be a valid UUID')." }
+        required: [type, field, reason]
+
+      BusinessLogicIssue:
+        type: object
+        description: "Details a failed business rule involving one or more resources."
+        properties:
+          type: { type: string, enum: ["business_logic"] }
+          resourceId: { type: string, description: "The ID of the resource that caused the issue (e.g., an out-of-stock itemId)." }
+          reason: { type: string, description: "A description of the business rule that was violated (e.g., 'The requested item has 0 stock remaining')." }
+        required: [type, resourceId, reason]
+
+     Order:
+       type: object
+       properties:
+         id: { type: string, format: uuid }
+         status:
+           type: string
+           description: |
+             A required, standardized status code representing the programmatic state category of the order.
+             This is intended for client-side logic (e.g., state machines), NOT for direct display to the user.
+             For rich, human-readable status, clients should check for the 'dev.ocs.order.detailed_status@1.0' capability.
+           enum:
+             - pending     # Order created, but not yet confirmed by the system (e.g., awaiting inventory check).
+             - confirmed   # The order is accepted and will be processed.
+             - processing  # The order is actively being worked on (e.g., kitchen is preparing, item is being manufactured).
+             - in_transit  # The order has left the origin and is on its way to the destination.
+             - completed   # The order has been successfully fulfilled (delivered, picked up, or digitally accessed).
+             - cancelled   # The order has been cancelled by the user or the system.
+          actions:
+            type: array
+            description: |
+              A list of actions the client can perform on this order in its current state.
+              The presence of an action indicates the user should be shown the corresponding UI control.
+            items:
+              type: object
+              properties:
+                id: { type: "string", enum: ["cancel", "initiate_return", "add_rating"] }
+                href: { type: "string", format: "uri", description: "The API endpoint to call to perform this action." }
+              required: [id, href]
+          returnIds:
+            type: array
+            description: "An array of IDs for any Return objects associated with this order."
+            items:
+              type: string
+              format: uuid
+          items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
+         total: { $ref: '#/components/schemas/Money' }
+         deliveryAddress: { $ref: '#/components/schemas/Location' }
+         createdAt: { type: string, format: date-time }
+         updatedAt: { type: string, format: date-time }
+         metadata:
+           type: object
+           description: |
+             Namespaced key-value pairs. The structure of this object may be defined
+             by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
+             will use their ID as a key.
+             Examples:
+             - "dev.ocs.order.shipment_tracking@1.0"
+             - "dev.ocs.order.kitchen_status@1.0"
+             - "dev.ocs.order.delivery_tracking@1.0"
+             - "dev.ocs.order.tipping_and_ratings@1.0"
+             - "dev.ocs.order.digital_access@1.0"
+             - "dev.ocs.order.detailed_status@1.0"
+        required: [id, status, items, total, createdAt, updatedAt]
+
+     Return:
+       type: object
+       description: "A Return object representing a return request and its lifecycle."
+       properties:
+         id: { type: string, format: uuid, description: "The unique identifier for this return." }
+         originalOrderId: { type: string, format: uuid }
+         status:
+           type: string
+           enum: [requested, approved, rejected, in_transit, received, processed, completed]
+           description: "The current status of the return workflow."
+         items:
+           type: array
+           items:
+             type: object
+             properties:
+               cartItemId: { type: string, description: "The ID of the item from the original order." }
+               quantity: { type: integer }
+         reason: { type: string, description: "The reason the user provided for the return." }
+         returnLabelUrl: { type: string, format: uri, description: "A URL to a printable shipping label for the user." }
+         createdAt: { type: string, format: date-time }
+         updatedAt: { type: string, format: date-time }
+       required: [id, originalOrderId, status, items, createdAt, updatedAt]
+
+     JsonPatchOperation:
       type: object
       description: "A single JSON Patch operation, as defined by RFC 6902."
       required: [op, path]
@@ -661,13 +714,74 @@ components:
         payer: { type: string }
       required: [success, transaction, network, payer]
 
-    Error:
-      type: object
-      properties:
-        code: { type: string, enum: [bad_request, unauthorized, forbidden, not_found, conflict, idempotency_key_reused, product_unavailable, delivery_address_invalid, payment_failed, server_error] }
-        message: { type: string }
-        details: { type: array, items: { type: object, properties: { field: { type: string }, issue: { type: string } } } }
-      required: [code, message]
+     Error:
+       type: object
+       description: "A structured error response that communicates with the machine, the developer, and the end-user."
+       properties:
+         code:
+           type: string
+           description: "A specific, machine-readable error code for programmatic handling."
+           enum:
+             # General
+             - bad_request
+             - unauthorized
+             - forbidden
+             - not_found
+             - conflict
+             - server_error
+             # Idempotency
+             - idempotency_key_reused
+             # Cart & Product
+             - product_unavailable
+             - product_customization_invalid
+             # Promotions
+             - promotion_invalid
+             - promotion_expired
+             - promotion_not_applicable
+             - promotion_stacking_not_allowed
+             # Fulfillment & Ordering
+             - delivery_address_required
+             - delivery_address_invalid
+             - fulfillment_intent_incomplete
+             - fulfillment_intent_duplicate_item
+             - fulfillment_method_invalid
+             # Payments
+             - payment_failed
+             # Cancellation & Returns
+             - cancellation_window_expired
+             - return_policy_violated
+         message:
+           type: string
+           description: "A developer-facing, human-readable message, NOT for display to the end-user."
+         details:
+           type: array
+           description: "An array of structured objects providing deep context about the error."
+           items:
+             oneOf:
+               - $ref: '#/components/schemas/ValidationIssue'
+               - $ref: '#/components/schemas/BusinessLogicIssue'
+         userMessage:
+           type: object
+           description: "A localization-friendly, user-safe message. The client should use this to build the UI message."
+           properties:
+             localizationKey:
+               type: string
+               description: "An i18n key the client can use to look up a translated string."
+               example: "error.promotion.expired"
+             params:
+               type: object
+               description: "A key-value map of parameters to inject into the localized string."
+               example: { "code": "WINTER20", "expiryDate": "2024-01-31" }
+         nextActions:
+           type: array
+           description: "A list of suggested, valid actions the client can take to recover from this error."
+           items:
+             type: object
+             properties:
+               id: { type: string, description: "A programmatic identifier for the action." }
+               href: { type: string, format: "uri", description: "The endpoint to call for this action." }
+               method: { type: string, enum: ["GET", "POST", "PATCH", "DELETE"] }
+       required: [code, message]
 
   securitySchemes:
     bearerAuth:

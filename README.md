@@ -182,6 +182,8 @@ The client immediately opens a connection to the SSE endpoint.
 
 **Response Stream:**
 ```
+# --- Order is confirmed ---
+# The programmatic state and detailed status are added atomically.
 event: order.patch
 data: [
   {"op": "replace", "path": "/status", "value": "confirmed"},
@@ -191,6 +193,8 @@ data: [
   }}
 ]
 
+# --- Order is in transit, and a driver is assigned ---
+# The core status changes, and two new metadata capabilities are added.
 event: order.patch
 data: [
   {"op": "replace", "path": "/status", "value": "in_transit"},
@@ -203,6 +207,8 @@ data: [
   }}
 ]
 
+# --- Live location is updated moments later ---
+# A tiny, efficient patch is sent for only the data that changed.
 event: order.patch
 data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]
 ```
@@ -221,10 +227,10 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | **`dev.ocs.product.addons@1.0`** | Product (`CatalogItem`) | Defines simple, selectable add-ons for a product, such as gift wrapping, extended warranty, or side dishes. | [product/addons/v1.json](./schemas/product/addons/v1.json) |
 | **`dev.ocs.product.physical_properties@1.0`** | Product (`CatalogItem`) | Defines physical properties like weight and dimensions, primarily for shipping estimation. | [product/physical_properties/v1.json](./schemas/product/physical_properties/v1.json) |
 | **`dev.ocs.restaurant.profile@1.0`** | Store | Adds restaurant-specific data like cuisine, hours, price range, and ratings. | [restaurant/profile/v1.json](./schemas/restaurant/profile/v1.json) |
-| **`dev.ocs.order.kitchen_status@1.0`** | Order | Provides real-time updates on an order's status within the kitchen. | [order/kitchen_status/v1.json](./schemas/order/kitchen_status/v1.json) |
+| **`dev.ocs.order.kitchen_status@1.0`** | Order | Provides real-time updates on an order's status within the kitchen. | [restaurant/kitchen_status/v1.json](./schemas/restaurant/kitchen_status/v1.json) |
 | **`dev.ocs.order.delivery_tracking@1.0`** | Order | Provides a real-time data structure for tracking a delivery, including driver info, GPS, and ETA. | [order/delivery_tracking/v1.json](./schemas/order/delivery_tracking/v1.json) |
 | **`dev.ocs.order.shipment_tracking@1.0`** | Order | Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package. | [order/shipment_tracking/v1.json](./schemas/order/shipment_tracking/v1.json) |
-| **`dev.ocs.order.tipping_and_ratings@1.0`** | Order | Allows for adding tips and rating the order after completion. | [order/tipping_and_ratings/v1.json](./schemas/order/tipping_and_ratings/v1.json) |
+| **`dev.ocs.order.tipping_and_ratings@1.0`** | Order | Allows for adding tips to the order. Ratings are submitted via a dedicated action endpoint. | [order/tipping_and_ratings/v1.json](./schemas/order/tipping_and_ratings/v1.json) |
 | **`dev.ocs.order.digital_access@1.0`** | Order | Provides an array of objects containing access details for digital goods, such as download URLs or license keys. | [order/digital_access/v1.json](./schemas/order/digital_access/v1.json) |
 | **`dev.ocs.order.detailed_status@1.0`** | Order | Provides a rich, human-readable status (title, description, progress) for display in a UI, augmenting the core `status` field. | [order/detailed_status/v1.json](./schemas/order/detailed_status/v1.json) |
 | **`dev.ocs.order.cancellation@1.0`** | Order (Action) | Enables the workflow for cancelling an order via a dedicated endpoint, discoverable through the `Order.actions` field. | N/A (Workflow) |
@@ -233,6 +239,7 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | **`dev.ocs.promotions.discoverable@1.0`** | Store, Catalog | Allows a server to advertise publicly available promotions to clients. | [promotions/discoverable/v1.json](./schemas/promotions/discoverable/v1.json) |
 | **`dev.ocs.order.applied_promotions@1.0`** | Order | Provides a final, authoritative record of all value modifications on the completed order. | [order/applied_promotions/v1.json](./schemas/order/applied_promotions/v1.json) |
 | **`dev.ocs.order.fulfillment_intent@1.0`** | CreateOrderRequest | Allows a client to specify a precise fulfillment plan for the items in a cart, supporting mixed fulfillment and split orders. | [order/fulfillment_intent/v1.json](./schemas/order/fulfillment_intent/v1.json) |
+| **`dev.ocs.store.constraints@1.0`** | Store | Advertises server-side business rules (e.g., promotion policies, return windows) to help clients prevent errors. | [store/constraints/v1.json](./schemas/store/constraints/v1.json) |
 
 <br />
 
@@ -274,7 +281,7 @@ OCS is a living standard. The future direction includes:
 | `/orders/{id}/cancel` | `POST` | Request to cancel an order. | Yes |
 | `/returns` | `POST` | Initiate a return for items from an order. | Yes |
 | `/returns/{id}` | `GET` | Get the status of a specific return. | Yes |
-| `/carts/{id}/promotions` | `POST` | Apply or validate a promotion on a cart. | Yes |
+| `/carts/{cartId}/promotions` | `POST` | Apply or validate a promotion on a cart. | Yes |
 
 <br />
 

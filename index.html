@@ -1801,11 +1801,11 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/
                                 <td>Order</td>
                                 <td>Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package.</td>
                             </tr>
-                            <tr>
-                                <td><span class="inline-code">dev.ocs.order.tipping_and_ratings@1.0</span></td>
-                                <td>Order</td>
-                                <td>Allows for adding tips and rating the order after completion.</td>
-                            </tr>
+                             <tr>
+                                 <td><span class="inline-code">dev.ocs.order.tipping_and_ratings@1.0</span></td>
+                                 <td>Order</td>
+                                 <td>Allows for adding tips to the order. Ratings are submitted via a dedicated action endpoint.</td>
+                             </tr>
                             <tr>
                                 <td><span class="inline-code">dev.ocs.order.digital_access@1.0</span></td>
                                 <td>Order</td>
@@ -1826,12 +1826,17 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/
                                 <td>Order (Action)</td>
                                 <td>Enables a full lifecycle for item returns, including initiation and tracking via new /returns endpoints.</td>
                             </tr>
-                            <tr>
-                                <td><span class="inline-code">dev.ocs.order.refunds@1.0</span></td>
-                                <td>Order (Metadata)</td>
-                                <td>Provides a standardized, auditable record of all monetary refunds associated with an order.</td>
-                            </tr>
-                        </tbody>
+                             <tr>
+                                 <td><span class="inline-code">dev.ocs.order.refunds@1.0</span></td>
+                                 <td>Order (Metadata)</td>
+                                 <td>Provides a standardized, auditable record of all monetary refunds associated with an order.</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">dev.ocs.store.constraints@1.0</span></td>
+                                 <td>Store</td>
+                                 <td>Advertises server-side business rules (e.g., promotion policies, return windows) to help clients prevent errors.</td>
+                             </tr>
+                         </tbody>
                     </table>
                 </div>
             </section>
@@ -1991,18 +1996,29 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/
                      </div>
                  </div>
 
-                 <div class="endpoint-card">
-                     <div class="endpoint-header">
-                         <span class="http-method http-post">POST</span>
-                         <span class="endpoint-path">/orders/{id}/cancel</span>
-                         <span class="badge badge-warning">Auth Required</span>
-                     </div>
-                     <div class="endpoint-body">
-                         <p>Request to cancel an order.</p>
-                     </div>
-                 </div>
+                  <div class="endpoint-card">
+                      <div class="endpoint-header">
+                          <span class="http-method http-post">POST</span>
+                          <span class="endpoint-path">/orders/{id}/cancel</span>
+                          <span class="badge badge-warning">Auth Required</span>
+                      </div>
+                      <div class="endpoint-body">
+                          <p>Request to cancel an order.</p>
+                      </div>
+                  </div>
 
-                 <div class="endpoint-card">
+                  <div class="endpoint-card">
+                      <div class="endpoint-header">
+                          <span class="http-method http-post">POST</span>
+                          <span class="endpoint-path">/orders/{id}/ratings</span>
+                          <span class="badge badge-warning">Auth Required</span>
+                      </div>
+                      <div class="endpoint-body">
+                          <p>Submit ratings for a completed order.</p>
+                      </div>
+                  </div>
+
+                  <div class="endpoint-card">
                      <div class="endpoint-header">
                          <span class="http-method http-post">POST</span>
                          <span class="endpoint-path">/returns</span>
@@ -2288,69 +2304,199 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
             <section id="error-handling">
                 <h2>Error Handling</h2>
 
-                <p>OCS uses standard HTTP status codes and provides detailed error responses. For the complete list of error codes and response schemas, see the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L664-L670" target="_blank" style="color: var(--primary); text-decoration: underline;">Error schema</a> and <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L697-L727" target="_blank" style="color: var(--primary); text-decoration: underline;">responses section</a> in the OpenAPI spec.</p>
+                <p>The OCS error handling system is designed as a first-class communication platform that serves three distinct audiences: the <strong>machine</strong> (for programmatic recovery), the <strong>developer</strong> (for debugging), and the <strong>end-user</strong> (for clear, localized guidance). It combines proactive error prevention with rich, contextual error responses.</p>
+
+                <div class="info-box">
+                    <strong>Philosophy</strong>
+                    Errors are part of the API experience, not an afterthought. A great API tells you not just what went wrong, but why it happened and how to fix it—before you even make the request.
+                </div>
+
+                <h3>1. Proactive Error Prevention</h3>
+
+                <p>Before making requests, clients can discover server constraints and business rules to prevent errors entirely.</p>
+
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Discover Store Constraints</div>
+                    <p>Check if the server supports <span class="inline-code">dev.ocs.store.constraints@1.0</span> in the capabilities response. If available, fetch store metadata to understand business rules.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Adapt UI Based on Rules</div>
+                    <p>Use constraint data to disable invalid options, show appropriate warnings, and guide user behavior.</p>
+                </div>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-javascript">// Example: Prevent invalid cart sizes
+async function getStoreConstraints(storeId) {
+  const store = await fetch(`${API_BASE}/stores/${storeId}`).then(r => r.json());
+  return store.metadata?.['dev.ocs.store.constraints@1.0'];
+}
+
+const constraints = await getStoreConstraints('store_123');
+if (constraints?.maxCartItems) {
+  // Disable "Add to Cart" when limit reached
+  addToCartButton.disabled = cart.items.length >= constraints.maxCartItems;
+}</code></pre></div>
+                </div>
+
+                <h3>2. Rich Error Responses</h3>
+
+                <p>When errors do occur, OCS provides structured responses with multiple layers of information.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <div class="feature-title">Machine-Readable Codes</div>
+                        <div class="feature-description">Specific error codes for programmatic handling and recovery logic.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">👨‍💻</div>
+                        <div class="feature-title">Developer Context</div>
+                        <div class="feature-description">Detailed technical messages and structured validation/business logic issues.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">👤</div>
+                        <div class="feature-title">User-Friendly Messages</div>
+                        <div class="feature-description">Localization-ready messages with parameters for clean UI display.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🛠️</div>
+                        <div class="feature-title">Recovery Actions</div>
+                        <div class="feature-description">Suggested next steps with endpoint URLs to resolve the error.</div>
+                    </div>
+                </div>
+
+                <h3>Error Response Structure</h3>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "code": "promotion_stacking_not_allowed",
+  "message": "Multiple promotions cannot be applied to the same cart",
+  "details": [
+    {
+      "type": "business_logic",
+      "resourceId": "cart_abc",
+      "reason": "Cart already has promotion 'SUMMER10' applied"
+    }
+  ],
+  "userMessage": {
+    "localizationKey": "error.promotion.multiple_not_allowed",
+    "params": {
+      "existingCode": "SUMMER10"
+    }
+  },
+  "nextActions": [
+    {
+      "id": "remove_promotion",
+      "href": "/carts/cart_abc/promotions/SUMMER10",
+      "method": "DELETE"
+    }
+  ]
+}</code></pre></div>
+                </div>
+
+                <h3>Handling Different Error Types</h3>
+
+                <div class="card">
+                    <h4>Validation Errors</h4>
+                    <p>Client-side input issues with specific field pointers.</p>
+                    <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <div class="code-block"><pre><code class="language-json">{
+  "code": "bad_request",
+  "details": [
+    {
+      "type": "validation",
+      "field": "/deliveryAddress/latitude",
+      "value": "invalid_coords",
+      "reason": "Must be a valid latitude between -90 and 90"
+    }
+  ]
+}</code></pre></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Business Logic Errors</h4>
+                    <p>Server-side rule violations with resource context.</p>
+                    <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <div class="code-block"><pre><code class="language-json">{
+  "code": "product_unavailable",
+  "details": [
+    {
+      "type": "business_logic",
+      "resourceId": "prod_123",
+      "reason": "Product has 0 stock remaining"
+    }
+  ]
+}</code></pre></div>
+                    </div>
+                </div>
+
+                <h3>Common Error Codes</h3>
 
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>Status Code</th>
-                                <th>Error Code</th>
+                                <th>Code</th>
+                                <th>HTTP Status</th>
                                 <th>Description</th>
+                                <th>Recovery Strategy</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
+                                <td><span class="inline-code">product_unavailable</span></td>
                                 <td>400</td>
-                                <td><span class="inline-code">bad_request</span></td>
-                                <td>The request was malformed or invalid</td>
+                                <td>Requested item is out of stock</td>
+                                <td>Remove from cart or suggest alternatives</td>
                             </tr>
                             <tr>
-                                <td>401</td>
-                                <td><span class="inline-code">unauthorized</span></td>
-                                <td>Authentication credentials are missing or invalid</td>
+                                <td><span class="inline-code">promotion_invalid</span></td>
+                                <td>400</td>
+                                <td>Invalid promo code</td>
+                                <td>Prompt user to enter a different code</td>
                             </tr>
                             <tr>
-                                <td>402</td>
-                                <td>N/A</td>
-                                <td>Payment is required (x402 protocol)</td>
+                                <td><span class="inline-code">delivery_address_required</span></td>
+                                <td>400</td>
+                                <td>Physical items need delivery address</td>
+                                <td>Show address form</td>
                             </tr>
                             <tr>
+                                <td><span class="inline-code">payment_failed</span></td>
+                                <td>400</td>
+                                <td>Payment processing failed</td>
+                                <td>Retry payment or use different method</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">cancellation_window_expired</span></td>
                                 <td>403</td>
-                                <td><span class="inline-code">forbidden</span></td>
-                                <td>The client is not authorized to perform this action</td>
-                            </tr>
-                            <tr>
-                                <td>404</td>
-                                <td><span class="inline-code">not_found</span></td>
-                                <td>The requested resource could not be found</td>
-                            </tr>
-                            <tr>
-                                <td>409</td>
-                                <td><span class="inline-code">conflict</span></td>
-                                <td>A conflict occurred (e.g., reused idempotency key)</td>
-                            </tr>
-                            <tr>
-                                <td>500</td>
-                                <td><span class="inline-code">server_error</span></td>
-                                <td>An unexpected server error occurred</td>
+                                <td>Order too old to cancel</td>
+                                <td>Show return options instead</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <h3>Error Response Format</h3>
-                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                <div class="code-block"><pre><code class="language-json">{
-                "code": "product_unavailable",
-                "message": "The requested product is currently out of stock",
-                "details": [
-                {
-                "field": "itemId",
-                "issue": "Product 'prod_123' has 0 stock remaining"
-                }
-                ]
-}</code></pre></div>
+                <h3>Implementation Best Practices</h3>
+
+                <ul>
+                    <li><strong>Check constraints first:</strong> Always fetch store constraints before building cart/checkout UIs.</li>
+                    <li><strong>Handle all error fields:</strong> Use <span class="inline-code">userMessage</span> for UI display, <span class="inline-code">details</span> for debugging, and <span class="inline-code">nextActions</span> for recovery.</li>
+                    <li><strong>Localize user messages:</strong> Use the <span class="inline-code">localizationKey</span> and <span class="inline-code">params</span> to show translated, context-aware messages.</li>
+                    <li><strong>Implement recovery flows:</strong> Use <span class="inline-code">nextActions</span> to provide one-click error resolution.</li>
+                    <li><strong>Log developer messages:</strong> Use the <span class="inline-code">message</span> field for server-side logging and debugging.</li>
+                </ul>
+
+                <div class="info-box success">
+                    <strong>Result</strong>
+                    With OCS error handling, your application can prevent most errors proactively and handle the rest gracefully, creating a smooth, professional user experience.
                 </div>
             </section>
 
