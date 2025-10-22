@@ -1805,6 +1805,8 @@ if (returnAction) {
                 <ul>
                     <li><strong>Cancellations:</strong> The <code>cancel</code> action only appears if an order is cancellable.</li>
                     <li><strong>Writing Reviews:</strong> The <code>add_review</code> action only appears on a <code>CatalogItem</code> if the logged-in user has purchased it.</li>
+                    <li><strong>Ratings:</strong> The <code>rate_order</code> action appears on completed orders if <code>dev.ocs.order.ratings@1.0</code> is supported.</li>
+                    <li><strong>Returns:</strong> The <code>initiate_return</code> action appears if <code>dev.ocs.order.returns@1.0</code> is supported and the order is eligible.</li>
                 </ul>
 
                 <div class="info-box success">
@@ -1833,18 +1835,28 @@ if (returnAction) {
                             <div class="code-block"><pre><code class="language-json">{
   "capabilities": [
     {
+      "id": "dev.ocs.cart@1.0",
+      "schemaUrl": "https://schemas.ocs.dev/cart/v1.json"
+    },
+    {
       "id": "dev.ocs.product.variants@1.0",
       "schemaUrl": "https://schemas.ocs.dev/product/variants/v1.json"
     },
     {
       "id": "dev.ocs.order.shipment_tracking@1.0",
       "schemaUrl": "https://schemas.ocs.dev/order/shipment_tracking/v1.json"
+    },
+    {
+      "id": "dev.ocs.order.ratings@1.0"
+    },
+    {
+      "id": "dev.ocs.order.returns@1.0"
     }
   ]
 }</code></pre></div>
                         <div class="info-box">
                             <strong>Client Insight:</strong>
-                            "Okay, this server supports products with variants (like size and color) and will provide shipment tracking details for orders. I can now enable the UI for these features."
+                            "Okay, this server supports stateful shopping carts (dev.ocs.cart@1.0), products with variants, shipment tracking, order ratings, and returns workflows. I can now enable the UI for these features."
                         </div>
                     </div>
                 </div>
@@ -1903,7 +1915,12 @@ if (returnAction) {
                             <div class="code-block"><pre><code class="language-json">{
   "cartId": "cart_abc",
   "deliveryAddress": {
-    "address": "123 OCS Lane, Protocol City, 1337"
+    "address": "123 Main St, City, State 12345",
+    "latitude": 37.7749,
+    "longitude": -122.4194
+  },
+  "billingAddress": {
+    "address": "456 Billing Ave, City, State 67890"
   }
 }</code></pre></div>
                         </div>
@@ -1948,12 +1965,142 @@ event: order.patch
 data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]</code></pre></div>
                         <div class="info-box">
                             <strong>Client Insight:</strong>
-                            The client's UI updates the status to "Shipped." Because it saw the <span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span> capability in Step 1, it knows to look for the <span class="inline-code">dev.ocs.order.shipment_tracking</span> key in the metadata and can now display a "Track Your Shipment" button that links to the <span class="inline-code">trackingUrl</span>.
+                            The client's UI updates the status to "Shipped." Because it saw the <span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span> capability in Step 1, it knows to look for the <span class="inline-code">dev.ocs.order.shipment_tracking</span> key in the metadata and can now display a "Track Your Shipment" button that links to the <span class="inline-code">trackingUrl</span>. If ratings are supported, it can also show a "Rate Your Order" button.
                         </div>
                     </div>
                 </div>
                 </div>
                 </span>
+            </section>
+
+            <!-- Customer Information Examples -->
+            <section id="customer-info-examples">
+                <h2>Customer Information Examples</h2>
+
+                <p>These examples demonstrate how clients use the new customer information capabilities to enhance the user experience with saved profiles, guest checkouts, and billing addresses.</p>
+
+                <h3>Using Saved User Profiles for Address Pre-filling</h3>
+
+                <p>When <span class="inline-code">dev.ocs.user.profile@1.0</span> is supported, clients can fetch and use saved addresses to streamline checkout.</p>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-get">GET</span>
+                        <span class="endpoint-path">/user/profile</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <strong>Response:</strong>
+                        <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <div class="code-block"><pre><code class="language-json">{
+  "savedAddresses": [
+    {
+      "label": "Home",
+      "address": {
+        "streetAddress": "123 Main St",
+        "addressLocality": "Anytown",
+        "addressRegion": "CA",
+        "postalCode": "12345",
+        "addressCountry": "US"
+      }
+    },
+    {
+      "label": "Work",
+      "address": {
+        "streetAddress": "456 Office Blvd",
+        "addressLocality": "Business City",
+        "addressRegion": "CA",
+        "postalCode": "67890",
+        "addressCountry": "US"
+      }
+    }
+  ],
+  "defaultBillingAddress": {
+    "streetAddress": "123 Main St",
+    "addressLocality": "Anytown",
+    "addressRegion": "CA",
+    "postalCode": "12345",
+    "addressCountry": "US"
+  },
+  "preferences": {
+    "language": "en-US",
+    "notifications": true,
+    "currency": "USD"
+  },
+  "consentGiven": true
+}</code></pre></div>
+                        <div class="info-box">
+                            <strong>Client Logic:</strong>
+                            Populate address dropdowns with savedAddresses. Pre-select defaultBillingAddress for billing. Use preferences to set UI language and currency. Check consentGiven before collecting additional data.
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Guest Checkout with Temporary Customer Info</h3>
+
+                <p>For anonymous users, <span class="inline-code">dev.ocs.cart.guest@1.0</span> allows attaching temporary customer information to carts.</p>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-post">POST</span>
+                        <span class="endpoint-path">/carts</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <strong>Request (Guest Cart):</strong>
+                        <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <div class="code-block"><pre><code class="language-json">{
+  "storeId": "store_123",
+  "guestInfo": {
+    "email": "guest@example.com",
+    "name": "John Doe",
+    "phone": "+1-555-0123"
+  }
+}</code></pre></div>
+                        <div class="info-box">
+                            <strong>Client Insight:</strong>
+                            Guest carts can include basic contact info without requiring account creation. This enables checkout flows for anonymous users while maintaining data for order fulfillment and communication.
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Order with Billing Address and Custom Fields</h3>
+
+                <p>Enhanced order requests can include separate billing addresses and custom fields for international commerce.</p>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="http-method http-post">POST</span>
+                        <span class="endpoint-path">/orders</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <strong>Request:</strong>
+                        <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <div class="code-block"><pre><code class="language-json">{
+  "cartId": "cart_abc",
+  "deliveryAddress": {
+    "address": "123 Main St, Anytown, CA 12345"
+  },
+  "billingAddress": {
+    "address": "456 Billing Rd, Business City, CA 67890"
+  },
+  "metadata": {
+    "dev.ocs.order.customer_fields": {
+      "_version": "1.0",
+      "taxId": "US123456789",
+      "customsDeclaration": {
+        "description": "Apparel",
+        "value": 25.00,
+        "countryOfOrigin": "US"
+      },
+      "companyName": "Example Corp"
+    }
+  }
+}</code></pre></div>
+                        <div class="info-box">
+                            <strong>Client Logic:</strong>
+                            Include billingAddress when different from delivery. Use customer_fields for tax IDs, customs info, and B2B details. This supports international shipping and compliance requirements.
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- Advanced Commerce Scenarios -->
@@ -2412,9 +2559,22 @@ app.get('/catalogs/:id', (req, res) => {
                         </thead>
                         <tbody>
                             <tr>
+                                <td><span class="inline-code">dev.ocs.cart@1.0</span></td>
+                                <td>Server-wide</td>
+                                <td>Indicates support for stateful, server-side shopping carts with configurable lifecycle policies (expiration, limits, persistence).</td>
+                                <td>[cart/v1.json](./schemas/cart/v1.json)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.order.direct@1.0</span></td>
+                                <td>Server-wide</td>
+                                <td>Indicates support for cart-less "Buy Now" orders created directly from items, bypassing the cart entirely.</td>
+                                <td>[order/direct/v1.json](./schemas/order/direct/v1.json)</td>
+                            </tr>
+                            <tr>
                                 <td><span class="inline-code">dev.ocs.product.variants@1.0</span></td>
                                 <td>Product (CatalogItem)</td>
                                 <td>Defines user-selectable options (e.g., size, color) and their corresponding variants, each with its own ID, price, and stock.</td>
+                                <td>[product/variants/v1.json](./schemas/product/variants/v1.json)</td>
                             </tr>
                             <tr>
                                 <td><span class="inline-code">dev.ocs.product.customization@1.0</span></td>
@@ -2451,11 +2611,18 @@ app.get('/catalogs/:id', (req, res) => {
                                 <td>Order</td>
                                 <td>Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package.</td>
                             </tr>
-                             <tr>
-                                 <td><span class="inline-code">dev.ocs.order.tipping@1.0</span></td>
-                                 <td>Order</td>
-                                 <td>Allows for adding tips to the order. Ratings are submitted via a dedicated action endpoint.</td>
-                             </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.order.tipping@1.0</span></td>
+                                  <td>Order</td>
+                                  <td>Allows for adding tips to the order.</td>
+                                  <td>[order/tipping/v1.json](./schemas/order/tipping/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.order.ratings@1.0</span></td>
+                                  <td>Order</td>
+                                  <td>Allows customers to submit ratings and feedback for completed orders.</td>
+                                  <td>N/A</td>
+                              </tr>
                             <tr>
                                 <td><span class="inline-code">dev.ocs.order.digital_access@1.0</span></td>
                                 <td>Order</td>
@@ -2471,26 +2638,60 @@ app.get('/catalogs/:id', (req, res) => {
                                 <td>Order (Action)</td>
                                 <td>Enables the workflow for cancelling an order via a dedicated endpoint, discoverable through the Order.actions field.</td>
                             </tr>
-                             <tr>
-                                 <td><span class="inline-code">dev.ocs.order.returns@1.0</span></td>
-                                 <td>Order (Action)</td>
-                                 <td>Enables a discoverable workflow for item returns, initiated via an action on the Order and navigated via hypermedia links.</td>
-                             </tr>
-                             <tr>
-                                 <td><span class="inline-code">dev.ocs.order.refunds@1.0</span></td>
-                                 <td>Order (Metadata)</td>
-                                 <td>Provides a standardized, auditable record of all monetary refunds associated with an order.</td>
-                             </tr>
-                             <tr>
-                                 <td><span class="inline-code">dev.ocs.store.constraints@1.0</span></td>
-                                 <td>Store</td>
-                                 <td>Advertises server-side business rules (e.g., promotion policies, return windows) to help clients prevent errors.</td>
-                             </tr>
-                             <tr>
-                                 <td><span class="inline-code">dev.ocs.auth.flows@1.0</span></td>
-                                 <td>Server-wide</td>
-                                 <td>Provides URLs for authentication flows (sign-in, sign-out, profile, registration).</td>
-                             </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.order.returns@1.0</span></td>
+                                  <td>Order (Action)</td>
+                                  <td>Enables a discoverable workflow for item returns, initiated via an action on the Order and navigated via hypermedia links.</td>
+                                  <td>N/A (Workflow)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.order.refunds@1.0</span></td>
+                                  <td>Order (Metadata)</td>
+                                  <td>Provides a standardized, auditable record of all monetary refunds associated with an order.</td>
+                                  <td>[order/refunds/v1.json](./schemas/order/refunds/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.promotions.discoverable@1.0</span></td>
+                                  <td>Store, Catalog</td>
+                                  <td>Allows a server to advertise publicly available promotions to clients.</td>
+                                  <td>[promotions/discoverable/v1.json](./schemas/promotions/discoverable/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.promotions.policies@1.0</span></td>
+                                  <td>Server-wide</td>
+                                  <td>Defines promotion stacking rules, validation policies, and exclusion rules to help clients provide better UX and prevent promotion conflicts.</td>
+                                  <td>[promotions/policies/v1.json](./schemas/promotions/policies/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.order.applied_promotions@1.0</span></td>
+                                  <td>Order</td>
+                                  <td>Provides a final, authoritative record of all value modifications on the completed order.</td>
+                                  <td>[order/applied_promotions/v1.json](./schemas/order/applied_promotions/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.order.fulfillment_intent@1.0</span></td>
+                                  <td>CreateOrderRequest</td>
+                                  <td>Allows a client to specify a precise fulfillment plan for the items in a cart, supporting mixed fulfillment and split orders.</td>
+                                  <td>[order/fulfillment_intent/v1.json](./schemas/order/fulfillment_intent/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.store.constraints@1.0</span></td>
+                                  <td>Store</td>
+                                  <td>Advertises server-side business rules (e.g., promotion policies, return windows) to help clients prevent errors.</td>
+                                  <td>[store/constraints/v1.json](./schemas/store/constraints/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.payment.x402_fiat@1.0</span></td>
+                                  <td>Server-wide</td>
+                                  <td>Advertises support for fiat payments via the x402 fiat_intent scheme and provides public keys for payment providers.</td>
+                                  <td>[payment/x402_fiat/v1.json](./schemas/payment/x402_fiat/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.auth.flows@1.0</span></td>
+                                  <td>Server-wide</td>
+                                  <td>Provides URLs for authentication flows (sign-in, sign-out, profile, registration).</td>
+                                  <td>[auth/flows/v1.json](./schemas/auth/flows/v1.json)</td>
+                              </tr>
                              <tr>
                                  <td><span class="inline-code">dev.ocs.product.search@1.0</span></td>
                                  <td>Server-wide</td>

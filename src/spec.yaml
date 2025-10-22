@@ -109,7 +109,7 @@ paths:
         '200':
           description: A list of supported capabilities.
           content:
-            application/ocs+json; version=1.0:
+           application/ocs+json; version=1.0:
               schema:
                 $ref: '#/components/schemas/CapabilitiesResponse'
         '500':
@@ -368,29 +368,31 @@ paths:
     post:
       tags: [Ordering]
       summary: Request to cancel an order
-      description: Initiates a request to cancel an order. This action is only available if advertised in the order's `actions` array.
+      description: Cancels an order.
       security:
         - bearerAuth: []
       parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema: { type: string }
-        - $ref: '#/components/parameters/IdempotencyKey'
-       requestBody:
-         content:
-           application/ocs+json; version=1.0:
-             schema:
-               type: object
-               properties:
-                 reason: { type: string }
-       responses:
-         '200':
-           description: The cancellation was successful. The updated Order object is returned with status 'cancelled'.
-           content:
-             application/ocs+json; version=1.0:
-               schema: { $ref: '#/components/schemas/Order' }
-         '403':
+        -
+           name: orderId
+           in: path
+           required: true
+           schema: { type: string }
+        -
+          $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        content:
+        application/ocs+json; version=1.0:
+          schema:
+            type: object
+            properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: The cancellation was successful. The updated Order object is returned with status 'cancelled'.
+          content:
+            application/ocs+json; version=1.0:
+              schema: { $ref: '#/components/schemas/Order' }
+        '403':
            description: The order is not in a state where it can be cancelled.
            content:
              application/ocs+json; version=1.0:
@@ -456,29 +458,29 @@ paths:
            content:
              application/ocs+json; version=1.0:
                schema:
-                 oneOf:
-                   - $ref: '#/components/schemas/Order'
-                   - type: array
+                  oneOf:
+               -\n                      $ref: '#/components/schemas/Order'
+               - type: array
                      items:
                        $ref: '#/components/schemas/Order'
-        '400':
+          '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
+          '401':
           $ref: '#/components/responses/Unauthorized'
-        '402':
-          description: Payment is required to proceed. The body contains payment requirements as per the x402 protocol.
-          content:
-            application/ocs+json; version=1.0:
-              schema:
-                $ref: '#/components/schemas/X402PaymentRequiredResponse'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
+          '402':
+              description: Payment is required to proceed. The body contains payment requirements as per the x402 protocol.
+              content:
+               application/ocs+json; version=1.0:
+               schema:
+                 $ref: '#/components/schemas/X402PaymentRequiredResponse'
+          '403':
+           $ref: '#/components/responses/Forbidden'
+           '404':
+           $ref: '#/components/responses/NotFound'
+           '409':
+           $ref: '#/components/responses/Conflict'
+           '500':
+             $ref: '#/components/responses/ServerError'
 
   /orders/{orderId}:
     get:
@@ -514,9 +516,9 @@ paths:
       tags: [Ordering]
       summary: Subscribe to real-time order updates (SSE)
       security:
-        - bearerAuth: []
-       description: |
-         Establishes a Server-Sent Events (SSE) connection to receive real-time updates for an order.
+         - bearerAuth: []
+          description: |
+            Establishes a Server-Sent Events (SSE) connection to receive real-time updates for an order.
          The client should handle a `text/event-stream` response.
 
          **Events:**
@@ -774,7 +776,7 @@ components:
             items: { type: array, items: { $ref: '#/components/schemas/CatalogItem' } }
             metadata:
               type: object
-              description: |
+      description: |
                 Namespaced key-value pairs. The structure of this object may be defined
                 by schemas discoverable at the `/capabilities` endpoint. Each capability
                 uses its base ID as a key, with a "_version" field inside.
@@ -957,14 +959,9 @@ components:
       required: [orderType, items]
 
     CreateOrderRequest:
-      oneOf:
-        - $ref: '#/components/schemas/CreateOrderFromCartRequest'
-        - $ref: '#/components/schemas/CreateDirectOrderRequest'
-      discriminator:
-        propertyName: orderType
-        mapping:
-          from_cart: '#/components/schemas/CreateOrderFromCartRequest'
-          direct: '#/components/schemas/CreateDirectOrderRequest'
+          oneOf:
+            from_cart: '#/components/schemas/CreateOrderFromCartRequest'
+            direct: '#/components/schemas/CreateDirectOrderRequest'
 
      PromotionRequest:
        type: object
@@ -974,10 +971,9 @@ components:
            type: string
            enum: [promo_code, gift_card, loyalty_points]
            description: "The type of promotion being applied."
-         value:
-           type: string
-           description: "The value for the promotion (e.g., the code 'SUMMER10')."
-       required: [type, value]
+          value:
+            description: "The value for the promotion (e.g., the code 'SUMMER10')."
+          required: [type, value]
 
      RatingRequest:
        type: object
@@ -1009,8 +1005,8 @@ components:
          type: { type: string, enum: ["validation"] }
          field: { type: string, description: "A JSON Pointer to the invalid field in the request body." }
          value: { description: "The invalid value that was provided by the client." }
-         reason: { type: string, description: "A description of the validation rule that failed (e.g., 'String must be a valid UUID')." }
-       required: [type, field, reason]
+          reason: { type: string, description: "A description of the validation rule that failed (e.g., 'String must be a valid UUID')." }
+          required: [type, field, reason]
 
      BusinessLogicIssue:
        type: object
@@ -1033,21 +1029,17 @@ components:
             For rich, human-readable status, clients should check for the 'dev.ocs.order.detailed_status@1.0' capability.
           enum:
             - pending     # Order created, but not yet confirmed by the system (e.g., awaiting inventory check).
-            - confirmed   # The order is accepted and will be processed.
-            - processing  # The order is actively being worked on (e.g., kitchen is preparing, item is being manufactured).
-            - in_transit  # The order has left the origin and is on its way to the destination.
-            - completed   # The order has been successfully fulfilled (delivered, picked up, or digitally accessed).
-            - cancelled   # The order has been cancelled by the user or the system.
-         actions:
-           type: array
+             - confirmed   # The order is accepted and will be processed.
+            actions:
+              type: array
            description: |
              A list of actions the client can perform on this order in its current state.
              The presence of an action indicates the user should be shown the corresponding UI control.
            items:
              type: object
-             properties:
-                id: { type: "string", enum: ["cancel", "initiate_return", "add_rating", "pause_subscription", "resume_subscription", "cancel_subscription"] }
-               href: { type: "string", format: "uri", description: "The API endpoint to call to perform this action." }
+              properties:
+                 id: { type: "string", enum: ["cancel", "initiate_return", "add_rating", "pause_subscription", "resume_subscription", "cancel_subscription"] }
+                  href: { type: "string", format: "uri", description: "The API endpoint to call to perform this action." }
              required: [id, href]
          returns:
            type: array
@@ -1072,8 +1064,8 @@ components:
              - "dev.ocs.order.tipping": { "_version": "1.0", ... }
              - "dev.ocs.order.digital_access": { "_version": "1.0", ... }
              - "dev.ocs.order.detailed_status": { "_version": "1.0", ... }
-             - "dev.ocs.order.subscription": { "_version": "1.0", ... }
-       required: [id, status, items, total, createdAt, updatedAt]
+              - "dev.ocs.order.subscription": { "_version": "1.0", ... }
+          required: [id, status, items, total, createdAt, updatedAt]
 
     InitiateReturnRequest:
       type: object
@@ -1088,8 +1080,8 @@ components:
               cartItemId: { type: string, description: "The ID of the item from the original order." }
               quantity: { type: integer, minimum: 1 }
             required: [cartItemId, quantity]
-        reason: { type: string, description: "The user-provided reason for the return." }
-      required: [items, reason]
+         reason: { type: string, description: "The user-provided reason for the return." }
+         required: [items, reason]
 
      ReturnSummary:
        type: object
@@ -1097,8 +1089,8 @@ components:
        properties:
          id: { type: string, format: "uuid", description: "The unique ID of the return." }
          status: { type: string, enum: ["requested", "approved", "rejected", "in_transit", "received", "processed", "completed"] }
-         href: { type: string, format: "uri", description: "The URL to fetch the full Return object." }
-       required: [id, status, href]
+          href: { type: string, format: "uri", description: "The URL to fetch the full Return object." }
+          required: [id, status, href]
 
      Return:
        type: object
@@ -1117,8 +1109,8 @@ components:
          reason: { type: string }
          returnLabelUrl: { type: string, format: "uri", description: "A URL to a printable shipping label." }
          createdAt: { type: string, format: "date-time" }
-         updatedAt: { type: string, format: "date-time" }
-       required: [id, orderHref, status, items, createdAt, updatedAt]
+          updatedAt: { type: string, format: "date-time" }
+          required: [id, orderHref, status, items, createdAt, updatedAt]
 
      JsonPatchOperation:
       type: object
@@ -1613,9 +1605,9 @@ components:
           description: "Requests remaining in the current window (will be 0)"
         X-RateLimit-Reset:
           schema: { type: integer }
-          description: "Unix timestamp when the rate limit resets"
-      relatedCapabilities: ["dev.ocs.server.rate_limits"]
-       metadataKeys:
+           description: "Unix timestamp when the rate limit resets"
+        relatedCapabilities: ["dev.ocs.server.rate_limits"]
+          metadataKeys:
          - "Check dev.ocs.server.rate_limits capability for rate limit policies"
 
      order_items_unavailable:
@@ -1637,9 +1629,9 @@ components:
          - action: "update_quantities"
            method: "PATCH"
            endpoint: "/carts/{cartId}/items/{itemId}"
-           description: "Reduce quantities of partially available items"
-        relatedCapabilities: ["dev.ocs.cart"]
-        details:
+            description: "Reduce quantities of partially available items"
+         relatedCapabilities: ["dev.ocs.cart"]
+           details:
           type: array
           description: "List of unavailable items with specific reasons"
           items:
@@ -1653,8 +1645,8 @@ components:
                 description: "Human-readable reason why the item is unavailable"
               availableQuantity:
                 type: integer
-                description: "How many units are actually available (0 if completely unavailable)"
-            required: [itemId, reason]
+                 description: "How many units are actually available (0 if completely unavailable)"
+               required: [itemId, reason]
 
      insufficient_stock:
        httpStatus: 409
