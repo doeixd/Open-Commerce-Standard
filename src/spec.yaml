@@ -886,6 +886,13 @@ components:
               itemCount: { type: integer, description: "Number of items from this store in the cart" }
               subtotal: { $ref: '#/components/schemas/Money', description: "Subtotal for items from this store" }
             required: [storeId, itemCount, subtotal]
+        guestInfo:
+          type: object
+          description: "Temporary customer information for guest checkouts. Only present if the server supports dev.ocs.cart.guest@1.0 capability."
+          properties:
+            email: { type: string, format: email, description: "Guest's email address." }
+            deliveryAddress: { $ref: '#/components/schemas/Location', description: "Delivery address for the guest." }
+            billingAddress: { $ref: '#/components/schemas/Location', description: "Billing address for the guest." }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
       required: [id, items, subtotal, tax, total, createdAt, updatedAt]
@@ -912,6 +919,12 @@ components:
         deliveryAddress:
           $ref: '#/components/schemas/Location'
           description: "A delivery address is required if, and only if, the referenced cart contains at least one item with a fulfillmentType of 'physical' or 'hybrid' (where any component is physical)."
+        billingAddress:
+          $ref: '#/components/schemas/Location'
+          description: "An optional billing address for payment processing. Required if the payment method demands it (discoverable via x402 metadata)."
+        consentGiven:
+          type: boolean
+          description: "Indicates if the user has given consent for data collection/storage, as per dev.ocs.store.policies@1.0 dataPolicy."
         notes: { type: string }
         metadata: { type: object }
       required: [orderType, cartId]
@@ -932,6 +945,12 @@ components:
         deliveryAddress:
           $ref: '#/components/schemas/Location'
           description: "A delivery address is required if any item has a fulfillmentType of 'physical' or 'hybrid' (where any component is physical)."
+        billingAddress:
+          $ref: '#/components/schemas/Location'
+          description: "An optional billing address for payment processing. Required if the payment method demands it (discoverable via x402 metadata)."
+        consentGiven:
+          type: boolean
+          description: "Indicates if the user has given consent for data collection/storage, as per dev.ocs.store.policies@1.0 dataPolicy."
         notes: { type: string }
         promotionCode: { type: string, description: "Optional promotion code to apply to the order." }
         metadata: { type: object }

@@ -2530,6 +2530,42 @@ app.get('/catalogs/:id', (req, res) => {
                                   <td>Provides internationalization support including supported locales, default locale, and formatting rules for numbers, currencies, and dates.</td>
                                   <td>[i18n/v1.json](./schemas/i18n/v1.json)</td>
                               </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.store.info@1.0</span></td>
+                                  <td>Store</td>
+                                  <td>Provides general store information including location, hours, website, and contact details, referencing schema.org LocalBusiness properties.</td>
+                                  <td>[store/info/v1.json](./schemas/store/info/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.store.policies@1.0</span></td>
+                                  <td>Store</td>
+                                  <td>Provides URLs to store policies such as return policy, privacy policy, terms of service, etc.</td>
+                                  <td>[store/policies/v1.json](./schemas/store/policies/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.store.shipping@1.0</span></td>
+                                  <td>Store</td>
+                                  <td>Defines comprehensive shipping policies including delivery areas, pricing calculations, processing times, shipping options, and providers.</td>
+                                  <td>[store/shipping/v1.json](./schemas/store/shipping/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.user.profile@1.0</span></td>
+                                  <td>Server-wide</td>
+                                  <td>Provides user-specific data like saved addresses and preferences via a discoverable profile endpoint.</td>
+                                  <td>[user/profile/v1.json](./schemas/user/profile/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.cart.guest@1.0</span></td>
+                                  <td>Server-wide</td>
+                                  <td>Allows carts to include temporary customer information for anonymous guest checkouts.</td>
+                                  <td>N/A (Extends Cart schema)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.order.customer_fields@1.0</span></td>
+                                  <td>Order</td>
+                                  <td>Defines common custom fields for international commerce, tax, and customs purposes.</td>
+                                  <td>[order/customer_fields/v1.json](./schemas/order/customer_fields/v1.json)</td>
+                              </tr>
                           </tbody>
                     </table>
                 </div>

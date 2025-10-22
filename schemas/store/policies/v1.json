@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for store policies capability (dev.ocs.store.policies@1.0), providing URLs to various store policies.",
+  "properties": {
+    "returnPolicy": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the store's return policy."
+    },
+    "privacyPolicy": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the store's privacy policy."
+    },
+    "termsOfService": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the store's terms of service."
+    },
+    "shippingPolicy": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the store's shipping policy."
+    },
+    "refundPolicy": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the store's refund policy."
+    },
+    "accessibilityPolicy": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the store's accessibility policy."
+    },
+    "cookiePolicy": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the store's cookie policy."
+    },
+    "contactPolicy": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the store's contact or support policy."
+    },
+    "dataPolicy": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the store's data privacy policy, used for user consent in orders."
+    }
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for store shipping capability (dev.ocs.store.shipping@1.0), defining comprehensive shipping policies including delivery areas, pricing calculations, processing times, shipping options, and providers.",
+  "properties": {
+    "deliveryAreas": {
+      "type": "array",
+      "description": "List of delivery areas. Can be simple strings (e.g., 'US', 'CA') or GeoJSON Features for precise geographic zones.",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "description": "Simple string representation of a delivery area (e.g., country code, region name)."
+          },
+          {
+            "type": "object",
+            "description": "GeoJSON Feature representing a delivery area with geographic boundaries.",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["Feature"],
+                "description": "GeoJSON Feature type."
+              },
+              "geometry": {
+                "type": "object",
+                "description": "GeoJSON geometry object defining the delivery area boundaries.",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["Point", "MultiPoint", "LineString", "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection"],
+                    "description": "GeoJSON geometry type."
+                  },
+                  "coordinates": {
+                    "type": "array",
+                    "description": "Coordinates for the geometry."
+                  }
+                },
+                "required": ["type", "coordinates"]
+              },
+              "properties": {
+                "type": "object",
+                "description": "Additional properties for the delivery area.",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the delivery area."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description of the delivery area."
+                  }
+                }
+              }
+            },
+            "required": ["type", "geometry"]
+          }
+        ]
+      }
+    },
+    "shippingOptions": {
+      "type": "array",
+      "description": "List of available shipping options.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the shipping option."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the shipping option (e.g., 'Standard Shipping')."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the shipping option."
+          },
+          "processingTime": {
+            "type": "object",
+            "description": "Estimated processing and delivery time.",
+            "properties": {
+              "minDays": {
+                "type": "integer",
+                "description": "Minimum number of days for processing and delivery."
+              },
+              "maxDays": {
+                "type": "integer",
+                "description": "Maximum number of days for processing and delivery."
+              }
+            }
+          },
+          "costCalculation": {
+            "type": "object",
+            "description": "How shipping cost is calculated.",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["flat", "weight_based", "distance_based", "tiered"],
+                "description": "Type of cost calculation."
+              },
+              "flatRate": {
+                "type": "number",
+                "description": "Flat rate amount (used when type is 'flat')."
+              },
+              "weightRates": {
+                "type": "array",
+                "description": "Weight-based rates (used when type is 'weight_based').",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "minWeight": {
+                      "type": "number",
+                      "description": "Minimum weight in kg or lbs."
+                    },
+                    "maxWeight": {
+                      "type": "number",
+                      "description": "Maximum weight in kg or lbs."
+                    },
+                    "rate": {
+                      "type": "number",
+                      "description": "Shipping rate for this weight range."
+                    }
+                  },
+                  "required": ["minWeight", "maxWeight", "rate"]
+                }
+              },
+              "distanceRates": {
+                "type": "array",
+                "description": "Distance-based rates (used when type is 'distance_based').",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "minDistance": {
+                      "type": "number",
+                      "description": "Minimum distance in km or miles."
+                    },
+                    "maxDistance": {
+                      "type": "number",
+                      "description": "Maximum distance in km or miles."
+                    },
+                    "rate": {
+                      "type": "number",
+                      "description": "Shipping rate for this distance range."
+                    }
+                  },
+                  "required": ["minDistance", "maxDistance", "rate"]
+                }
+              },
+              "tiers": {
+                "type": "array",
+                "description": "Tiered rates based on order subtotal (used when type is 'tiered').",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "threshold": {
+                      "type": "number",
+                      "description": "Order subtotal threshold."
+                    },
+                    "rate": {
+                      "type": "number",
+                      "description": "Shipping rate for orders above this threshold."
+                    }
+                  },
+                  "required": ["threshold", "rate"]
+                }
+              }
+            },
+            "required": ["type"]
+          },
+          "providers": {
+            "type": "array",
+            "description": "List of shipping providers/carriers for this option.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["id", "name"]
+      }
+    },
+    "providers": {
+      "type": "array",
+      "description": "List of shipping providers/carriers.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the provider (e.g., 'UPS', 'FedEx')."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the provider."
+          },
+          "website": {
+            "type": "string",
+            "format": "uri",
+            "description": "Website URL of the provider."
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "additionalFees": {
+      "type": "object",
+      "description": "Additional fees that may apply to shipping.",
+      "properties": {
+        "handlingFee": {
+          "type": "number",
+          "description": "Flat handling fee."
+        },
+        "insuranceFee": {
+          "type": "number",
+          "description": "Insurance fee (could be percentage or flat)."
+        },
+        "signatureRequiredFee": {
+          "type": "number",
+          "description": "Fee for signature required delivery."
+        }
+      }
+    }
+  }
+}

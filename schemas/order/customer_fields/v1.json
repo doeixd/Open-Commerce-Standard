@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for order customer fields capability (dev.ocs.order.customer_fields@1.0), defining common custom fields for international commerce and tax purposes.",
+  "properties": {
+    "taxId": {
+      "type": "string",
+      "description": "Tax identification number (e.g., VAT ID, TIN) for tax calculation and compliance."
+    },
+    "customsDeclaration": {
+      "type": "object",
+      "description": "Customs declaration details for international shipping.",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Description of goods for customs."
+        },
+        "value": {
+          "type": "number",
+          "description": "Declared value of the goods."
+        },
+        "countryOfOrigin": {
+          "type": "string",
+          "description": "Country where the goods were produced."
+        }
+      }
+    },
+    "companyName": {
+      "type": "string",
+      "description": "Company name for B2B orders."
+    },
+    "purchaseOrderNumber": {
+      "type": "string",
+      "description": "Purchase order number for B2B transactions."
+    }
+  }
+}

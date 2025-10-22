@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for store info capability (dev.ocs.store.info@1.0), providing general store information including location, hours, website, and contact details, referencing schema.org LocalBusiness properties.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the store."
+    },
+    "description": {
+      "type": "string",
+      "description": "A description of the store."
+    },
+    "address": {
+      "type": "object",
+      "description": "The physical address of the store.",
+      "properties": {
+        "streetAddress": {
+          "type": "string",
+          "description": "The street address."
+        },
+        "addressLocality": {
+          "type": "string",
+          "description": "The locality (e.g., city)."
+        },
+        "addressRegion": {
+          "type": "string",
+          "description": "The region (e.g., state or province)."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "The postal code."
+        },
+        "addressCountry": {
+          "type": "string",
+          "description": "The country."
+        }
+      },
+      "required": ["streetAddress", "addressLocality", "addressRegion", "postalCode"]
+    },
+    "telephone": {
+      "type": "string",
+      "description": "The telephone number."
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "The website URL."
+    },
+    "openingHours": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The opening hours in schema.org format (e.g., 'Mo-Sa 11:00-14:30')."
+    },
+    "priceRange": {
+      "type": "string",
+      "description": "The price range indicator (e.g., '$', '$$', '$$$')."
+    },
+    "aggregateRating": {
+      "type": "object",
+      "description": "The overall rating based on reviews.",
+      "properties": {
+        "ratingValue": {
+          "type": "number",
+          "description": "The average rating value."
+        },
+        "reviewCount": {
+          "type": "integer",
+          "description": "The number of reviews."
+        }
+      }
+    },
+    "geo": {
+      "type": "object",
+      "description": "The geographic coordinates.",
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "The latitude."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "The longitude."
+        }
+      }
+    },
+    "logo": {
+      "type": "string",
+      "format": "uri",
+      "description": "The logo URL."
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "The email address."
+    },
+    "faxNumber": {
+      "type": "string",
+      "description": "The fax number."
+    },
+    "image": {
+      "type": "string",
+      "format": "uri",
+      "description": "A cover image URL for the store."
+    },
+    "photo": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
+      "description": "An array of photo URLs."
+    },
+    "slogan": {
+      "type": "string",
+      "description": "A slogan or motto associated with the store."
+    },
+    "foundingDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The date the store was founded."
+    },
+    "numberOfEmployees": {
+      "type": "integer",
+      "description": "The number of employees."
+    },
+    "paymentAccepted": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Payment methods accepted (e.g., 'Cash', 'Credit Card')."
+    },
+    "currenciesAccepted": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Currencies accepted (e.g., 'USD', 'EUR')."
+    },
+    "areaServed": {
+      "type": "string",
+      "description": "The geographic area where the store operates."
+    },
+    "branchCode": {
+      "type": "string",
+      "description": "A short textual code uniquely identifying the store branch."
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Keywords or tags describing the store."
+    },
+    "knowsAbout": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Topics the store is known about or specializes in."
+    },
+    "hasMap": {
+      "type": "string",
+      "format": "uri",
+      "description": "A URL to a map of the store location."
+    }
+  },
+  "required": ["name", "address"]
+}
