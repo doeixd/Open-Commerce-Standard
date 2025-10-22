@@ -1,5 +1,5 @@
 <div align="left">
-  <img src="assets/logo.png" alt="Open Commerce Standard Logo" width="200">
+  <img src="assets/logo.png" alt="Open Commerce Standard Logo" width="150">
 </div>
 
 # Open Commerce Standard (OCS)
