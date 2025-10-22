@@ -687,13 +687,16 @@
                  <a href="#how-it-works" class="nav-link">How It Works</a>
              </div>
 
-            <div class="nav-section">
-                <div class="nav-section-title">Core Concepts</div>
-                <a href="#core-concepts" class="nav-link">Core Concepts</a>
-                <a href="#hypermedia-engine" class="nav-link">Hypermedia Engine</a>
-                <a href="#universal-client" class="nav-link">Universal Client Example</a>
-                <a href="#capabilities" class="nav-link">Capabilities Reference</a>
-            </div>
+             <div class="nav-section">
+                 <div class="nav-section-title">Core Concepts</div>
+                 <a href="#core-concepts" class="nav-link">Core Concepts</a>
+                 <a href="#versioning-rules" class="nav-link">Versioning Rules</a>
+                 <a href="#hypermedia-engine" class="nav-link">Hypermedia Engine</a>
+                  <a href="#universal-client" class="nav-link">Universal Client Example</a>
+                  <a href="#advanced-scenarios" class="nav-link">Advanced Commerce Scenarios</a>
+                  <a href="#internationalization" class="nav-link">Internationalization</a>
+                  <a href="#capabilities" class="nav-link">Capabilities Reference</a>
+             </div>
 
             <div class="nav-section">
                 <div class="nav-section-title">API Reference</div>
@@ -739,7 +742,7 @@
                     </table>
                 </div>
 
-                <p>The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. It integrates web3-native payments via the x402 Protocol for instant, low-fee blockchain transactions.</p>
+                <p>The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. OCS provides a unified API for any commerce model, whether you need a multi-item shopping cart for your online store or a streamlined, one-click checkout for your digital service. It integrates web3-native payments via the x402 Protocol for instant, low-fee blockchain transactions.</p>
 
                 <div class="info-box">
                     <strong>OpenAPI Specification</strong>
@@ -948,7 +951,7 @@ events.addEventListener('order.patch', (e) => {
                     <h4>Check for Variants</h4>
                     <div class="code-wrapper">
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <div class="code-block"><pre><code class="language-javascript">const hasVariants = item.metadata?.['dev.ocs.product.variants@1.0'];
+                        <div class="code-block"><pre><code class="language-javascript">const hasVariants = item.metadata?.['dev.ocs.product.variants'];
 if (hasVariants) {
   // Show size/color picker
   const variants = hasVariants.variants;
@@ -1114,8 +1117,9 @@ const tshirt = {
   available: true,
   fulfillmentType: "physical",
   metadata: {
-    // This key matches a capability we discovered earlier!
-    "dev.ocs.product.variants@1.0": {
+    // This key matches the base ID from the capability we discovered earlier!
+    "dev.ocs.product.variants": {
+      "_version": "1.0",
       options: ["Size", "Color"],
       variants: [
         {
@@ -1140,9 +1144,17 @@ function hasVariants(item, capabilities) {
   const variantCapability = capabilities.find(
     cap => cap.id === "dev.ocs.product.variants@1.0"
   );
-  
-  return variantCapability && 
-         item.metadata?.["dev.ocs.product.variants@1.0"];
+
+  return variantCapability &&
+         item.metadata?.["dev.ocs.product.variants"];
+}
+
+// Then render accordingly:
+if (hasVariants(tshirt, capabilities)) {
+  // Show size/color picker
+  const variants = tshirt.metadata["dev.ocs.product.variants"];
+  console.log('Available options:', variants.options);
+  console.log('Available variants:', variants.variants);
 }
 
 // Then render accordingly:
@@ -1451,6 +1463,12 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                         <div class="feature-title">Dynamic Capability Discovery</div>
                         <div class="feature-description">An API That Adapts to Any Business. OCS is more than payments. A powerful discovery mechanism allows your client to dynamically adapt to any feature the server supports—from product variants and customizations to real-time delivery tracking.</div>
                     </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🛒</div>
+                        <div class="feature-title">For Any Checkout Flow</div>
+                        <div class="feature-description">One size doesn't fit all. OCS provides a robust, server-side cart for complex shopping journeys. For quick purchases, it also supports a stateless "Buy Now" flow. Your app can discover which models a server supports and dynamically provide the perfect UI for every product.</div>
+                    </div>
                 </div>
             </section>
 
@@ -1586,23 +1604,77 @@ Server → 201 Created → Client
                 <p>Months later, you want to tap into a global market or serve an AI-driven use case. You simply enable the <strong><span class="inline-code">exact</span></strong> scheme in your OCS server configuration. Your application will now automatically present crypto as an additional payment option to your users—<strong>no rebuilding of your checkout flow is required.</strong> This allows you to meet your customers where they are, offering the best payment method for their needs, all through one consistent and elegant protocol.</p>
             </section>
 
-            <!-- Core Concepts -->
-            <section id="core-concepts">
-                <h2>Core Concepts</h2>
+            <!-- From Online Stores to Digital Subscriptions -->
+            <section id="commerce-models">
+                <h2>From Online Stores to Digital Subscriptions</h2>
 
-                <p>OCS's power lies in <strong>delegating complexity to <span class="inline-code">metadata</span> and making it discoverable</strong>.</p>
+                <p>OCS is built for the entire spectrum of digital commerce.</p>
 
-                <div class="card">
-                    <p>Core schemas stay lean—no endless optional fields for variants, sizes, or weights. Domain-specific data resides in a generic <span class="inline-code">metadata</span> object.</p>
-                    
-                    <p>To avoid chaos, <span class="inline-code">GET /capabilities</span> provides a "table of contents" for metadata, linking to standardized JSON Schemas. Clients adapt dynamically, creating a system that's simple by default, complex by choice.</p>
-                </div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🏪</div>
+                        <div class="feature-title">E-commerce Marketplaces</div>
+                        <div class="feature-description">Building a large e-commerce marketplace? Use the core, server-side Cart to manage complex sessions, validate promotions, and calculate shipping and taxes with confidence.</div>
+                    </div>
 
-                <div class="info-box">
-                    <strong>Key Principle</strong>
-                    Instead of bloating core schemas with every possible field, OCS uses structured metadata with discoverable schemas. This keeps the API minimal while supporting unlimited extensibility.
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-title">Quick Digital Purchases</div>
+                        <div class="feature-description">Selling access to a single digital article or a SaaS subscription? Enable the Direct Order capability to provide a frictionless, "Buy Now" experience that takes users from discovery to purchase in a single step.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-title">Adaptive Client Apps</div>
+                        <div class="feature-description">The power of OCS is that your client application can support all of these models through one consistent and predictable API. Discover capabilities at runtime and render the perfect UI for every product.</div>
+                    </div>
                 </div>
             </section>
+
+             <!-- Core Concepts -->
+             <section id="core-concepts">
+                 <h2>Core Concepts</h2>
+
+                 <p>OCS's power lies in <strong>delegating complexity to <span class="inline-code">metadata</span> and making it discoverable</strong>.</p>
+
+                 <div class="card">
+                     <p>Core schemas stay lean—no endless optional fields for variants, sizes, or weights. Domain-specific data resides in a generic <span class="inline-code">metadata</span> object.</p>
+
+                     <p>To avoid chaos, <span class="inline-code">GET /capabilities</span> provides a "table of contents" for metadata, linking to standardized JSON Schemas. Clients adapt dynamically, creating a system that's simple by default, complex by choice.</p>
+                 </div>
+
+                 <div class="info-box">
+                     <strong>Key Principle</strong>
+                     Instead of bloating core schemas with every possible field, OCS uses structured metadata with discoverable schemas. This keeps the API minimal while supporting unlimited extensibility.
+                 </div>
+             </section>
+
+             <!-- Versioning Rules -->
+             <section id="versioning-rules">
+                 <h2>Versioning Rules</h2>
+
+                 <p>OCS uses semantic versioning for capabilities and the overall standard to ensure smooth evolution without breaking existing clients.</p>
+
+                 <div class="card">
+                     <h4>PATCH Updates (1.0 → 1.1)</h4>
+                     <p>Add optional fields or minor enhancements with no breaking changes. Clients can safely upgrade without modifications.</p>
+                 </div>
+
+                 <div class="card">
+                     <h4>MINOR Updates (1.x → 2.0)</h4>
+                     <p>Breaking changes are allowed but must include a migration guide. Servers announce deprecation 3 months in advance.</p>
+                 </div>
+
+                 <div class="card">
+                     <h4>Deprecation Policy</h4>
+                     <p>Servers must support old versions for at least 12 months after sunset announcement to give clients time to adapt.</p>
+                 </div>
+
+                 <div class="info-box">
+                     <strong>Client Version Negotiation</strong>
+                     Clients negotiate versions via the <span class="inline-code">Accept-OCS-Capabilities</span> header (comma-separated list of capability IDs with versions, e.g., <span class="inline-code">dev.ocs.product.variants@2.0</span>). If omitted, servers use default versions. This makes evolution explicit and allows servers to innovate without breaking existing clients.
+                 </div>
+             </section>
 
             <!-- The OCS Hypermedia Engine -->
             <section id="hypermedia-engine">
@@ -1790,7 +1862,8 @@ if (returnAction) {
   "available": true,
   "metadata": {
     "x-vendor-style-code": "FW25-TEE-01",
-    "dev.ocs.product.variants@1.0": {
+    "dev.ocs.product.variants": {
+      "_version": "1.0",
       "options": ["Size", "Color"],
       "variants": [
         {
@@ -1813,7 +1886,7 @@ if (returnAction) {
 
                 <div class="info-box">
                     <strong>Client Insight:</strong>
-                    The client sees the <span class="inline-code">dev.ocs.product.variants@1.0</span> key. It now knows it can confidently parse the data within to build a size/color selection UI and disable the "White" option because its stock is 0.
+                    The client sees the <span class="inline-code">dev.ocs.product.variants</span> key. It now knows it can confidently parse the data within to build a size/color selection UI and disable the "White" option because its stock is 0.
                 </div>
 
                 <h3>Step 3: Place the Order</h3>
@@ -1851,7 +1924,8 @@ if (returnAction) {
                             <div class="code-block"><pre><code class="language-http">event: order.patch
 data: [
   {"op": "replace", "path": "/status", "value": "confirmed"},
-  {"op": "add", "path": "/metadata/dev.ocs.order.detailed_status@1.0", "value": {
+  {"op": "add", "path": "/metadata/dev.ocs.order.detailed_status", "value": {
+    "_version": "1.0",
     "title": "Order Confirmed",
     "description": "Your order has been confirmed and will be processed soon."
   }}
@@ -1860,8 +1934,9 @@ data: [
 event: order.patch
 data: [
   {"op": "replace", "path": "/status", "value": "in_transit"},
-  {"op": "replace", "path": "/metadata/dev.ocs.order.detailed_status@1.0/title", "value": "Out for Delivery"},
-  {"op": "add", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0", "value": {
+  {"op": "replace", "path": "/metadata/dev.ocs.order.detailed_status/title", "value": "Out for Delivery"},
+  {"op": "add", "path": "/metadata/dev.ocs.order.delivery_tracking", "value": {
+    "_version": "1.0",
     "driver": { "name": "Jane D.", "vehicle": "Blue Sedan" },
     "status": "en_route_to_customer",
     "liveLocation": { "latitude": 40.7135, "longitude": -74.0050 },
@@ -1870,15 +1945,454 @@ data: [
 ]
 
 event: order.patch
-data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]</code></pre></div>
+data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]</code></pre></div>
                         <div class="info-box">
                             <strong>Client Insight:</strong>
-                            The client's UI updates the status to "Shipped." Because it saw the <span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span> capability in Step 1, it knows to look for that key in the metadata and can now display a "Track Your Shipment" button that links to the <span class="inline-code">trackingUrl</span>.
+                            The client's UI updates the status to "Shipped." Because it saw the <span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span> capability in Step 1, it knows to look for the <span class="inline-code">dev.ocs.order.shipment_tracking</span> key in the metadata and can now display a "Track Your Shipment" button that links to the <span class="inline-code">trackingUrl</span>.
                         </div>
                     </div>
                 </div>
                 </div>
                 </span>
+            </section>
+
+            <!-- Advanced Commerce Scenarios -->
+            <section id="advanced-scenarios">
+                <h2>Advanced Commerce Scenarios</h2>
+
+                <p>OCS handles complex commerce scenarios through discoverable capabilities. Here are examples of how clients adapt to advanced features like hybrid fulfillment, subscriptions, pre-orders, and service scheduling.</p>
+
+                <h3>Hybrid Fulfillment: Physical + Digital Bundles</h3>
+
+                <p>Some products combine multiple fulfillment types. A book with a digital audiobook companion requires both shipping and digital access.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "id": "bundle_book_audiobook",
+  "name": "Complete Package: Book + Audiobook",
+  "price": { "amount": "29.99", "currency": "USD" },
+  "fulfillmentType": "hybrid",
+  "fulfillmentComponents": [
+    {
+      "type": "physical",
+      "description": "Hardcover book shipped to your address",
+      "required": true
+    },
+    {
+      "type": "digital",
+      "description": "MP3 audiobook download",
+      "required": true
+    }
+  ],
+  "available": true
+}</code></pre></div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Client Logic:</strong>
+                    When fulfillmentType is "hybrid", check fulfillmentComponents. If any component is "physical", require deliveryAddress. Show appropriate UI for each component type. Note that all components marked as "required": true must be fulfilled together.
+                </div>
+
+                <h3>Subscription Orders: Recurring Billing</h3>
+
+                <p>Subscription orders use metadata to define billing cycles and management options. Clients can discover available actions like pause, resume, and cancel based on the subscription status.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "id": "order_sub_123",
+  "status": "confirmed",
+  "metadata": {
+    "dev.ocs.order.subscription": {
+      "_version": "1.0",
+      "frequency": "monthly",
+      "nextBillingDate": "2025-11-15T00:00:00Z",
+      "status": "active",
+      "cancellationPolicy": {
+        "canCancelAnytime": true
+      }
+    }
+  },
+  "actions": [
+    {
+      "id": "pause_subscription",
+      "href": "/orders/order_sub_123/subscription/pause"
+    },
+    {
+      "id": "cancel_subscription",
+      "href": "/orders/order_sub_123/subscription/cancel"
+    }
+  ]
+}</code></pre></div>
+                </div>
+
+                <h3>Pre-Orders: Future Availability</h3>
+
+                <p>Pre-order items show release information and payment timing options.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "id": "game_nextgen",
+  "name": "Next-Gen Console",
+  "price": { "amount": "499.99", "currency": "USD" },
+  "fulfillmentType": "physical",
+  "available": true,
+  "metadata": {
+    "dev.ocs.order.preorder": {
+      "_version": "1.0",
+      "releaseDate": "2025-11-10T00:00:00Z",
+      "paymentTiming": "immediate"
+    }
+  }
+}</code></pre></div>
+                </div>
+
+                <h3>Service Scheduling: Appointments & Reservations</h3>
+
+                <p>Service-based items include time slot availability and booking constraints.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "id": "haircut_service",
+  "name": "Premium Haircut",
+  "fulfillmentType": "pickup",
+  "available": true,
+  "metadata": {
+    "dev.ocs.service.scheduling": {
+      "_version": "1.0",
+      "duration": 45,
+      "location": "Main Street Salon",
+      "timeSlots": [
+        {
+          "startTime": "2025-10-25T10:00:00Z",
+          "endTime": "2025-10-25T10:45:00Z",
+          "available": true,
+          "price": { "amount": "75.00", "currency": "USD" }
+        },
+        {
+          "startTime": "2025-10-25T14:00:00Z",
+          "endTime": "2025-10-25T14:45:00Z",
+          "available": false,
+          "price": { "amount": "75.00", "currency": "USD" }
+        }
+      ]
+    }
+  }
+}</code></pre></div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Client Implementation:</strong>
+                    For service scheduling, display available time slots as a calendar/picker. When user selects a slot, include it in the cart item metadata. Handle booking conflicts gracefully.
+                </div>
+
+                <h3>Error Handling: Item Availability Changes</h3>
+
+                <p>When items become unavailable during checkout, OCS provides structured error responses with recovery options.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "code": "order_items_unavailable",
+  "message": "Some items are no longer available",
+  "details": [
+    {
+      "type": "business_logic",
+      "resourceId": "prod_123",
+      "reason": "Item has 0 stock remaining. Previously had 5.",
+      "availableQuantity": 0
+    }
+  ],
+  "userMessage": {
+    "localizationKey": "error.cart.items_unavailable"
+  },
+  "nextActions": [
+    {
+      "id": "review_cart",
+      "href": "/carts/cart_123",
+      "method": "GET"
+    },
+    {
+      "id": "update_quantities",
+      "href": "/carts/cart_123/items/item_456",
+      "method": "PATCH"
+    }
+  ]
+}</code></pre></div>
+                </div>
+            </section>
+
+            <!-- Internationalization -->
+            <section id="internationalization">
+                <h2>Internationalization (i18n)</h2>
+
+                <p>OCS provides comprehensive internationalization support, allowing clients to deliver culturally appropriate experiences in any language. The system follows OCS principles of server-driven discovery and client adaptability.</p>
+
+                <h3>Locale Discovery</h3>
+
+                <p>Clients discover a server's i18n capabilities through the standard capabilities endpoint.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "capabilities": [
+    {
+      "id": "dev.ocs.i18n@1.0",
+      "schemaUrl": "https://schemas.ocs.dev/i18n/v1.json",
+      "metadata": {
+        "_version": "1.0",
+        "defaultLocale": "en-US",
+        "supportedLocales": [
+          {
+            "code": "en-US",
+            "isRtl": false,
+            "numberFormat": {
+              "decimalSeparator": ".",
+              "groupingSeparator": ","
+            },
+            "currencyFormat": {
+              "symbol": "$",
+              "position": "before"
+            },
+            "dateFormat": {
+              "shortDate": "MM/dd/yyyy",
+              "longDate": "MMMM dd, yyyy",
+              "timeFormat": "h:mm a"
+            }
+          },
+          {
+            "code": "fr-FR",
+            "isRtl": false,
+            "numberFormat": {
+              "decimalSeparator": ",",
+              "groupingSeparator": " "
+            },
+            "currencyFormat": {
+              "symbol": "€",
+              "position": "after"
+            },
+            "dateFormat": {
+              "shortDate": "dd/MM/yyyy",
+              "longDate": "dd MMMM yyyy",
+              "timeFormat": "HH:mm"
+            }
+          },
+          {
+            "code": "ar-SA",
+            "isRtl": true,
+            "numberFormat": {
+              "decimalSeparator": ".",
+              "groupingSeparator": ","
+            },
+            "currencyFormat": {
+              "symbol": "ر.س",
+              "position": "before"
+            },
+            "dateFormat": {
+              "shortDate": "dd/MM/yyyy",
+              "longDate": "dd MMMM yyyy",
+              "timeFormat": "HH:mm"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}</code></pre></div>
+                </div>
+
+                <h3>Language Negotiation</h3>
+
+                <p>OCS uses standard HTTP headers for language negotiation, following RFC 7231.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-http">// Client request with language preferences
+GET /catalogs/catalog_123 HTTP/1.1
+Accept-Language: fr-FR, fr;q=0.9, en;q=0.8
+Accept: application/ocs+json; version=1.0
+
+// Server response with selected language
+HTTP/1.1 200 OK
+Content-Language: fr-FR
+Content-Type: application/ocs+json; version=1.0
+
+{
+  "id": "catalog_123",
+  "name": "Électronique Grand Public",
+  "description": "Découvrez notre sélection d'appareils électroniques",
+  "items": [
+    {
+      "id": "prod_456",
+      "name": "Téléphone Intelligent",
+      "price": { "amount": "599.99", "currency": "EUR" }
+    }
+  ]
+}</code></pre></div>
+                </div>
+
+                <h3>Localized Content</h3>
+
+                <p>All user-facing strings in API responses are automatically localized based on the negotiated language.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "id": "prod_123",
+  "name": "Classic T-Shirt",  // English
+  "description": "A comfortable cotton t-shirt",
+  "metadata": {
+    "dev.ocs.product.variants": {
+      "_version": "1.0",
+      "options": ["Size", "Color"],  // Localized option names
+      "variants": [
+        {
+          "id": "var_large_black",
+          "values": ["Large", "Black"]  // Localized values
+        }
+      ]
+    }
+  }
+}</code></pre></div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Client Implementation:</strong>
+                    Content localization is automatic - the server handles translation. Clients only need to request their preferred language and render the received strings.
+                </div>
+
+                <h3>Error Message Localization</h3>
+
+                <p>Error messages use localization keys for client-side translation.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "code": "cart_expired",
+  "message": "Cart expired after 3600 seconds of inactivity",
+  "userMessage": {
+    "localizationKey": "error.cart.expired",
+    "params": {
+      "seconds": 3600
+    }
+  },
+  "nextActions": [
+    {
+      "id": "recreate_cart",
+      "href": "/carts",
+      "method": "POST"
+    }
+  ]
+}</code></pre></div>
+                </div>
+
+                <h3>Formatting Rules</h3>
+
+                <p>Clients use the formatting rules from the i18n capability to display numbers, currencies, and dates correctly.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-javascript">// Example: Formatting currency based on locale rules
+function formatCurrency(amount, currency, localeRules) {
+  const { symbol, position } = localeRules.currencyFormat;
+  const formattedAmount = formatNumber(amount, localeRules.numberFormat);
+
+  if (position === 'before') {
+    return `${symbol}${formattedAmount}`;
+  } else {
+    return `${formattedAmount} ${symbol}`;
+  }
+}
+
+// For en-US: "$1,299.50"
+// For fr-FR: "1 299,50 €"
+// For ar-SA: "ر.س 1,299.50"</code></pre></div>
+                </div>
+
+                <h3>Right-to-Left Language Support</h3>
+
+                <p>The i18n capability includes RTL flags for proper UI layout.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-javascript">// RTL language detection and UI adaptation
+const locale = selectedLocale; // From i18n capability
+if (locale.isRtl) {
+  document.documentElement.setAttribute('dir', 'rtl');
+  // Apply RTL-specific styles and layout adjustments
+} else {
+  document.documentElement.setAttribute('dir', 'ltr');
+}</code></pre></div>
+                </div>
+
+                <h3>Server Implementation</h3>
+
+                <p>Servers implementing i18n support need to handle locale negotiation and content translation.</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-javascript">// Example server-side locale negotiation
+function negotiateLocale(acceptLanguage, supportedLocales, defaultLocale) {
+  if (!acceptLanguage) return defaultLocale;
+
+  // Parse Accept-Language header (simplified)
+  const requestedLocales = acceptLanguage.split(',').map(lang => {
+    const [code, q] = lang.trim().split(';q=');
+    return { code: code.trim(), q: parseFloat(q) || 1.0 };
+  }).sort((a, b) => b.q - a.q);
+
+  // Find best match
+  for (const request of requestedLocales) {
+    // Exact match
+    const exact = supportedLocales.find(loc => loc.code === request.code);
+    if (exact) return exact.code;
+
+    // Language match (e.g., 'fr-CA' matches 'fr-FR')
+    const languageMatch = supportedLocales.find(loc =>
+      loc.code.startsWith(request.code.split('-')[0] + '-')
+    );
+    if (languageMatch) return languageMatch.code;
+
+    // Base language match
+    const baseMatch = supportedLocales.find(loc =>
+      loc.code.split('-')[0] === request.code.split('-')[0]
+    );
+    if (baseMatch) return baseMatch.code;
+  }
+
+  return defaultLocale;
+}
+
+// Usage in API handler
+app.get('/catalogs/:id', (req, res) => {
+  const capabilities = getServerCapabilities();
+  const i18n = capabilities.find(cap => cap.id === 'dev.ocs.i18n@1.0');
+
+  if (i18n) {
+    const selectedLocale = negotiateLocale(
+      req.headers['accept-language'],
+      i18n.metadata.supportedLocales,
+      i18n.metadata.defaultLocale
+    );
+
+    // Fetch localized content
+    const catalog = getLocalizedCatalog(req.params.id, selectedLocale);
+
+    res.set('Content-Language', selectedLocale);
+    res.json(catalog);
+  } else {
+    // Fallback to default behavior
+    const catalog = getCatalog(req.params.id);
+    res.json(catalog);
+  }
+});</code></pre></div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Server Requirements:</strong>
+                    When advertising dev.ocs.i18n@1.0, servers must implement proper locale negotiation, provide accurate formatting rules, and ensure all user-facing content is translated according to the negotiated locale.
+                </div>
+
+                <div class="info-box">
+                    <strong>Visual Example:</strong>
+                    Imagine the same e-commerce app UI displayed side-by-side: on the left in English (LTR) showing "$1,299.50", and on the right in Arabic (RTL) showing "ر.س ١٬٢٩٩.٥٠" with right-aligned text and RTL layout. This demonstrates how OCS i18n enables truly global commerce experiences.
+                </div>
+
+                <div class="info-box success">
+                    <strong>Global-Ready by Design:</strong>
+                    OCS internationalization enables truly global commerce. Any client can provide a fully localized experience in any supported language, with culturally correct formatting and proper UI layout for RTL languages.
+                </div>
             </section>
 
             <!-- Capabilities Reference -->
@@ -1987,12 +2501,36 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/
                                  <td>Product (CatalogItem)</td>
                                  <td>Provides an ordered category path (breadcrumb) for navigation.</td>
                              </tr>
-                             <tr>
-                                 <td><span class="inline-code">dev.ocs.product.relations@1.0</span></td>
-                                 <td>Product (CatalogItem)</td>
-                                 <td>Provides related products (recommendations, accessories, alternatives).</td>
-                             </tr>
-                         </tbody>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.product.relations@1.0</span></td>
+                                  <td>Product (CatalogItem)</td>
+                                  <td>Provides related products (recommendations, accessories, alternatives).</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.order.subscription@1.0</span></td>
+                                  <td>Order</td>
+                                  <td>Defines recurring subscription orders with frequency, billing cycles, and cancellation policies.</td>
+                                  <td>[order/subscription/v1.json](./schemas/order/subscription/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.order.preorder@1.0</span></td>
+                                  <td>Product (CatalogItem)</td>
+                                  <td>Defines preorder information for items not yet available, including release dates and payment timing.</td>
+                                  <td>[order/preorder/v1.json](./schemas/order/preorder/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.service.scheduling@1.0</span></td>
+                                  <td>Product (CatalogItem)</td>
+                                  <td>Defines scheduling information for service-based items like appointments, including time slots and booking constraints.</td>
+                                  <td>[service/scheduling/v1.json](./schemas/service/scheduling/v1.json)</td>
+                              </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.i18n@1.0</span></td>
+                                  <td>Server-wide</td>
+                                  <td>Provides internationalization support including supported locales, default locale, and formatting rules for numbers, currencies, and dates.</td>
+                                  <td>[i18n/v1.json](./schemas/i18n/v1.json)</td>
+                              </tr>
+                          </tbody>
                     </table>
                 </div>
             </section>
@@ -2593,6 +3131,56 @@ if (constraints?.maxCartItems) {
                     </div>
                 </div>
 
+                <div class="card">
+                    <h4>Common E-commerce Errors</h4>
+                    <p>Frequently encountered errors in online commerce scenarios.</p>
+                    <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <div class="code-block"><pre><code class="language-json">// Insufficient stock
+{
+  "code": "insufficient_stock",
+  "message": "Only 3 units available, requested 5",
+  "userMessage": {
+    "localizationKey": "error.stock.insufficient",
+    "params": { "available": 3, "requested": 5 }
+  },
+  "nextActions": [
+    {
+      "id": "reduce_quantity",
+      "href": "/carts/cart_123/items/item_456",
+      "method": "PATCH"
+    }
+  ]
+}
+
+// Geographic restriction
+{
+  "code": "geographic_restriction",
+  "message": "Item not available for delivery to Hawaii",
+  "userMessage": {
+    "localizationKey": "error.geographic.restricted",
+    "params": { "location": "Hawaii" }
+  }
+}
+
+// Minimum order value
+{
+  "code": "minimum_order_value",
+  "message": "Order total $45.00 is below minimum $50.00",
+  "userMessage": {
+    "localizationKey": "error.order.minimum_not_met",
+    "params": { "current": "45.00", "minimum": "50.00" }
+  },
+  "nextActions": [
+    {
+      "id": "add_more_items",
+      "href": "/carts/cart_123/items",
+      "method": "POST"
+    }
+  ]
+}</code></pre></div>
+                    </div>
+                </div>
+
                 <h3>Common Error Codes</h3>
 
                 <div class="table-container">
@@ -2630,12 +3218,60 @@ if (constraints?.maxCartItems) {
                                 <td>Payment processing failed</td>
                                 <td>Retry payment or use different method</td>
                             </tr>
-                            <tr>
-                                <td><span class="inline-code">cancellation_window_expired</span></td>
-                                <td>403</td>
-                                <td>Order too old to cancel</td>
-                                <td>Show return options instead</td>
-                            </tr>
+                             <tr>
+                                 <td><span class="inline-code">cancellation_window_expired</span></td>
+                                 <td>403</td>
+                                 <td>Order too old to cancel</td>
+                                 <td>Show return options instead</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">cart_expired</span></td>
+                                 <td>410</td>
+                                 <td>Cart deleted due to inactivity</td>
+                                 <td>Create new cart and add items</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">order_items_unavailable</span></td>
+                                 <td>409</td>
+                                 <td>Some cart items became unavailable</td>
+                                 <td>Remove unavailable items and retry</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">insufficient_stock</span></td>
+                                 <td>409</td>
+                                 <td>Requested quantity exceeds available inventory</td>
+                                 <td>Reduce quantity or try again later</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">invalid_quantity</span></td>
+                                 <td>400</td>
+                                 <td>Quantity is negative, zero, or too large</td>
+                                 <td>Provide a valid quantity</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">geographic_restriction</span></td>
+                                 <td>403</td>
+                                 <td>Item not available in customer's location</td>
+                                 <td>Choose different item or location</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">minimum_order_value</span></td>
+                                 <td>400</td>
+                                 <td>Order total below minimum required</td>
+                                 <td>Add more items to meet minimum</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">service_unavailable</span></td>
+                                 <td>503</td>
+                                 <td>Service temporarily down for maintenance</td>
+                                 <td>Wait and retry later</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">payment_method_unsupported</span></td>
+                                 <td>400</td>
+                                 <td>Selected payment method not accepted</td>
+                                 <td>Choose different payment method</td>
+                             </tr>
                         </tbody>
                     </table>
                 </div>

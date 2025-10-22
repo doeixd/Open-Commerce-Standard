@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Schema for the dev.ocs.i18n@1.0 capability. Defines the server's internationalization support.",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Schema version"
+    },
+    "defaultLocale": {
+      "type": "string",
+      "description": "The default locale (e.g., 'en-US') used if the client requests an unsupported language. Must be one of the supportedLocales."
+    },
+    "supportedLocales": {
+      "type": "array",
+      "description": "A list of all locales the server can provide translated content and formats for.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "A BCP 47 language tag (e.g., 'en-US', 'fr-FR', 'es')."
+          },
+          "isRtl": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether this is a right-to-left language, for client UI hints."
+          },
+          "numberFormat": {
+            "type": "object",
+            "description": "Rules for formatting numbers in this locale.",
+            "properties": {
+              "decimalSeparator": {
+                "type": "string",
+                "description": "Character used to separate the integer part from the fractional part of a number"
+              },
+              "groupingSeparator": {
+                "type": "string",
+                "description": "Character used to separate groups of digits in large numbers"
+              }
+            },
+            "required": ["decimalSeparator"]
+          },
+          "currencyFormat": {
+            "type": "object",
+            "description": "Rules for formatting currency in this locale.",
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "description": "Currency symbol (e.g., '$', '€')"
+              },
+              "position": {
+                "type": "string",
+                "enum": ["before", "after"],
+                "description": "Whether the symbol appears before or after the amount"
+              }
+            }
+          },
+          "dateFormat": {
+            "type": "object",
+            "description": "Rules for formatting dates in this locale.",
+            "properties": {
+              "shortDate": {
+                "type": "string",
+                "description": "Short date format pattern (e.g., 'MM/dd/yyyy' for US, 'dd/MM/yyyy' for Europe)"
+              },
+              "longDate": {
+                "type": "string",
+                "description": "Long date format pattern"
+              },
+              "timeFormat": {
+                "type": "string",
+                "description": "Time format pattern (e.g., 'HH:mm' for 24-hour, 'h:mm a' for 12-hour)"
+              }
+            }
+          }
+        },
+        "required": ["code", "numberFormat"]
+      }
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the i18n configuration was last updated"
+    }
+  },
+  "required": ["_version", "defaultLocale", "supportedLocales"]
+}

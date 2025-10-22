@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/promotions/policies/v1.json",
+  "type": "object",
+  "description": "Defines server-wide promotion policies and stacking rules (dev.ocs.promotions.policies@1.0).",
+  "properties": {
+    "stackingAllowed": {
+      "type": "boolean",
+      "description": "Whether multiple promotions can be applied to a single cart/order."
+    },
+    "stackingRules": {
+      "type": "object",
+      "description": "Detailed rules governing how promotions can be combined.",
+      "properties": {
+        "maxPromotions": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of promotions that can be active simultaneously."
+        },
+        "allowedCombinations": {
+          "type": "array",
+          "description": "Specific promotion type combinations that are allowed.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "types": {
+                "type": "array",
+                "description": "Array of promotion types that can be combined together.",
+                "items": {
+                  "type": "string",
+                  "enum": ["promo_code", "gift_card", "loyalty_points", "automatic_discount"]
+                }
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["first_applied", "best_discount", "customer_choice"],
+                "description": "Which promotion takes precedence when conflicts arise."
+              }
+            },
+            "required": ["types", "priority"]
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "description": "Promotion types that cannot be combined with each other.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "The promotion type that has exclusion rules."
+              },
+              "excludes": {
+                "type": "array",
+                "description": "Array of promotion types that cannot be used with this type.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["type", "excludes"]
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation rules for promotion codes and redemption.",
+      "properties": {
+        "caseSensitive": {
+          "type": "boolean",
+          "description": "Whether promotion codes are case-sensitive."
+        },
+        "allowPartialRedemption": {
+          "type": "boolean",
+          "description": "Whether gift cards or credits can be partially used (remaining balance preserved)."
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "stackingAllowed": true,
+      "stackingRules": {
+        "maxPromotions": 3,
+        "allowedCombinations": [
+          {
+            "types": ["promo_code", "loyalty_points"],
+            "priority": "best_discount"
+          },
+          {
+            "types": ["gift_card", "loyalty_points"],
+            "priority": "first_applied"
+          }
+        ],
+        "exclusions": [
+          {
+            "type": "promo_code",
+            "excludes": ["gift_card", "automatic_discount"]
+          }
+        ]
+      },
+      "validation": {
+        "caseSensitive": false,
+        "allowPartialRedemption": true
+      }
+    },
+    {
+      "stackingAllowed": false,
+      "validation": {
+        "caseSensitive": true,
+        "allowPartialRedemption": false
+      }
+    }
+  ]
+}

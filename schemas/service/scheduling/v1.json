@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Defines scheduling information for service-based items like appointments or reservations.",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Schema version"
+    },
+    "timeSlots": {
+      "type": "array",
+      "description": "Available time slots for booking this service",
+      "items": {
+        "type": "object",
+        "properties": {
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the service slot begins"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the service slot ends"
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether this time slot is still available for booking"
+          },
+          "price": {
+            "type": "object",
+            "description": "Price for this specific time slot (may vary by time/day)",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "description": "The monetary amount as a string to avoid precision issues"
+              },
+              "currency": {
+                "type": "string",
+                "description": "ISO 4217 currency code (e.g., 'USD', 'EUR')"
+              }
+            },
+            "required": ["amount", "currency"]
+          }
+        },
+        "required": ["startTime", "endTime", "available"]
+      }
+    },
+    "duration": {
+      "type": "integer",
+      "description": "Service duration in minutes",
+      "minimum": 1
+    },
+    "location": {
+      "type": "string",
+      "description": "Where the service is performed (address, room number, etc.)"
+    },
+    "bookingWindow": {
+      "type": "object",
+      "description": "Constraints on when bookings can be made",
+      "properties": {
+        "advanceNoticeHours": {
+          "type": "integer",
+          "description": "Minimum hours notice required for booking",
+          "minimum": 0
+        },
+        "maxAdvanceDays": {
+          "type": "integer",
+          "description": "Maximum days in advance bookings can be made",
+          "minimum": 1
+        }
+      }
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the scheduling information was last updated"
+    }
+  },
+  "required": ["_version", "timeSlots", "duration", "location"]
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for the dev.ocs.server.rate_limits@1.0 capability. Its presence indicates the server implements rate limiting and provides discoverable rate limit policies.",
+  "properties": {
+    "authenticated": {
+      "type": "object",
+      "description": "Rate limits for authenticated requests (with valid bearer token).",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of requests allowed in the window."
+        },
+        "window": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Time window in seconds."
+        },
+        "unit": {
+          "type": "string",
+          "description": "Human-readable description of the limit (e.g., 'requests per hour')."
+        }
+      },
+      "required": ["limit", "window", "unit"]
+    },
+    "anonymous": {
+      "type": "object",
+      "description": "Rate limits for anonymous/unauthenticated requests.",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of requests allowed in the window."
+        },
+        "window": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Time window in seconds."
+        },
+        "unit": {
+          "type": "string",
+          "description": "Human-readable description of the limit (e.g., 'requests per hour')."
+        }
+      },
+      "required": ["limit", "window", "unit"]
+    },
+    "burstLimit": {
+      "type": "object",
+      "description": "Short-term burst protection limits to prevent rapid-fire requests.",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of requests allowed in the burst window."
+        },
+        "window": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Burst window in seconds (typically 1-10 seconds)."
+        },
+        "unit": {
+          "type": "string",
+          "description": "Human-readable description of the limit (e.g., 'requests per second')."
+        }
+      },
+      "required": ["limit", "window", "unit"]
+    }
+  }
+}

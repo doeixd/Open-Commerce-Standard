@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Indicates an order is a recurring subscription.",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Schema version"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": ["daily", "weekly", "biweekly", "monthly", "quarterly", "annual"],
+      "description": "How often the subscription renews"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the subscription begins"
+    },
+    "nextBillingDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the next billing cycle occurs"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "paused", "cancelled", "expired"],
+      "description": "Current status of the subscription"
+    },
+    "cancellationPolicy": {
+      "type": "object",
+      "properties": {
+        "canCancelAnytime": {
+          "type": "boolean",
+          "description": "Whether the subscription can be cancelled at any time"
+        },
+        "minimumCommitment": {
+          "type": "integer",
+          "description": "Minimum number of billing cycles required",
+          "minimum": 0
+        }
+      },
+      "required": ["canCancelAnytime"]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the subscription was created"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the subscription was last updated"
+    }
+  },
+  "required": ["_version", "frequency", "startDate", "status"]
+}

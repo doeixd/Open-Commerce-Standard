@@ -13,6 +13,74 @@ info:
     2.  **Minimalist Commerce Core:** The standard generalizes the `Cart` -> `Order` flow. A single `fulfillmentType` field on products is the only mandatory addition, enabling clients to handle physical, digital, and pickup goods.
     3.  **HTTP-Native Design:** The standard uses core HTTP principles, including RESTful resources, standard verbs and status codes, and Server-Sent Events (SSE) for real-time updates.
 
+    ## Rate Limiting
+
+    OCS servers SHOULD implement rate limiting to prevent abuse. Rate limiting MUST be communicated via standard headers.
+
+    ### Headers
+
+    Servers SHOULD return these headers on all responses:
+
+    ```http
+    X-RateLimit-Limit: 100
+    X-RateLimit-Remaining: 95
+    X-RateLimit-Reset: 1698105600
+    ```
+
+    **Header Definitions:**
+    - `X-RateLimit-Limit`: Maximum requests allowed in the current window
+    - `X-RateLimit-Remaining`: Requests remaining in current window
+    - `X-RateLimit-Reset`: Unix timestamp when the limit resets
+
+    ### 429 Too Many Requests Response
+
+    When rate limit is exceeded:
+
+    ```http
+    HTTP/1.1 429 Too Many Requests
+    X-RateLimit-Limit: 100
+    X-RateLimit-Remaining: 0
+    X-RateLimit-Reset: 1698105600
+    Retry-After: 120
+    Content-Type: application/ocs+json; version=1.0
+
+    {
+      "code": "rate_limit_exceeded",
+      "message": "Rate limit of 100 requests per minute exceeded",
+      "userMessage": {
+        "localizationKey": "error.rate_limit.exceeded"
+      }
+    }
+    ```
+
+    ### Discoverable Rate Limits
+
+    Servers MAY advertise rate limit policies via the `dev.ocs.server.rate_limits@1.0` capability:
+
+    ```json
+    {
+      "id": "dev.ocs.server.rate_limits@1.0",
+      "schemaUrl": "https://schemas.ocs.dev/server/rate_limits/v1.json",
+      "metadata": {
+        "authenticated": {
+          "limit": 1000,
+          "window": 3600,
+          "unit": "requests per hour"
+        },
+        "anonymous": {
+          "limit": 100,
+          "window": 3600,
+          "unit": "requests per hour"
+        },
+        "burstLimit": {
+          "limit": 20,
+          "window": 1,
+          "unit": "requests per second"
+        }
+      }
+    }
+    ```
+
 servers:
   - url: https://{domain}/api/v1
     variables:
@@ -41,24 +109,274 @@ paths:
         '200':
           description: A list of supported capabilities.
           content:
-            application/json:
+            application/ocs+json; version=1.0:
               schema:
                 $ref: '#/components/schemas/CapabilitiesResponse'
-         '500':
-           $ref: '#/components/responses/ServerError'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
-   /orders/{orderId}/cancel:
-     post:
-       tags: [Ordering]
-       summary: Request to cancel an order
-       description: Initiates a request to cancel an order. This action is only available if advertised in the order's `actions` array.
-       security:
-         - bearerAuth: []
-       parameters:
-         - name: orderId
-           in: path
-           required: true
-           schema: { type: string }
+  /stores:
+    get:
+      tags: [Discovery]
+      summary: List available stores
+      description: Returns a paginated list of all stores/vendors available on this server.
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Paginated list of stores
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/StoresResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /catalogs:
+    get:
+      tags: [Discovery]
+      summary: List available catalogs
+      description: Returns a paginated list of catalogs, optionally filtered by store.
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+        - name: storeId
+          in: query
+          schema: { type: string, format: uuid }
+          description: Filter catalogs by store ID
+      responses:
+        '200':
+          description: Paginated list of catalogs
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/CatalogsResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /catalogs/{catalogId}:
+    get:
+      tags: [Discovery]
+      summary: Get a full product catalog by ID
+      parameters:
+        - name: catalogId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/AcceptOCSCapabilities'
+      responses:
+        '200':
+          description: The full catalog with all products
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Catalog'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /carts:
+    post:
+      tags: [Cart Management]
+      summary: Create a new shopping cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: '#/components/schemas/CreateCartRequest'
+      responses:
+        '201':
+          description: Cart created successfully
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /carts/{cartId}:
+    get:
+      tags: [Cart Management]
+      summary: Get a cart by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/AcceptOCSCapabilities'
+      responses:
+        '200':
+          description: The cart object
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Cart not found
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "cart_not_found"
+                message: "Cart does not exist or has been submitted"
+        '410':
+          description: Cart expired
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: "cart_expired"
+                message: "Cart expired after 3600 seconds of inactivity"
+                userMessage:
+                  localizationKey: "error.cart.expired"
+                  params:
+                    lifetimeSeconds: 3600
+                nextActions:
+                  - id: "create_new_cart"
+                    href: "/carts"
+                    method: "POST"
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /carts/{cartId}/items:
+    post:
+      tags: [Cart Management]
+      summary: Add an item to the cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+      responses:
+        '200':
+          description: Item added, updated cart returned
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /carts/{cartId}/items/{itemId}:
+    patch:
+      tags: [Cart Management]
+      summary: Update a cart item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: '#/components/schemas/UpdateCartItemRequest'
+      responses:
+        '200':
+          description: Item updated, updated cart returned
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags: [Cart Management]
+      summary: Remove an item from the cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Item removed, updated cart returned
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /orders/{orderId}/cancel:
+    post:
+      tags: [Ordering]
+      summary: Request to cancel an order
+      description: Initiates a request to cancel an order. This action is only available if advertised in the order's `actions` array.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/IdempotencyKey'
        requestBody:
          content:
            application/ocs+json; version=1.0:
@@ -78,7 +396,34 @@ paths:
              application/ocs+json; version=1.0:
                schema: { $ref: '#/components/schemas/Error' }
 
-   /orders:
+  /orders:
+    get:
+      tags: [Ordering]
+      summary: List user's orders
+      description: Returns a paginated list of orders for the authenticated user.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, confirmed, processing, in_transit, completed, cancelled]
+          description: Filter orders by status
+      responses:
+        '200':
+          description: Paginated list of orders
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: '#/components/schemas/OrdersResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
     post:
       tags: [Ordering]
       summary: Place an order from a cart
@@ -147,6 +492,7 @@ paths:
           required: true
           schema:
             type: string
+        - $ref: '#/components/parameters/AcceptOCSCapabilities'
       responses:
         '200':
           description: The order object.
@@ -213,6 +559,7 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -250,6 +597,7 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -297,9 +645,84 @@ components:
           format: uri
           description: "The URL pointing to the JSON Schema that defines the structure for this capability's metadata."
           example: "https://schemas.ocs.dev/product/variants/v1.json"
+        status:
+          type: string
+          enum: ["beta", "stable", "deprecated"]
+          description: |
+            Lifecycle status of the capability:
+            - **beta**: Experimental, may change without notice. Not recommended for production use.
+            - **stable**: Production-ready, follows semantic versioning policy.
+            - **deprecated**: Still supported but will be removed. Check 'sunset' field for removal date.
+        sunset:
+          type: string
+          format: date
+          description: "ISO 8601 date when a deprecated capability will be removed. Only present if status is 'deprecated'. Servers MUST provide minimum 12 months notice."
+          example: "2026-06-01"
+        migrationGuide:
+          type: string
+          format: uri
+          description: "URL to documentation explaining how to migrate from this capability version to a newer version. Typically present when status is 'deprecated'."
+          example: "https://docs.ocs.dev/migrations/product-variants-v1-to-v2"
         metadata:
           type: object
           description: "Optional metadata providing implementation-specific details for this capability, such as endpoint URLs or configuration options."
+
+    # --- Pagination Schemas ---
+    PaginationMeta:
+      type: object
+      description: Pagination metadata for list responses
+      properties:
+        limit:
+          type: integer
+          description: "Number of items requested per page"
+        nextCursor:
+          type: string
+          nullable: true
+          description: "Cursor for next page. Null if no more pages."
+        previousCursor:
+          type: string
+          nullable: true
+          description: "Cursor for previous page. Null if on first page."
+        totalCount:
+          type: integer
+          description: "Total number of items (optional, may be expensive to compute)"
+      required: [limit]
+
+    StoresResponse:
+      type: object
+      description: Paginated response for GET /stores
+      properties:
+        stores:
+          type: array
+          items:
+            $ref: '#/components/schemas/Store'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+      required: [stores, pagination]
+
+    CatalogsResponse:
+      type: object
+      description: Paginated response for GET /catalogs
+      properties:
+        catalogs:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogSummary'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+      required: [catalogs, pagination]
+
+    OrdersResponse:
+      type: object
+      description: Paginated response for GET /orders
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+      required: [orders, pagination]
 
     # --- OCS Core Schemas ---
     Money:
@@ -328,11 +751,11 @@ components:
           type: object
           description: |
             Namespaced key-value pairs. The structure of this object may be defined
-            by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
-            will use their ID as a key.
+            by schemas discoverable at the `/capabilities` endpoint. Each capability
+            uses its base ID as a key, with a "_version" field inside.
             Examples:
-            - "dev.ocs.restaurant.profile@1.0"
-            - "dev.ocs.store.constraints@1.0"
+            - "dev.ocs.restaurant.profile": { "_version": "1.0", ... }
+            - "dev.ocs.store.constraints": { "_version": "1.0", ... }
       required: [id, name, location]
 
     CatalogSummary:
@@ -353,10 +776,10 @@ components:
               type: object
               description: |
                 Namespaced key-value pairs. The structure of this object may be defined
-                by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
-                will use their ID as a key.
+                by schemas discoverable at the `/capabilities` endpoint. Each capability
+                uses its base ID as a key, with a "_version" field inside.
                 Examples:
-                - "dev.ocs.promotions.discoverable@1.0"
+                - "dev.ocs.promotions.discoverable": { "_version": "1.0", ... }
           required: [items]
 
     CatalogItem:
@@ -369,20 +792,39 @@ components:
         available: { type: boolean, default: true }
         fulfillmentType:
           type: string
-          enum: [pickup, physical, digital]
+          enum: [pickup, physical, digital, hybrid]
           description: "The fulfillment method for this item, which dictates the required information for an order."
         metadata:
           type: object
           description: |
             Namespaced key-value pairs. The structure of this object may be defined
-            by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
-            will use their ID as a key.
-            Examples:
-            - "dev.ocs.product.variants@1.0"
-            - "dev.ocs.product.customization@1.0"
-            - "dev.ocs.product.addons@1.0"
-            - "dev.ocs.product.physical_properties@1.0"
-      required: [id, name, price, available, fulfillmentType]
+            by schemas discoverable at the `/capabilities` endpoint. Each capability
+            uses its base ID as a key, with a "_version" field inside.
+             Examples:
+             - "dev.ocs.product.variants": { "_version": "1.0", ... }
+             - "dev.ocs.product.customization": { "_version": "1.0", ... }
+             - "dev.ocs.product.addons": { "_version": "1.0", ... }
+             - "dev.ocs.product.physical_properties": { "_version": "1.0", ... }
+             - "dev.ocs.order.preorder": { "_version": "1.0", ... }
+             - "dev.ocs.service.scheduling": { "_version": "1.0", ... }
+        fulfillmentComponents:
+          type: array
+          description: "For hybrid fulfillment items, specifies the individual components that make up this product."
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [physical, digital, pickup]
+                description: "The fulfillment type of this component"
+              description:
+                type: string
+                description: "Human-readable description of this component"
+              required:
+                type: boolean
+                description: "Whether this component is required for the order"
+            required: [type, description, required]
+       required: [id, name, price, available, fulfillmentType]
 
     CreateCartRequest:
       type: object
@@ -433,6 +875,17 @@ components:
         subtotal: { $ref: '#/components/schemas/Money' }
         tax: { $ref: '#/components/schemas/Money' }
         total: { $ref: '#/components/schemas/Money' }
+        stores:
+          type: array
+          description: "List of stores represented in this cart. Only present if the server supports multi-store carts (dev.ocs.cart.multi_store@1.0 capability)."
+          items:
+            type: object
+            properties:
+              storeId: { type: string, format: uuid }
+              storeName: { type: string }
+              itemCount: { type: integer, description: "Number of items from this store in the cart" }
+              subtotal: { $ref: '#/components/schemas/Money', description: "Subtotal for items from this store" }
+            required: [storeId, itemCount, subtotal]
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
       required: [id, items, subtotal, tax, total, createdAt, updatedAt]
@@ -444,19 +897,55 @@ components:
           properties:
             cartItemId: { type: string, format: uuid, description: "Unique identifier for this item instance in the cart." }
             price: { $ref: '#/components/schemas/Money' }
-            metadata: { type: object, description: "Namespaced key-value pairs." }
+            metadata: { type: object, description: "Namespaced key-value pairs. Each capability uses its base ID as a key, with a '_version' field inside." }
           required: [cartItemId, price]
 
-    CreateOrderRequest:
+    CreateOrderFromCartRequest:
       type: object
+      description: "The standard request to create an order from an existing cart."
       properties:
+        orderType:
+          type: string
+          enum: [from_cart]
+          description: "Discriminator field indicating this is a cart-based order."
         cartId: { type: string, format: uuid }
         deliveryAddress:
           $ref: '#/components/schemas/Location'
-          description: "A delivery address is required if, and only if, the referenced cart contains at least one item with a fulfillmentType of 'physical'."
+          description: "A delivery address is required if, and only if, the referenced cart contains at least one item with a fulfillmentType of 'physical' or 'hybrid' (where any component is physical)."
         notes: { type: string }
         metadata: { type: object }
-      required: [cartId]
+      required: [orderType, cartId]
+
+    CreateDirectOrderRequest:
+      type: object
+      description: "The request to create an order directly from a list of items, bypassing the cart. Only available if the server advertises the dev.ocs.order.direct@1.0 capability."
+      properties:
+        orderType:
+          type: string
+          enum: [direct]
+          description: "Discriminator field indicating this is a direct order."
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItemRequest'
+          description: "The list of items to order."
+        deliveryAddress:
+          $ref: '#/components/schemas/Location'
+          description: "A delivery address is required if any item has a fulfillmentType of 'physical' or 'hybrid' (where any component is physical)."
+        notes: { type: string }
+        promotionCode: { type: string, description: "Optional promotion code to apply to the order." }
+        metadata: { type: object }
+      required: [orderType, items]
+
+    CreateOrderRequest:
+      oneOf:
+        - $ref: '#/components/schemas/CreateOrderFromCartRequest'
+        - $ref: '#/components/schemas/CreateDirectOrderRequest'
+      discriminator:
+        propertyName: orderType
+        mapping:
+          from_cart: '#/components/schemas/CreateOrderFromCartRequest'
+          direct: '#/components/schemas/CreateDirectOrderRequest'
 
      PromotionRequest:
        type: object
@@ -538,7 +1027,7 @@ components:
            items:
              type: object
              properties:
-               id: { type: "string", enum: ["cancel", "initiate_return", "add_rating"] }
+                id: { type: "string", enum: ["cancel", "initiate_return", "add_rating", "pause_subscription", "resume_subscription", "cancel_subscription"] }
                href: { type: "string", format: "uri", description: "The API endpoint to call to perform this action." }
              required: [id, href]
          returns:
@@ -555,15 +1044,16 @@ components:
           type: object
           description: |
             Namespaced key-value pairs. The structure of this object may be defined
-            by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
-            will use their ID as a key.
-            Examples:
-            - "dev.ocs.order.shipment_tracking@1.0"
-            - "dev.ocs.order.kitchen_status@1.0"
-            - "dev.ocs.order.delivery_tracking@1.0"
-            - "dev.ocs.order.tipping@1.0"
-            - "dev.ocs.order.digital_access@1.0"
-            - "dev.ocs.order.detailed_status@1.0"
+            by schemas discoverable at the `/capabilities` endpoint. Each capability
+            uses its base ID as a key, with a "_version" field inside.
+             Examples:
+             - "dev.ocs.order.shipment_tracking": { "_version": "1.0", ... }
+             - "dev.ocs.order.kitchen_status": { "_version": "1.0", ... }
+             - "dev.ocs.order.delivery_tracking": { "_version": "1.0", ... }
+             - "dev.ocs.order.tipping": { "_version": "1.0", ... }
+             - "dev.ocs.order.digital_access": { "_version": "1.0", ... }
+             - "dev.ocs.order.detailed_status": { "_version": "1.0", ... }
+             - "dev.ocs.order.subscription": { "_version": "1.0", ... }
        required: [id, status, items, total, createdAt, updatedAt]
 
     InitiateReturnRequest:
@@ -691,7 +1181,10 @@ components:
 
     Error:
       type: object
-      description: "A structured error response that communicates with the machine, the developer, and the end-user."
+      description: |
+        A structured error response that communicates with the machine, the developer, and the end-user.
+
+        See `x-error-catalog` in components for comprehensive specifications of all error codes, including HTTP status codes, retry strategies, common causes, and suggested recovery actions.
       properties:
         code:
           type: string
@@ -707,6 +1200,11 @@ components:
             # Idempotency
             - idempotency_key_reused
             # Cart & Product
+            - cart_not_found
+            - cart_expired
+            - cart_already_submitted
+            - cart_empty
+            - cart_multi_store_limit_exceeded
             - product_unavailable
             - product_customization_invalid
             # Promotions
@@ -719,12 +1217,22 @@ components:
             - delivery_address_invalid
             - fulfillment_intent_incomplete
             - fulfillment_intent_duplicate_item
-            - fulfillment_method_invalid
-            # Payments
+             - fulfillment_method_invalid
+             - order_request_invalid
+             - order_items_unavailable
+             - insufficient_stock
+             - invalid_quantity
+             - geographic_restriction
+             - minimum_order_value
+             - service_unavailable
+             - payment_method_unsupported
+             # Payments
             - payment_failed
             # Cancellation & Returns
             - cancellation_window_expired
             - return_policy_violated
+            # Rate Limiting
+            - rate_limit_exceeded
         message:
           type: string
           description: "A developer-facing, human-readable message, NOT for display to the end-user."
@@ -758,6 +1266,460 @@ components:
               method: { type: string, enum: ["GET", "POST", "PATCH", "DELETE"] }
       required: [code, message]
 
+  # --- Error Catalog ---
+  # Machine-readable error specifications providing detailed context for every error code.
+  # Each entry defines HTTP status, retry behavior, common causes, and suggested recovery actions.
+  x-error-catalog:
+    # --- General Errors ---
+    bad_request:
+      httpStatus: 400
+      title: "Bad Request"
+      description: "The request was malformed or contains invalid data."
+      category: "client_error"
+      retryable: false
+
+    unauthorized:
+      httpStatus: 401
+      title: "Unauthorized"
+      description: "Authentication credentials are required or invalid."
+      category: "authentication"
+      retryable: true
+      retryStrategy: "Obtain valid authentication token and retry"
+
+    forbidden:
+      httpStatus: 403
+      title: "Forbidden"
+      description: "The authenticated user does not have permission to perform this action."
+      category: "authorization"
+      retryable: false
+
+    not_found:
+      httpStatus: 404
+      title: "Not Found"
+      description: "The requested resource does not exist."
+      category: "client_error"
+      retryable: false
+
+    conflict:
+      httpStatus: 409
+      title: "Conflict"
+      description: "The request conflicts with the current state of the server."
+      category: "client_error"
+      retryable: false
+
+    server_error:
+      httpStatus: 500
+      title: "Internal Server Error"
+      description: "An unexpected error occurred on the server."
+      category: "server_error"
+      retryable: true
+      retryStrategy: "Wait and retry with exponential backoff"
+
+    # --- Idempotency Errors ---
+    idempotency_key_reused:
+      httpStatus: 409
+      title: "Idempotency Key Reused"
+      description: "The provided Idempotency-Key was already used with a different request body."
+      category: "client_error"
+      retryable: false
+      possibleCauses:
+        - "The same idempotency key was sent with different request parameters"
+        - "Client retry logic is not preserving the original request body"
+      suggestedActions:
+        - action: "generate_new_key"
+          description: "Generate a new UUIDv4 and retry with the correct request body"
+
+    # --- Cart Errors ---
+    cart_not_found:
+      httpStatus: 404
+      title: "Cart Not Found"
+      description: "The requested cartId does not exist or has already been converted to an order."
+      category: "resource_not_found"
+      retryable: false
+      possibleCauses:
+        - "Cart was already submitted as an order"
+        - "CartId is invalid or malformed"
+        - "Cart belongs to a different user"
+      suggestedActions:
+        - action: "create_new_cart"
+          method: "POST"
+          endpoint: "/carts"
+          description: "Create a new cart"
+        - action: "check_orders"
+          method: "GET"
+          endpoint: "/orders"
+          description: "Check if cart was already converted to order"
+      relatedCapabilities: ["dev.ocs.cart"]
+
+    cart_expired:
+      httpStatus: 410
+      title: "Cart Expired"
+      description: "The cart existed but was deleted due to inactivity per the server's lifetimeSeconds policy."
+      category: "gone"
+      retryable: false
+      possibleCauses:
+        - "Cart exceeded the configured lifetime without updates"
+        - "Server restarted and non-persistent carts were cleared"
+      suggestedActions:
+        - action: "recreate_cart"
+          method: "POST"
+          endpoint: "/carts"
+          description: "Create a new cart with the same items"
+      relatedCapabilities: ["dev.ocs.cart"]
+      metadataKeys:
+        - "Check dev.ocs.cart capability metadata.lifetimeSeconds for expiration policy"
+
+    cart_already_submitted:
+      httpStatus: 409
+      title: "Cart Already Submitted"
+      description: "This cart has already been successfully converted to an order."
+      category: "conflict"
+      retryable: false
+      possibleCauses:
+        - "Duplicate order submission (e.g., double-click)"
+        - "Retry without proper idempotency key"
+      suggestedActions:
+        - action: "get_order"
+          method: "GET"
+          endpoint: "/orders"
+          description: "Retrieve the existing order"
+      relatedCapabilities: ["dev.ocs.cart"]
+
+    cart_empty:
+      httpStatus: 400
+      title: "Cart Empty"
+      description: "Cannot create an order from an empty cart."
+      category: "validation"
+      retryable: true
+      retryStrategy: "Add items to cart before creating order"
+      suggestedActions:
+        - action: "add_items"
+          method: "POST"
+          endpoint: "/carts/{cartId}/items"
+          description: "Add items to the cart"
+      relatedCapabilities: ["dev.ocs.cart"]
+
+    cart_multi_store_limit_exceeded:
+      httpStatus: 400
+      title: "Multi-Store Cart Limit Exceeded"
+      description: "Cannot add items from different stores to the same cart, or the maximum number of stores per cart has been exceeded."
+      category: "business_logic"
+      retryable: false
+      possibleCauses:
+        - "Attempting to add items from a different store than the cart's initial store"
+        - "Server does not support multi-store carts"
+        - "Multi-store cart limit has been reached"
+      suggestedActions:
+        - action: "create_separate_cart"
+          method: "POST"
+          endpoint: "/carts"
+          description: "Create a separate cart for items from the other store"
+      relatedCapabilities: ["dev.ocs.cart", "dev.ocs.cart.multi_store"]
+      metadataKeys:
+        - "Check dev.ocs.cart.multi_store capability for multi-store cart policies"
+
+    # --- Product Errors ---
+    product_unavailable:
+      httpStatus: 409
+      title: "Product Unavailable"
+      description: "The requested product is not currently available for purchase."
+      category: "business_logic"
+      retryable: true
+      retryStrategy: "Check product availability and retry later"
+      possibleCauses:
+        - "Product is out of stock"
+        - "Product has been discontinued"
+        - "Product is not available in customer's region"
+
+    product_customization_invalid:
+      httpStatus: 400
+      title: "Invalid Product Customization"
+      description: "The provided product customization is invalid or incomplete."
+      category: "validation"
+      retryable: true
+      retryStrategy: "Correct customization parameters and retry"
+      relatedCapabilities: ["dev.ocs.product.customization"]
+
+    # --- Promotion Errors ---
+    promotion_invalid:
+      httpStatus: 400
+      title: "Invalid Promotion"
+      description: "The provided promotion code is not valid."
+      category: "validation"
+      retryable: false
+
+    promotion_expired:
+      httpStatus: 400
+      title: "Promotion Expired"
+      description: "The promotion code has expired and is no longer valid."
+      category: "business_logic"
+      retryable: false
+
+    promotion_not_applicable:
+      httpStatus: 409
+      title: "Promotion Not Applicable"
+      description: "The promotion code cannot be applied to this cart or order."
+      category: "business_logic"
+      retryable: false
+      possibleCauses:
+        - "Cart total does not meet minimum requirements"
+        - "Cart does not contain eligible items"
+        - "Customer is not in eligible group"
+
+    promotion_stacking_not_allowed:
+      httpStatus: 409
+      title: "Promotion Stacking Not Allowed"
+      description: "This promotion cannot be combined with other promotions already applied."
+      category: "business_logic"
+      retryable: false
+      relatedCapabilities: ["dev.ocs.promotions.policies"]
+
+    # --- Fulfillment Errors ---
+    delivery_address_required:
+      httpStatus: 400
+      title: "Delivery Address Required"
+      description: "A delivery address is required because the order contains physical items."
+      category: "validation"
+      retryable: true
+      retryStrategy: "Provide a valid delivery address"
+
+    delivery_address_invalid:
+      httpStatus: 400
+      title: "Invalid Delivery Address"
+      description: "The provided delivery address is invalid or cannot be serviced."
+      category: "validation"
+      retryable: true
+      retryStrategy: "Provide a valid, serviceable delivery address"
+
+    fulfillment_intent_incomplete:
+      httpStatus: 400
+      title: "Incomplete Fulfillment Intent"
+      description: "The fulfillment intent is missing required information or contains invalid data."
+      category: "validation"
+      retryable: true
+      retryStrategy: "Complete all required fulfillment details"
+      relatedCapabilities: ["dev.ocs.order.fulfillment_intent"]
+
+    fulfillment_intent_duplicate_item:
+      httpStatus: 400
+      title: "Duplicate Item in Fulfillment Intent"
+      description: "The same cart item appears in multiple fulfillment groups."
+      category: "validation"
+      retryable: true
+      retryStrategy: "Ensure each cart item appears in exactly one fulfillment group"
+      relatedCapabilities: ["dev.ocs.order.fulfillment_intent"]
+
+    fulfillment_method_invalid:
+      httpStatus: 400
+      title: "Invalid Fulfillment Method"
+      description: "The requested fulfillment method is not supported for this item or location."
+      category: "validation"
+      retryable: true
+      retryStrategy: "Choose a valid fulfillment method"
+
+    order_request_invalid:
+      httpStatus: 400
+      title: "Invalid Order Request"
+      description: "The order request is invalid. Exactly one of 'cartId' or 'items' must be provided, not both or neither."
+      category: "validation"
+      retryable: true
+      retryStrategy: "Provide either cartId (for cart-based orders) OR items (for direct orders), but not both"
+      possibleCauses:
+        - "Both cartId and items were provided in the request"
+        - "Neither cartId nor items were provided"
+        - "orderType field is missing or invalid"
+      suggestedActions:
+        - action: "use_cart_order"
+          description: "For cart-based orders, provide orderType='from_cart' and cartId only"
+        - action: "use_direct_order"
+          description: "For direct orders, provide orderType='direct' and items only"
+      relatedCapabilities: ["dev.ocs.cart", "dev.ocs.order.direct"]
+
+    # --- Payment Errors ---
+    payment_failed:
+      httpStatus: 402
+      title: "Payment Failed"
+      description: "The payment could not be processed."
+      category: "payment"
+      retryable: true
+      retryStrategy: "Try a different payment method or contact payment provider"
+      possibleCauses:
+        - "Insufficient funds"
+        - "Payment method declined"
+        - "Payment authorization expired"
+        - "Network error during payment processing"
+
+    # --- Cancellation & Returns Errors ---
+    cancellation_window_expired:
+      httpStatus: 403
+      title: "Cancellation Window Expired"
+      description: "The order can no longer be cancelled because it has progressed beyond the cancellation window."
+      category: "business_logic"
+      retryable: false
+      relatedCapabilities: ["dev.ocs.order.cancellation"]
+
+    return_policy_violated:
+      httpStatus: 403
+      title: "Return Policy Violated"
+      description: "The return request does not comply with the server's return policy."
+      category: "business_logic"
+      retryable: false
+      possibleCauses:
+        - "Return window has expired"
+        - "Item is not eligible for return"
+        - "Item condition does not meet return requirements"
+      relatedCapabilities: ["dev.ocs.order.returns"]
+
+    # --- Rate Limiting Errors ---
+    rate_limit_exceeded:
+      httpStatus: 429
+      title: "Rate Limit Exceeded"
+      description: "Too many requests have been made. Please slow down and retry after the specified time."
+      category: "rate_limiting"
+      retryable: true
+      retryStrategy: "Wait for the duration specified in the Retry-After header before retrying"
+      possibleCauses:
+        - "Making too many requests in a short period"
+        - "Exceeded per-minute or per-hour rate limits"
+        - "Burst limit exceeded"
+      headers:
+        Retry-After:
+          schema: { type: integer }
+          description: "Number of seconds to wait before retrying"
+        X-RateLimit-Limit:
+          schema: { type: integer }
+          description: "Maximum requests allowed in the current window"
+        X-RateLimit-Remaining:
+          schema: { type: integer }
+          description: "Requests remaining in the current window (will be 0)"
+        X-RateLimit-Reset:
+          schema: { type: integer }
+          description: "Unix timestamp when the rate limit resets"
+      relatedCapabilities: ["dev.ocs.server.rate_limits"]
+       metadataKeys:
+         - "Check dev.ocs.server.rate_limits capability for rate limit policies"
+
+     order_items_unavailable:
+       httpStatus: 409
+       title: "Order Items Unavailable"
+       description: "One or more items in the cart/order are no longer available for purchase."
+       category: "business_logic"
+       retryable: true
+       retryStrategy: "Remove unavailable items and retry"
+       possibleCauses:
+         - "Items went out of stock after being added to cart"
+         - "Items were discontinued"
+         - "Inventory levels changed"
+       suggestedActions:
+         - action: "review_cart"
+           method: "GET"
+           endpoint: "/carts/{cartId}"
+           description: "Review cart contents and remove unavailable items"
+         - action: "update_quantities"
+           method: "PATCH"
+           endpoint: "/carts/{cartId}/items/{itemId}"
+           description: "Reduce quantities of partially available items"
+        relatedCapabilities: ["dev.ocs.cart"]
+        details:
+          type: array
+          description: "List of unavailable items with specific reasons"
+          items:
+            type: object
+            properties:
+              itemId:
+                type: string
+                description: "ID of the unavailable item"
+              reason:
+                type: string
+                description: "Human-readable reason why the item is unavailable"
+              availableQuantity:
+                type: integer
+                description: "How many units are actually available (0 if completely unavailable)"
+            required: [itemId, reason]
+
+     insufficient_stock:
+       httpStatus: 409
+       title: "Insufficient Stock"
+       description: "The requested quantity exceeds available inventory."
+       category: "business_logic"
+       retryable: true
+       retryStrategy: "Reduce quantity or try again later"
+       possibleCauses:
+         - "Requested quantity is higher than current stock level"
+         - "Stock was reduced by another customer's order"
+       suggestedActions:
+         - action: "reduce_quantity"
+           method: "PATCH"
+           endpoint: "/carts/{cartId}/items/{itemId}"
+           description: "Reduce the quantity to match available stock"
+         - action: "check_availability"
+           method: "GET"
+           endpoint: "/catalogs/{catalogId}/items/{itemId}"
+           description: "Check current stock levels"
+
+     invalid_quantity:
+       httpStatus: 400
+       title: "Invalid Quantity"
+       description: "The requested quantity is invalid (negative, zero, or exceeds maximum allowed)."
+       category: "validation"
+       retryable: true
+       retryStrategy: "Provide a valid quantity"
+       possibleCauses:
+         - "Quantity is negative or zero"
+         - "Quantity exceeds per-customer limits"
+         - "Quantity exceeds per-order limits"
+
+     geographic_restriction:
+       httpStatus: 403
+       title: "Geographic Restriction"
+       description: "This item is not available for delivery/shipping to the specified location."
+       category: "business_logic"
+       retryable: false
+       possibleCauses:
+         - "Item shipping restrictions"
+         - "Legal/regulatory restrictions"
+         - "Vendor geographic limitations"
+
+     minimum_order_value:
+       httpStatus: 400
+       title: "Minimum Order Value Not Met"
+       description: "The order total does not meet the minimum required value."
+       category: "business_logic"
+       retryable: true
+       retryStrategy: "Add more items to meet minimum order value"
+       possibleCauses:
+         - "Order subtotal is below minimum threshold"
+         - "After discounts, order value is too low"
+       suggestedActions:
+         - action: "add_more_items"
+           method: "POST"
+           endpoint: "/carts/{cartId}/items"
+           description: "Add additional items to increase order value"
+
+     service_unavailable:
+       httpStatus: 503
+       title: "Service Temporarily Unavailable"
+       description: "The service is temporarily unavailable due to maintenance or high load."
+       category: "server_error"
+       retryable: true
+       retryStrategy: "Wait and retry with exponential backoff"
+       headers:
+         Retry-After:
+           schema: { type: integer }
+           description: "Suggested wait time in seconds"
+
+     payment_method_unsupported:
+       httpStatus: 400
+       title: "Payment Method Not Supported"
+       description: "The selected payment method is not supported for this order."
+       category: "payment"
+       retryable: true
+       retryStrategy: "Choose a different payment method"
+       possibleCauses:
+         - "Payment method not accepted by merchant"
+         - "Payment method not available in customer's region"
+         - "Payment method requires additional verification"
+
   securitySchemes:
     bearerAuth:
       type: http
@@ -771,7 +1733,48 @@ components:
       in: header
       required: true
       schema: { type: string, format: uuid }
-      description: A unique key to prevent duplicate requests.
+      description: |
+        A unique key to prevent duplicate requests. Required for all state-changing operations (POST, PATCH, DELETE).
+
+        **Behavior**:
+        - Server MUST store the key and response for at least 24 hours
+        - Replaying the same key with identical request returns the cached response
+        - Replaying the same key with different request returns 409 Conflict with code "idempotency_key_reused"
+
+        **Best Practice**: Use UUIDv4 generated client-side for each logical operation.
+
+         **Example**: `550e8400-e29b-41d4-a716-446655440000`
+    AcceptLanguage:
+      name: Accept-Language
+      in: header
+      required: false
+      schema: { type: string }
+      description: |
+        Specifies the client's preferred language(s) for localized content. Follows RFC 7231 Accept-Language format.
+
+        **Behavior**:
+        - Server should use this to select appropriate locale for translated content
+        - If server supports dev.ocs.i18n@1.0, it must negotiate locale from supportedLocales
+        - If not supported or no match found, server uses defaultLocale
+        - Server must respond with Content-Language header indicating selected locale
+
+        **Examples**:
+        - `en-US` (single language)
+        - `fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5` (weighted preferences)
+    ContentLanguage:
+      name: Content-Language
+      in: header
+      required: false
+      schema: { type: string }
+      description: |
+        Indicates the language of the response content. Set by server when responding with localized content.
+
+        **Behavior**:
+        - Must be included when response contains translated strings
+        - Should match one of the supportedLocales from dev.ocs.i18n@1.0 capability
+        - Clients should use this to determine text direction and formatting
+
+        **Example**: `fr-FR`
     Limit:
       name: limit
       in: query
@@ -782,6 +1785,34 @@ components:
       in: query
       schema: { type: string }
       description: The cursor for the next page of results.
+    AcceptOCSCapabilities:
+      name: Accept-OCS-Capabilities
+      in: header
+      required: false
+      schema: { type: string }
+      description: |
+        Comma-separated list of capability IDs with versions that the client prefers.
+
+        **Format**: `capability-id@version[, capability-id@version, ...]`
+
+        **Example**: `dev.ocs.product.variants@1.0, dev.ocs.order.tracking@2.1`
+
+        **Behavior**:
+        - If omitted, server uses latest stable version of each capability
+        - If requested version unavailable, server returns closest compatible version
+        - Server indicates actual version used in response metadata keys
+
+        **Use Case**: Allows clients to request specific capability versions for backward compatibility during server upgrades.
+
+  headers:
+    Accept-OCS-Capabilities:
+      schema:
+        type: string
+      description: |
+        Comma-separated list of capability IDs with versions.
+        Example: dev.ocs.product.variants@2.0,dev.ocs.order.tracking@1.0
+        If omitted, server uses default versions.
+        Value: Makes evolution explicit. Servers can innovate without breaking existing clients.
 
   responses:
     BadRequest:

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for the dev.ocs.cart@1.0 capability. Its presence indicates the server supports stateful, server-side shopping carts with configurable lifecycle policies.",
+  "properties": {
+    "lifetimeSeconds": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The duration in seconds that an inactive cart will be persisted by the server before being deleted. If null or omitted, carts do not expire."
+    },
+    "maxItems": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The maximum number of items allowed in a single cart. If omitted, there is no server-imposed limit."
+    },
+    "maxConcurrentCarts": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The maximum number of active carts a user can have simultaneously. If omitted, there is no limit."
+    },
+    "persistencePolicy": {
+      "type": "string",
+      "enum": ["session", "user", "anonymous"],
+      "description": "How carts are persisted: 'session' (tied to browser session/cookie), 'user' (requires authentication, persists across sessions), 'anonymous' (temporary, no login required)."
+    },
+    "autoMergeOnLogin": {
+      "type": "boolean",
+      "description": "Whether anonymous carts are automatically merged with authenticated user carts upon login. If omitted, merge behavior is server-specific."
+    }
+  }
+}

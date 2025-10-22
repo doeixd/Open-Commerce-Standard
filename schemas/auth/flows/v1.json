@@ -1,12 +1,170 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/auth/flows/v1.json",
   "type": "object",
-  "description": "Schema for discovering authentication-related endpoints (dev.ocs.auth.flows@1.0).",
+  "description": "Schema for discovering authentication-related endpoints, token formats, and supported authentication methods (dev.ocs.auth.flows@1.0).",
   "properties": {
-    "signInUrl": { "type": "string", "format": "uri", "description": "The endpoint to initiate a sign-in flow." },
-    "signOutUrl": { "type": "string", "format": "uri", "description": "The endpoint to call to sign the user out." },
-    "profileUrl": { "type": "string", "format": "uri", "description": "The endpoint to fetch the current user's profile." },
-    "registrationUrl": { "type": "string", "format": "uri", "description": "The endpoint to initiate a new user registration flow." }
+    "signInUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "The endpoint to initiate a sign-in flow."
+    },
+    "signOutUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "The endpoint to call to sign the user out."
+    },
+    "profileUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "The endpoint to fetch the current user's profile."
+    },
+    "registrationUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "The endpoint to initiate a new user registration flow."
+    },
+    "tokenFormat": {
+      "type": "string",
+      "enum": ["jwt", "opaque", "api_key"],
+      "description": "Format of tokens returned by the authentication system. JWT tokens can be decoded client-side; opaque tokens require server validation."
+    },
+    "tokenLocation": {
+      "type": "string",
+      "enum": ["header", "cookie"],
+      "default": "header",
+      "description": "Where the token is expected in requests. 'header' means Authorization: Bearer <token>, 'cookie' means httpOnly cookie."
+    },
+    "methods": {
+      "type": "array",
+      "description": "Supported authentication methods that clients can offer to users.",
+      "items": {
+        "type": "string",
+        "enum": ["password", "oauth2", "siwe", "magic_link", "webauthn"]
+      },
+      "minItems": 1
+    },
+    "oauth2": {
+      "type": "object",
+      "description": "OAuth 2.0 configuration if 'oauth2' is included in methods.",
+      "properties": {
+        "authorizationUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "OAuth 2.0 authorization endpoint."
+        },
+        "tokenUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "OAuth 2.0 token endpoint."
+        },
+        "scopes": {
+          "type": "array",
+          "description": "Available OAuth scopes.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "providers": {
+          "type": "array",
+          "description": "Social login providers supported by this server.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Provider identifier (e.g., 'google', 'github')."
+              },
+              "name": {
+                "type": "string",
+                "description": "Human-readable provider name."
+              },
+              "iconUrl": {
+                "type": "string",
+                "format": "uri",
+                "description": "URL to provider's brand icon for UI display."
+              }
+            },
+            "required": ["id", "name"]
+          }
+        }
+      },
+      "required": ["authorizationUrl", "tokenUrl"]
+    },
+    "siwe": {
+      "type": "object",
+      "description": "Sign-In With Ethereum (EIP-4361) configuration if 'siwe' is included in methods.",
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "Domain for SIWE message (prevents phishing attacks)."
+        },
+        "challengeUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Endpoint to fetch a SIWE challenge message."
+        },
+        "verifyUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Endpoint to submit signed SIWE message for verification."
+        }
+      },
+      "required": ["domain", "challengeUrl", "verifyUrl"]
+    },
+    "sessionDuration": {
+      "type": "integer",
+      "description": "Default session duration in seconds before token expiration.",
+      "minimum": 1
+    },
+    "refreshTokenSupported": {
+      "type": "boolean",
+      "description": "Whether the server supports refresh tokens for extending sessions without re-authentication."
+    }
   },
-  "required": ["signInUrl", "signOutUrl", "profileUrl"]
+  "required": ["signInUrl", "tokenFormat", "methods"],
+  "examples": [
+    {
+      "signInUrl": "https://auth.example.com/login",
+      "signOutUrl": "https://auth.example.com/logout",
+      "profileUrl": "https://api.example.com/users/me",
+      "registrationUrl": "https://auth.example.com/register",
+      "tokenFormat": "jwt",
+      "tokenLocation": "header",
+      "methods": ["password", "oauth2", "siwe"],
+      "oauth2": {
+        "authorizationUrl": "https://auth.example.com/oauth/authorize",
+        "tokenUrl": "https://auth.example.com/oauth/token",
+        "scopes": ["read", "write", "profile"],
+        "providers": [
+          {
+            "id": "google",
+            "name": "Google",
+            "iconUrl": "https://cdn.example.com/icons/google.svg"
+          },
+          {
+            "id": "github",
+            "name": "GitHub",
+            "iconUrl": "https://cdn.example.com/icons/github.svg"
+          }
+        ]
+      },
+      "siwe": {
+        "domain": "example.com",
+        "challengeUrl": "https://api.example.com/auth/siwe/challenge",
+        "verifyUrl": "https://api.example.com/auth/siwe/verify"
+      },
+      "sessionDuration": 3600,
+      "refreshTokenSupported": true
+    },
+    {
+      "signInUrl": "https://api.store.com/auth/login",
+      "profileUrl": "https://api.store.com/me",
+      "tokenFormat": "api_key",
+      "tokenLocation": "header",
+      "methods": ["password"],
+      "sessionDuration": 86400,
+      "refreshTokenSupported": false
+    }
+  ]
 }

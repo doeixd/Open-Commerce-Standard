@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Defines preorder information for items not yet available for immediate fulfillment.",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "enum": ["1.0"],
+      "description": "Schema version"
+    },
+    "releaseDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the item will be available for shipment/delivery"
+    },
+    "estimatedShipDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Estimated date when the item will ship after release"
+    },
+    "paymentTiming": {
+      "type": "string",
+      "enum": ["immediate", "on_ship"],
+      "description": "When the customer is charged - immediately upon order or when shipped"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the preorder information was last updated"
+    }
+  },
+  "required": ["_version", "releaseDate", "paymentTiming"]
+}

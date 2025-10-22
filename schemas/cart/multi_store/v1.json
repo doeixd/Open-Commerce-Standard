@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for the dev.ocs.cart.multi_store@1.0 capability. Its presence indicates the server supports carts containing items from multiple stores.",
+  "properties": {
+    "maxStoresPerCart": {
+      "type": "integer",
+      "minimum": 2,
+      "description": "The maximum number of different stores that can be represented in a single cart. If omitted, there is no limit."
+    },
+    "taxCalculation": {
+      "type": "string",
+      "enum": ["per_store", "combined"],
+      "description": "How taxes are calculated for multi-store carts. 'per_store' means taxes are calculated separately for each store's items. 'combined' means taxes are calculated on the combined cart total."
+    },
+    "shippingCalculation": {
+      "type": "string",
+      "enum": ["per_store", "combined", "optimized"],
+      "description": "How shipping costs are calculated. 'per_store' means separate shipping per store. 'combined' means a single combined shipping cost. 'optimized' means the server will intelligently combine or split shipments for cost optimization."
+    },
+    "splitOrders": {
+      "type": "boolean",
+      "description": "Whether checkout creates separate orders per store (true) or a single combined order (false)."
+    }
+  },
+  "required": ["taxCalculation", "shippingCalculation", "splitOrders"]
+}

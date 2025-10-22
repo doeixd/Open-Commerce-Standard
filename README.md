@@ -46,10 +46,12 @@ The full OpenAPI 3.0 specification is available in [`spec.yaml`](./src/spec.yaml
 ## Key Features
 
 *   **Universal Commerce Model:** A single, elegant model handles **physical goods**, **digital goods/services**, and **in-store pickup** using a simple `fulfillmentType` flag.
+*   **Flexible Checkout Flows:** OCS supports both stateful, multi-step shopping carts for complex journeys and stateless, "Buy Now" checkouts for simple, one-click purchases. This is enabled by the discoverable `dev.ocs.order.direct@1.0` capability, allowing clients to provide the optimal user experience for any scenario.
 *   **Dynamic Capability Discovery:** The `GET /capabilities` endpoint allows a client to understand a server's full feature set, enabling truly adaptive applications.
 *   **Real-time Order Updates:** A built-in Server-Sent Events (SSE) endpoint (`/orders/{id}/updates`) provides efficient, real-time order status changes using standardized JSON Patch.
 *   **Structured, Extensible Metadata:** Go beyond simple key-value pairs. OCS provides a system for servers to link to official JSON Schemas that define the structure of their `metadata`.
 *   **Web3-Native Payments:** Includes a complete, protocol-compliant implementation for handling payments via the [x402 Protocol](https://github.com/coinbase/x402).
+*   **Global-Ready by Design:** Full internationalization support is built into the standard. Servers can advertise supported languages and regional formats, allowing clients to provide a fully localized experience, including right-to-left (RTL) language support and culturally correct currency formatting.
 *   **Formal Security Model:** Recommends and formalizes a `Bearer` token authentication scheme for all protected resources.
 
 <br />
@@ -252,8 +254,9 @@ The client fetches a catalog (`/catalogs/{id}`) and gets a product (`CatalogItem
   "available": true,
   "metadata": {
     "x-vendor-style-code": "FW25-TEE-01",
-    // The key matches the ID from the capabilities endpoint.
-    "dev.ocs.product.variants@1.0": {
+    // The key matches the base ID from the capabilities endpoint.
+    "dev.ocs.product.variants": {
+      "_version": "1.0",
       "options": ["Size", "Color"],
       "variants": [
         {
@@ -341,7 +344,8 @@ The client immediately opens a connection to the SSE endpoint.
 event: order.patch
 data: [
   {"op": "replace", "path": "/status", "value": "confirmed"},
-  {"op": "add", "path": "/metadata/dev.ocs.order.detailed_status@1.0", "value": {
+  {"op": "add", "path": "/metadata/dev.ocs.order.detailed_status", "value": {
+    "_version": "1.0",
     "title": "Order Confirmed",
     "description": "Your order has been confirmed and will be processed soon."
   }}
@@ -352,8 +356,9 @@ data: [
 event: order.patch
 data: [
   {"op": "replace", "path": "/status", "value": "in_transit"},
-  {"op": "replace", "path": "/metadata/dev.ocs.order.detailed_status@1.0/title", "value": "Out for Delivery"},
-  {"op": "add", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0", "value": {
+  {"op": "replace", "path": "/metadata/dev.ocs.order.detailed_status/title", "value": "Out for Delivery"},
+  {"op": "add", "path": "/metadata/dev.ocs.order.delivery_tracking", "value": {
+    "_version": "1.0",
     "driver": { "name": "Jane D.", "vehicle": "Blue Sedan" },
     "status": "en_route_to_customer",
     "liveLocation": { "latitude": 40.7135, "longitude": -74.0050 },
@@ -364,9 +369,161 @@ data: [
 # --- Live location is updated moments later ---
 # A tiny, efficient patch is sent for only the data that changed.
 event: order.patch
-data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]
+data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]
 ```
-* **Client Insight:** The client's UI updates the status to "Shipped." Because it saw the `dev.ocs.order.shipment_tracking@1.0` capability in Step 1, it knows to look for that key in the metadata and can now display a "Track Your Shipment" button that links to the `trackingUrl`.
+* **Client Insight:** The client's UI updates the status to "Shipped." Because it saw the `dev.ocs.order.shipment_tracking@1.0` capability in Step 1, it knows to look for the `dev.ocs.order.shipment_tracking` key in the metadata and can now display a "Track Your Shipment" button that links to the `trackingUrl`.
+
+<br />
+
+## Handling Different Commerce Models
+
+OCS is designed to be flexible. Not all transactions are created equal, and the standard provides the tools to handle both complex and simple checkout flows gracefully.
+
+### The Standard Stateful Cart
+
+By default, OCS uses a robust, server-side `Cart` resource. This is the ideal foundation for traditional e-commerce, where users add multiple items, apply promotions, and calculate shipping before committing to a purchase. The server manages the state, ensuring data is always accurate and validated at every step.
+
+### The "Buy Now" Flow (dev.ocs.order.direct@1.0)
+
+For use cases like purchasing a single digital article, re-ordering a meal, or other quick transactions, servers can implement the Direct Order capability. This allows a client to bypass the cart and create an order directly from a list of items.
+
+A client discovers this capability at runtime and can dynamically render both "Add to Cart" and "Buy Now" buttons, providing the perfect, context-aware user experience for any product.
+
+<br />
+
+## Cart vs. Direct Order Discovery
+
+OCS makes cart support and direct order support explicit and discoverable through capabilities. This eliminates guesswork and enables clients to provide the optimal user experience based on what the server supports.
+
+### How It Works
+
+Clients check the `/capabilities` endpoint for two key capabilities:
+
+- **`dev.ocs.cart@1.0`**: Server supports stateful shopping carts with lifecycle policies
+- **`dev.ocs.order.direct@1.0`**: Server supports cart-less "Buy Now" orders
+
+### Client Decision Logic
+
+```javascript
+// Step 1: Discover capabilities
+const capabilities = await fetch('/capabilities').then(r => r.json());
+const capIds = capabilities.capabilities.map(c => c.id);
+
+const hasCart = capIds.includes('dev.ocs.cart');
+const hasDirect = capIds.includes('dev.ocs.order.direct');
+
+// Step 2: Determine UI based on capabilities
+if (!hasCart && !hasDirect) {
+  throw new Error('Server supports neither cart nor direct order creation');
+}
+
+if (hasCart && hasDirect) {
+  // Show both "Add to Cart" AND "Buy Now" buttons
+  renderProductPage({
+    buttons: ['addToCart', 'buyNow']
+  });
+
+  // Get cart policies for UI hints
+  const cartCap = capabilities.capabilities.find(c => c.id === 'dev.ocs.cart');
+  if (cartCap.metadata?.lifetimeSeconds) {
+    showCartExpirationTimer(cartCap.metadata.lifetimeSeconds);
+  }
+} else if (hasCart) {
+  // Traditional cart-only flow
+  renderProductPage({ buttons: ['addToCart'] });
+} else {
+  // Direct-only (minimal cart-less server)
+  renderProductPage({ buttons: ['buyNow'] });
+}
+```
+
+### Why This Matters
+
+- **No Trial-and-Error**: Clients know exactly what endpoints exist without making failing requests
+- **Dynamic UI**: Show the right buttons based on server capabilities
+- **Cart Policies**: The `dev.ocs.cart` capability metadata includes `lifetimeSeconds`, `maxItems`, and other policies that help clients provide better UX (e.g., showing cart expiration timers)
+- **Explicit Design**: Mixing cart and direct order discovery is now explicit, not implicit
+
+<br />
+
+## Error Handling
+
+OCS provides a comprehensive, machine-readable error catalog in the OpenAPI specification that defines every error code's behavior, common causes, and recovery strategies.
+
+### Structured Error Response
+
+All errors follow a consistent structure:
+
+```json
+{
+  "code": "cart_expired",
+  "message": "Cart expired after 3600 seconds of inactivity",
+  "userMessage": {
+    "localizationKey": "error.cart.expired",
+    "params": { "lifetimeSeconds": 3600 }
+  },
+  "nextActions": [
+    {
+      "id": "create_new_cart",
+      "href": "/carts",
+      "method": "POST"
+    }
+  ]
+}
+```
+
+### Common Error Patterns
+
+#### Cart Expiration (410 Gone)
+
+When a cart expires due to inactivity:
+
+```javascript
+try {
+  await createOrder({ cartId });
+} catch (error) {
+  if (error.code === 'cart_expired') {
+    // Persist items locally
+    const items = getCurrentCartItems();
+    localStorage.setItem('pendingCartItems', JSON.stringify(items));
+
+    // Recreate cart
+    const newCart = await createCart({ storeId });
+    for (const item of items) {
+      await addToCart(newCart.id, item);
+    }
+
+    // Retry order
+    return createOrder({ cartId: newCart.id });
+  }
+}
+```
+
+**Prevention**: Check the `dev.ocs.cart` capability's `metadata.lifetimeSeconds` and ensure cart updates happen before expiration.
+
+#### Cart Not Found (404 Not Found)
+
+The cart may have been converted to an order:
+
+```javascript
+if (error.code === 'cart_not_found') {
+  // Check if cart became an order
+  const orders = await fetch('/orders').then(r => r.json());
+  const recentOrder = orders.orders.find(o => o.createdAt > lastCartUpdate);
+
+  if (recentOrder) {
+    // Navigate to order page
+    navigateTo(`/orders/${recentOrder.id}`);
+  } else {
+    // Create new cart
+    createNewCart();
+  }
+}
+```
+
+### Full Error Catalog
+
+The complete error catalog with HTTP status codes, retry strategies, common causes, and recovery actions is available in the `x-error-catalog` section of [`spec.yaml`](./src/spec.yaml).
 
 <br />
 
@@ -391,16 +548,35 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | **`dev.ocs.order.returns@1.0`** | Order (Action) | Enables a discoverable workflow for item returns, initiated via an action on the Order and navigated via hypermedia links. | N/A (Workflow) |
 | **`dev.ocs.order.refunds@1.0`** | Order (Metadata) | Provides a standardized, auditable record of all monetary refunds associated with an order. | [order/refunds/v1.json](./schemas/order/refunds/v1.json) |
 | **`dev.ocs.promotions.discoverable@1.0`** | Store, Catalog | Allows a server to advertise publicly available promotions to clients. | [promotions/discoverable/v1.json](./schemas/promotions/discoverable/v1.json) |
+| **`dev.ocs.promotions.policies@1.0`** | Server-wide | Defines promotion stacking rules, validation policies, and exclusion rules to help clients provide better UX and prevent promotion conflicts. | [promotions/policies/v1.json](./schemas/promotions/policies/v1.json) |
 | **`dev.ocs.order.applied_promotions@1.0`** | Order | Provides a final, authoritative record of all value modifications on the completed order. | [order/applied_promotions/v1.json](./schemas/order/applied_promotions/v1.json) |
 | **`dev.ocs.order.fulfillment_intent@1.0`** | CreateOrderRequest | Allows a client to specify a precise fulfillment plan for the items in a cart, supporting mixed fulfillment and split orders. | [order/fulfillment_intent/v1.json](./schemas/order/fulfillment_intent/v1.json) |
 | **`dev.ocs.store.constraints@1.0`** | Store | Advertises server-side business rules (e.g., promotion policies, return windows) to help clients prevent errors. | [store/constraints/v1.json](./schemas/store/constraints/v1.json) |
-| **`dev.ocs.auth.flows@1.0`** | Server-wide | Provides URLs for authentication flows (sign-in, sign-out, profile, registration). | [auth/flows/v1.json](./schemas/auth/flows/v1.json) |
+| **`dev.ocs.auth.flows@1.0`** | Server-wide | Provides authentication flow URLs, token format information, and supported authentication methods (password, OAuth2, SIWE, magic link, WebAuthn). | [auth/flows/v1.json](./schemas/auth/flows/v1.json) |
 | **`dev.ocs.product.search@1.0`** | Server-wide | Provides a URL template for product search with supported sort options. | [product/search/v1.json](./schemas/product/search/v1.json) |
 | **`dev.ocs.product.categorization@1.0`** | Product (`CatalogItem`) | Provides an ordered category path (breadcrumb) for navigation. | [product/categorization/v1.json](./schemas/product/categorization/v1.json) |
 | **`dev.ocs.product.relations@1.0`** | Product (`CatalogItem`) | Provides related products (recommendations, accessories, alternatives). | [product/relations/v1.json](./schemas/product/relations/v1.json) |
 | **`dev.ocs.payment.x402_fiat@1.0`** | Server-wide | Advertises support for fiat payments via the x402 `fiat_intent` scheme and provides public keys for payment providers. | [payment/x402_fiat/v1.json](./schemas/payment/x402_fiat/v1.json) |
+| **`dev.ocs.cart@1.0`** | Server-wide | Indicates support for stateful, server-side shopping carts with configurable lifecycle policies (expiration, limits, persistence). | [cart/v1.json](./schemas/cart/v1.json) |
+| **`dev.ocs.order.direct@1.0`** | Server-wide | Indicates support for cart-less "Buy Now" orders created directly from items, bypassing the cart entirely. | [order/direct/v1.json](./schemas/order/direct/v1.json) |
+| **`dev.ocs.i18n@1.0`** | Server-wide | Provides internationalization support including supported locales, default locale, and formatting rules for numbers, currencies, and dates. | [i18n/v1.json](./schemas/i18n/v1.json) |
+| **`dev.ocs.order.subscription@1.0`** | Order | Defines recurring subscription orders with frequency, billing cycles, and cancellation policies. | [order/subscription/v1.json](./schemas/order/subscription/v1.json) |
+| **`dev.ocs.order.preorder@1.0`** | Product (`CatalogItem`) | Defines preorder information for items not yet available, including release dates and payment timing. | [order/preorder/v1.json](./schemas/order/preorder/v1.json) |
+| **`dev.ocs.service.scheduling@1.0`** | Product (`CatalogItem`) | Defines scheduling information for service-based items like appointments, including time slots and booking constraints. | [service/scheduling/v1.json](./schemas/service/scheduling/v1.json) |
 
 <br />
+
+## Versioning Rules
+
+OCS uses semantic versioning for capabilities and the overall standard.
+
+- **PATCH (1.0 → 1.1):** Add optional fields, no breaking changes. Clients can safely upgrade without changes.
+- **MINOR (1.x → 2.0):** Breaking changes allowed, must provide migration guide. Servers announce deprecation 3 months in advance.
+- **Deprecation:** Servers must support old versions for at least 12 months after sunset announcement.
+
+Clients negotiate versions via the `Accept-OCS-Capabilities` header (comma-separated list of capability IDs with versions, e.g., `dev.ocs.product.variants@2.0`). If omitted, servers use default versions.
+
+For detailed versioning strategy, multi-version support, client negotiation, deprecation policies, and migration examples, see the **[Capability Versioning Guide](./docs/capability-versioning.md)**.
 
 ## Future Direction
 
@@ -417,7 +593,7 @@ OCS is a living standard. The future direction includes:
 - **Always discover capabilities first:** Call `GET /capabilities` to adapt dynamically—never hardcode features.
 - **Use full Capability IDs as metadata keys:** E.g., `"dev.ocs.product.variants@1.0"` to link to schemas.
 - **Handle missing capabilities gracefully:** Fall back to basic representations if optional features aren't supported.
-- **Require idempotency:** Include `Idempotency-Key` in all state-changing requests to prevent duplicates.
+- **Require idempotency:** Include `Idempotency-Key` header in all state-changing requests (POST, PATCH, DELETE) to prevent duplicates. Servers store keys for 24 hours minimum.
 - **Support all fulfillment types:** Design checkout for `physical` (shipping), `digital`, and `pickup` items in any cart.
 
 <br />
@@ -450,6 +626,50 @@ All API requests and responses use the custom media type `application/ocs+json; 
 ```
 Accept: application/ocs+json; version=1.0
 Content-Type: application/ocs+json; version=1.0
+```
+
+<br />
+
+## Pagination
+
+List endpoints (`GET /stores`, `GET /catalogs`, `GET /orders`) return paginated responses using cursor-based pagination.
+
+### Request
+
+```http
+GET /stores?limit=20&cursor=eyJpZCI6InN0b3JlXzIwIn0
+```
+
+### Response
+
+```json
+{
+  "stores": [
+    { "id": "store_1", "name": "Store 1", ... }
+  ],
+  "pagination": {
+    "limit": 20,
+    "nextCursor": "eyJpZCI6InN0b3JlXzQwIn0",
+    "previousCursor": null,
+    "totalCount": 157
+  }
+}
+```
+
+### Client Usage
+
+```javascript
+let cursor = null;
+const allStores = [];
+
+do {
+  const url = `/stores?limit=20${cursor ? `&cursor=${cursor}` : ''}`;
+  const response = await fetch(url);
+  const data = await response.json();
+
+  allStores.push(...data.stores);
+  cursor = data.pagination.nextCursor;
+} while (cursor);
 ```
 
 <br />
