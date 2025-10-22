@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Open Commerce Standard (OCS) - Documentation</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-ghcolors.min.css" rel="stylesheet" />
     <style>
         * {
             margin: 0;
@@ -25,8 +25,8 @@
             --border-dark: #cbd5e1;
             --success: #10b981;
             --warning: #f59e0b;
-            --code-bg: #1e293b;
-            --code-text: #e2e8f0;
+            --code-bg: #f6f8fa;
+            --code-text: #24292e;
             --sidebar-width: 280px;
         }
 
@@ -88,7 +88,6 @@
             background: var(--bg-main);
             border-right: 1px solid var(--border);
             position: fixed;
-            height: 100vh;
             height: 100%;
             overflow-y: auto;
             padding: 2rem 0;
@@ -446,8 +445,8 @@
 
         .step-number {
             position: absolute;
-            left: 1.5rem;
-            top: 1.5rem;
+            left: 1.1rem;
+            top: 1.4rem;
             width: 32px;
             height: 32px;
             background: var(--primary);
@@ -458,6 +457,9 @@
             justify-content: center;
             font-weight: 700;
             font-size: 0.875rem;
+            padding: 0;
+            text-align: center;
+            text-box-trim: trim-both;
         }
 
         .step-title {
@@ -776,7 +778,7 @@
 
                 <div class="code-wrapper">
                     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>// Complete OCS workflow in one snippet
+                    <div class="code-block"><pre><code class="language-javascript">// Complete OCS workflow in one snippet
 const API_BASE = 'https://api.example.com';
 const AUTH_TOKEN = 'your_token';
 
@@ -822,7 +824,7 @@ const order = await fetch(`${API_BASE}/orders`, {
 const events = new EventSource(`${API_BASE}/orders/${order.id}/updates`);
 events.addEventListener('order.patch', (e) => {
   console.log('Order updated:', JSON.parse(e.data));
-});</pre></div>
+});</code></pre></div>
                 </div>
 
                 <h3>Required Headers</h3>
@@ -867,11 +869,11 @@ events.addEventListener('order.patch', (e) => {
                     <h4>Check for Variants</h4>
                     <div class="code-wrapper">
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <div class="code-block"><pre>const hasVariants = item.metadata?.['dev.ocs.product.variants@1.0'];
+                        <div class="code-block"><pre><code class="language-javascript">const hasVariants = item.metadata?.['dev.ocs.product.variants@1.0'];
 if (hasVariants) {
   // Show size/color picker
   const variants = hasVariants.variants;
-}</pre></div>
+}</code></pre></div>
                     </div>
                 </div>
 
@@ -879,11 +881,11 @@ if (hasVariants) {
                     <h4>Handle 402 Payment Required</h4>
                     <div class="code-wrapper">
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <div class="code-block"><pre>const response = await fetch(`${API_BASE}/orders`, { /* ... */ });
+                        <div class="code-block"><pre><code class="language-javascript">const response = await fetch(`${API_BASE}/orders`, { /* ... */ });
 if (response.status === 402) {
   const paymentInfo = await response.json();
   // Handle x402 payment flow
-}</pre></div>
+}</code></pre></div>
                     </div>
                 </div>
 
@@ -891,7 +893,7 @@ if (response.status === 402) {
                     <h4>Subscribe to Order Updates</h4>
                     <div class="code-wrapper">
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <div class="code-block"><pre>const eventSource = new EventSource(`${API_BASE}/orders/${orderId}/updates`);
+                        <div class="code-block"><pre><code class="language-javascript">const eventSource = new EventSource(`${API_BASE}/orders/${orderId}/updates`);
 eventSource.addEventListener('order.patch', (event) => {
   const patches = JSON.parse(event.data);
   patches.forEach(patch => {
@@ -899,7 +901,7 @@ eventSource.addEventListener('order.patch', (event) => {
       console.log('New status:', patch.value);
     }
   });
-});</pre></div>
+});</code></pre></div>
                     </div>
                 </div>
             </section>
@@ -947,7 +949,7 @@ eventSource.addEventListener('order.patch', (event) => {
                 <p>Every OCS interaction starts the same way: ask the server what it supports. This is like walking into a store and asking for the catalog before you order.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>// First, let's see what this server can do
+                    <div class="code-block"><pre><code class="language-javascript">// First, let's see what this server can do
 const API_BASE = 'https://api.example.com';
 const AUTH_TOKEN = 'your_token_here'; // You'd get this from your auth flow
 
@@ -970,7 +972,7 @@ const capabilities = await discoverCapabilities();
 // [
 //   { id: "dev.ocs.product.variants@1.0", schemaUrl: "..." },
 //   { id: "dev.ocs.order.shipment_tracking@1.0", schemaUrl: "..." }
-// ]</pre></div>
+// ]</code></pre></div>
                 </div>
 
                 <p>See what we did there? We now know this server supports product variants and shipment tracking. We can use this information to enable features in our UI. No hardcoding, no guessing.</p>
@@ -980,7 +982,7 @@ const capabilities = await discoverCapabilities();
                 <p>Now let's get the actual products. In OCS, products live in "catalogs".</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>// First, let's see what catalogs are available
+                    <div class="code-block"><pre><code class="language-javascript">// First, let's see what catalogs are available
 async function getCatalogs() {
   const response = await fetch(`${API_BASE}/catalogs`, {
     headers: {
@@ -1015,7 +1017,7 @@ console.log('Products:', catalog.items);
 //   price: { amount: "25.00", currency: "USD" },
 //   available: true,
 //   fulfillmentType: "physical"
-// }</pre></div>
+// }</code></pre></div>
                 </div>
 
                 <p>Notice how clean this is? A product is just a product. Name, price, availability. If you're building a simple client, you're done—just show these to the user.</p>
@@ -1025,7 +1027,7 @@ console.log('Products:', catalog.items);
                 <p>But what if a product has variants, like different sizes? This is where OCS gets clever. Instead of adding a <span class="inline-code">variants</span> field to every product (even ones that don't need it), we use <span class="inline-code">metadata</span>.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>// A product with variants looks like this:
+                    <div class="code-block"><pre><code class="language-javascript">// A product with variants looks like this:
 const tshirt = {
   id: "prod_123",
   name: "Classic T-Shirt",
@@ -1073,7 +1075,7 @@ if (hasVariants(tshirt, capabilities)) {
 } else {
   // Just show a simple "Add to Cart" button
   console.log('Simple product, no variants');
-}</pre></div>
+}</code></pre></div>
                 </div>
 
                 <p>This is the magic of OCS. Your client adapts to what the server supports. If variants exist, you show them. If not, you don't. No special cases, no brittle code.</p>
@@ -1083,7 +1085,7 @@ if (hasVariants(tshirt, capabilities)) {
                 <p>Alright, the user wants to buy something. Let's create a cart and add an item to it.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>// Create a new cart
+                    <div class="code-block"><pre><code class="language-javascript">// Create a new cart
 async function createCart() {
   const response = await fetch(`${API_BASE}/carts`, {
     method: 'POST',
@@ -1132,7 +1134,7 @@ console.log('Created cart:', cart.id);
 
 // Add a specific variant to the cart
 await addToCart(cart.id, 'prod_123', 1, 'var_large_black');
-console.log('Added item to cart!');</pre></div>
+console.log('Added item to cart!');</code></pre></div>
                 </div>
 
                 <p>Notice the <span class="inline-code">Idempotency-Key</span> header? This is important. If the network hiccups and you retry the request, the server won't add the item twice. This is the kind of detail OCS gets right.</p>
@@ -1142,7 +1144,7 @@ console.log('Added item to cart!');</pre></div>
                 <p>The user is ready to check out. Let's place the order.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>// Place an order
+                    <div class="code-block"><pre><code class="language-javascript">// Place an order
 async function placeOrder(cartId, orderType, deliveryAddress = null) {
   const body = {
     cartId: cartId,
@@ -1191,7 +1193,7 @@ console.log('Order placed!', order);
 //   items: [...],
 //   total: { amount: "25.00", currency: "USD" },
 //   createdAt: "2025-01-15T10:30:00Z"
-// }</pre></div>
+// }</code></pre></div>
                 </div>
 
                 <h4>Step 6: Tracking the Order in Real-Time</h4>
@@ -1199,7 +1201,7 @@ console.log('Order placed!', order);
                 <p>Here's where it gets cool. OCS supports real-time order updates via Server-Sent Events (SSE). This means you can show the user live updates as their order progresses.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>// Subscribe to order updates
+                    <div class="code-block"><pre><code class="language-javascript">// Subscribe to order updates
 function subscribeToOrderUpdates(orderId, onUpdate) {
   const eventSource = new EventSource(
     `${API_BASE}/orders/${orderId}/updates`,
@@ -1252,7 +1254,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
 });
 
 // When you're done, clean up
-// subscription.close();</pre></div>
+// subscription.close();</code></pre></div>
                 </div>
 
                 <h3>Why This Approach Works</h3>
@@ -1528,7 +1530,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                     <div class="endpoint-body">
                         <strong>Response:</strong>
                         <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            <div class="code-block"><pre>{
+                            <div class="code-block"><pre><code class="language-json">{
   "capabilities": [
     {
       "id": "dev.ocs.product.variants@1.0",
@@ -1539,7 +1541,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
       "schemaUrl": "https://schemas.ocs.dev/order/shipment_tracking/v1.json"
     }
   ]
-}</pre></div>
+}</code></pre></div>
                         <div class="info-box">
                             <strong>Client Insight:</strong>
                             "Okay, this server supports products with variants (like size and color) and will provide shipment tracking details for orders. I can now enable the UI for these features."
@@ -1551,7 +1553,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                 <p>The client fetches a catalog (<span class="inline-code">/catalogs/{id}</span>) and gets a product (<span class="inline-code">CatalogItem</span>).</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>{
+                    <div class="code-block"><pre><code class="language-json">{
   "id": "prod_123",
   "name": "Classic OCS Tee",
   "price": { "amount": "25.00", "currency": "USD" },
@@ -1577,7 +1579,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
       ]
     }
   }
-}</pre></div>
+}</code></pre></div>
                 </div>
 
                 <div class="info-box">
@@ -1596,13 +1598,13 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                     <div class="endpoint-body">
                         <strong>Request:</strong>
                         <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            <div class="code-block"><pre>{
+                            <div class="code-block"><pre><code class="language-json">{
   "cartId": "cart_abc",
   "orderType": "delivery",
   "deliveryAddress": {
     "address": "123 OCS Lane, Protocol City, 1337"
   }
-}</pre></div>
+}</code></pre></div>
                         </div>
                     </div>
                 </div>
@@ -1618,7 +1620,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                     <div class="endpoint-body">
                         <strong>Response Stream:</strong>
                         <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            <div class="code-block"><pre>event: order.patch
+                            <div class="code-block"><pre><code class="language-http">event: order.patch
 data: [{"op": "replace", "path": "/status", "value": "confirmed"}]
 
 event: order.patch
@@ -1631,7 +1633,7 @@ data: [
       "trackingUrl": "https://www.ups.com/track?tracknum=1Z999ABCDEFG"
     }
   ]}
-]</pre></div>
+]</code></pre></div>
                         <div class="info-box">
                             <strong>Client Insight:</strong>
                             The client's UI updates the status to "Shipped." Because it saw the <span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span> capability in Step 1, it knows to look for that key in the metadata and can now display a "Track Your Shipment" button that links to the <span class="inline-code">trackingUrl</span>.
