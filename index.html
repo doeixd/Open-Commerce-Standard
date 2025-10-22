@@ -1516,108 +1516,74 @@ Server → 201 Created → Client
 
             <!-- X402 Protocol -->
             <section id="x402-protocol">
-                <h2>X402 Protocol Compliance</h2>
+                <h2>A Unified Payment Protocol: x402</h2>
 
-                <p>OCS integrates the <a href="https://github.com/coinbase/x402" target="_blank">x402 Protocol</a>, Coinbase's open standard for internet-native payments. Here's the key thing to understand: <strong>x402 is payment-method agnostic</strong>. It works with traditional payment processors (Stripe, PayPal, etc.) AND blockchain-based payments (USDC, ETH, etc.). You're not locked into crypto—you can use whatever payment method makes sense for your business.</p>
+                <p>OCS leverages the <strong>x402 Protocol</strong> to provide a single, unified layer for all payment processing. The core design principle of x402 is its <strong>payment-rail agnosticism</strong>. It is an HTTP-native protocol that can orchestrate any payment type, from traditional credit cards via Stripe to web3-native assets like USDC.</p>
 
-                <div class="info-box">
-                    <strong>X402 Schemas</strong>
-                    Complete x402 payment schemas including <span class="inline-code">PaymentRequiredResponse</span>, <span class="inline-code">PaymentPayload</span>, and <span class="inline-code">SettlementResponse</span> are defined in the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L596-L663" target="_blank" style="color: var(--primary); text-decoration: underline;">X402 Protocol Schemas section</a> of the spec.
-                </div>
+                <p>This flexibility is achieved through extensible <strong>payment schemes</strong>, which act as "drivers" for different financial networks. OCS specifies two primary schemes:</p>
 
-                <div class="info-box">
-                    <strong>Payment Flexibility</strong>
-                    Think of x402 as a universal payment protocol. It's like HTTP for payments—it doesn't care if you're using Stripe, crypto wallets, or both. Start with what you know (like Stripe), and add crypto support when you're ready. Or never add it at all. The choice is yours.
-                </div>
+                <ol>
+                    <li><strong><span class="inline-code">fiat_intent</span> (For Traditional Payments):</strong> This scheme is designed to work with modern processors like Stripe and PayPal. It orchestrates the secure, token-based "Payment Intent" flow, where sensitive details are never exposed to the OCS server, ensuring security and compliance.</li>
+                    <li><strong><span class="inline-code">exact</span> (For Web3 Payments):</strong> This scheme uses cryptographic signatures (EIP-712) to authorize transactions directly on a blockchain, enabling instant settlement, true micropayments, and autonomous payments by AI agents.</li>
+                </ol>
 
-                <h3>Why X402?</h3>
+                <p>This dual-scheme architecture means you are never locked into a single payment world. You can start with the system that makes sense for your business today and expand effortlessly tomorrow.</p>
+
+                <h3>The OCS Advantage: One Protocol, Two Worlds</h3>
+
+                <p>Think of OCS as a universal adapter for digital commerce. By building on one simple protocol, you gain the benefits of both traditional and web3 finance.</p>
 
                 <div class="table-container">
                     <table class="comparison-table">
                         <thead>
                             <tr>
                                 <th>Feature</th>
-                                <th>Traditional Only</th>
-                                <th>X402 (Traditional + Crypto)</th>
+                                <th>Traditional Payments (Standalone)</th>
+                                <th>OCS with x402 (Unified)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td><strong>Payment Methods</strong></td>
-                                <td>Credit cards, bank transfers</td>
-                                <td>Credit cards, bank transfers, crypto, stablecoins</td>
+                                <td>Credit cards, bank transfers.</td>
+                                <td><strong>Best of both worlds:</strong> Credit cards, bank transfers, <strong>plus</strong> crypto and stablecoins.</td>
                             </tr>
                             <tr>
                                 <td><strong>Transaction Fees</strong></td>
-                                <td>2-3% + processing costs</td>
-                                <td>2-3% for cards, near-zero for crypto</td>
+                                <td>2-3% + processing costs.</td>
+                                <td>2-3% for cards, <strong>near-zero</strong> for crypto.</td>
                             </tr>
                             <tr>
                                 <td><strong>Settlement Time</strong></td>
-                                <td>Days</td>
-                                <td>Days for cards, seconds for crypto</td>
+                                <td>Days.</td>
+                                <td>Days for cards, <strong>seconds</strong> for crypto.</td>
                             </tr>
                             <tr>
                                 <td><strong>Micropayments</strong></td>
-                                <td>Not economical</td>
-                                <td>Fully supported with crypto</td>
+                                <td>Not economically viable.</td>
+                                <td><strong>Fully enabled</strong> by the low cost of crypto rails.</td>
                             </tr>
                             <tr>
-                                <td><strong>AI/Agent Friendly</strong></td>
-                                <td>Requires human intervention</td>
-                                <td>Autonomous payments possible</td>
+                                <td><strong>Programmability</strong></td>
+                                <td>Requires complex integrations and human oversight.</td>
+                                <td><strong>Enables true autonomous payments</strong> for AI agents and machine-to-machine commerce via crypto.</td>
                             </tr>
                             <tr>
-                                <td><strong>Flexibility</strong></td>
-                                <td>Locked to one provider</td>
-                                <td>Use any payment method, switch anytime</td>
+                                <td><strong>Provider Independence</strong></td>
+                                <td>Locked into one provider's specific API flow.</td>
+                                <td>A single, unified flow that can support <strong>any provider</strong> now or in the future.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <h3>Real-World Example: Starting with Stripe</h3>
+                <h3>Your Commerce, Your Choice: A Strategic Growth Path</h3>
 
-                <div class="card">
-                    <p>Let's say you're building an online store. You can start by integrating Stripe through x402. Your customers pay with credit cards, everything works exactly as expected. Later, you decide to add crypto payments for international customers who want to avoid currency conversion fees. With x402, you just add crypto as an additional payment option—no need to rebuild your payment flow. Both payment methods work through the same x402 protocol.</p>
-                </div>
+                <p>The power of the OCS payment model lies in its flexibility. You can adopt it incrementally without rewriting your business logic.</p>
 
-                <h3>How OCS Uses X402</h3>
+                <p>Imagine you're launching a new service. You can start with a simple, familiar integration by enabling the <strong><span class="inline-code">fiat_intent</span></strong> scheme with Stripe. Your customers will pay with credit cards, and the experience will be seamless and secure.</p>
 
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <div class="step-title">Client places order</div>
-                    <p>Client sends <span class="inline-code">POST /orders</span> request.</p>
-                </div>
-
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <div class="step-title">Payment required</div>
-                    <p>Server responds with <span class="inline-code">402 Payment Required</span>, including x402 payment requirements. This could be traditional payment info (Stripe checkout URL) OR crypto payment details (amount, asset, network, etc.)—or both as options for the customer to choose.</p>
-                </div>
-
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <div class="step-title">Client authorizes payment</div>
-                    <p>Client completes payment using their chosen method (credit card via Stripe, or blockchain authorization for crypto) and retries the request with the <span class="inline-code">X-PAYMENT</span> header containing the payment confirmation.</p>
-                </div>
-
-                <div class="step-card">
-                    <div class="step-number">4</div>
-                    <div class="step-title">Server verifies & settles</div>
-                    <p>Server verifies the payment through the appropriate processor (Stripe API for cards, x402 facilitator for crypto).</p>
-                </div>
-
-                <div class="step-card">
-                    <div class="step-number">5</div>
-                    <div class="step-title">Order completes</div>
-                    <p>Server returns the order details with a <span class="inline-code">X-PAYMENT-RESPONSE</span> header confirming the transaction.</p>
-                </div>
-
-                <div class="info-box success">
-                    <strong>Universal Support</strong>
-                    This integration supports physical goods (shipping), digital goods (access keys), and in-store pickup, all with your choice of payment methods—traditional processors, crypto, or both.
-                </div>
+                <p>Months later, you want to tap into a global market or serve an AI-driven use case. You simply enable the <strong><span class="inline-code">exact</span></strong> scheme in your OCS server configuration. Your application will now automatically present crypto as an additional payment option to your users—<strong>no rebuilding of your checkout flow is required.</strong> This allows you to meet your customers where they are, offering the best payment method for their needs, all through one consistent and elegant protocol.</p>
             </section>
 
             <!-- Core Concepts -->
