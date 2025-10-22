@@ -10,7 +10,7 @@
 
 ## Introduction
 
-The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. It integrates web3-native payments via the x402 Protocol for instant, low-fee blockchain transactions.
+The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. It integrates the powerful and extensible x402 Protocol for payments. This allows OCS to function as a unified payment gateway, supporting both web3-native assets (like USDC for instant, low-fee blockchain transactions) and traditional fiat currencies (via providers like Stripe and PayPal) through a single, elegant, and stateless API flow.
 
 ## Overview & Common Questions
 
@@ -54,21 +54,30 @@ The full OpenAPI 3.0 specification is available in [`spec.yaml`](./src/spec.yaml
 
 <br />
 
-## X402 Protocol Compliance
+## A Unified, HTTP-Native Payment Protocol (x402)
 
-OCS integrates the [x402 Protocol](https://github.com/coinbase/x402), Coinbase's open standard for internet-native payments, to enable seamless, blockchain-based transactions within the order lifecycle. This makes OCS "web3-native," allowing for instant, programmable payments using stablecoins like USDC.
+OCS integrates the x402 Protocol because it provides a single, open, and stateless pattern for handling any payment flow directly over HTTP. Instead of relying on cumbersome redirects or multiple API calls to manage state, the entire transaction is handled within a simple request/retry cycle.
 
-**Furthermore, OCS leverages the x402 protocol's extensibility to support traditional fiat payments.** Through the `fiat_intent` scheme, servers can handle secure, modern payment flows from providers like Stripe and PayPal, all within the same elegant request/retry cycle. This provides implementers with a single, unified protocol for both web3 and traditional e-commerce.
+This is made possible through extensible payment schemes, which allow OCS to support diverse payment rails.
 
-### Why X402?
+### 1. For Web3-Native Payments (The exact Scheme)
 
-Traditional payment systems (credit cards, PayPal) suffer from high fees (2-3% + processing costs), slow settlement (days), chargeback risks, and friction for machine-to-machine transactions. X402 addresses these by:
+For digital assets, OCS uses the exact scheme to enable payments that are impossible with traditional finance:
 
 - **Micropayments & Pay-Per-Use:** Charge per API call, content access, or item without subscriptions or minimums.
 - **Instant Settlement:** Blockchain-based transactions settle in seconds, not days.
 - **Low/No Fees:** Near-zero transaction costs compared to legacy rails.
 - **AI & Agent Friendly:** Enables autonomous payments by AI agents without human intervention.
 - **Programmable:** Direct HTTP integration via the 402 status code, extensible across chains.
+
+### 2. For Traditional Fiat Payments (The fiat_intent Scheme)
+
+For credit cards, bank transfers, and other traditional methods, OCS leverages the fiat_intent scheme to bring order to the chaos of provider-specific APIs.
+
+- **Simplified Client Logic:** The client doesn't need to know the complex, multi-step logic of Stripe's Payment Intents or PayPal's checkouts. It simply follows the server's instructions provided in the 402 response.
+- **Server-Driven UI:** The server sends all necessary context—including display names ("Credit / Debit Card"), icons, and instructions—allowing the client to build a rich UI dynamically.
+- **Secure and Compliant:** The flow is designed for modern, token-based payment processing. Sensitive card details are never exposed to the OCS client or server, ensuring PCI compliance.
+- **A Single, Unified Flow:** Developers write one piece of code to handle the x402 402 retry loop, and it will automatically support any fiat provider the server adds in the future.
 
 ### How OCS Uses X402
 
@@ -282,7 +291,43 @@ The user adds `var_large_black` to the cart. During checkout, the client places 
 }
 ```
 
-### Step 4: Track the Order in Real-Time
+### Step 4: Handle the Unified Payment Flow
+
+The user adds the item to the cart and proceeds to checkout. The client now makes its first attempt to POST /orders. The server, which supports both crypto and fiat, responds with 402 Payment Required, providing both options.
+
+**Server Response (402 Payment Required):**
+```json
+{
+  "x402Version": 1,
+  "accepts": [
+    {
+      "scheme": "fiat_intent",
+      "network": "stripe",
+      "asset": "USD",
+      "maxAmountRequired": "2500",
+      "extra": {
+        "clientSecret": "pi_3Pq..._secret_XYZ...",
+        "displayName": "Credit / Debit Card",
+        "inputAction": "Pay $25.00"
+      }
+    },
+    {
+      "scheme": "exact",
+      "network": "base-sepolia",
+      "asset": "0x...",
+      "maxAmountRequired": "25000000",
+      "extra": {
+        "displayName": "Pay with Crypto"
+      }
+    }
+  ]
+}
+```
+* **Client Insight:** "The server has given me two payment options. I don't need to know what 'Stripe' is or how blockchain signing works. I will simply render two buttons using the `displayName` for each. If the user clicks the first, I'll use the provided `clientSecret` to launch the Stripe SDK. If they click the second, I'll initiate the crypto signing flow. The server has done all the hard work for me."
+
+The client then retries the `POST /orders` request with the appropriate `X-PAYMENT` header after the user completes one of the flows.
+
+### Step 5: Track the Order in Real-Time
 
 The client immediately opens a connection to the SSE endpoint.
 

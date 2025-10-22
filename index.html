@@ -683,8 +683,9 @@
                 <a href="#philosophy" class="nav-link">Philosophy</a>
                 <a href="#quick-reference" class="nav-link">Quick Reference</a>
                 <a href="#getting-started" class="nav-link">Getting Started</a>
-                <a href="#key-features" class="nav-link">Key Features</a>
-            </div>
+                 <a href="#key-features" class="nav-link">Key Features</a>
+                 <a href="#how-it-works" class="nav-link">How It Works</a>
+             </div>
 
             <div class="nav-section">
                 <div class="nav-section-title">Core Concepts</div>
@@ -1434,40 +1435,82 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
 
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <div class="feature-icon">🌐</div>
-                        <div class="feature-title">Universal Commerce Model</div>
-                        <div class="feature-description">A single, elegant model handles physical goods, digital goods/services, and in-store pickup using a simple <span class="inline-code">fulfillmentType</span> flag.</div>
+                        <div class="feature-icon">💳</div>
+                        <div class="feature-title">Unified Payment Protocol</div>
+                        <div class="feature-description">One Protocol, Any Payment Rail. OCS leverages the x402 protocol's extensible "schemes" to handle any payment type. Use the exact scheme for instant, low-fee crypto settlements and the fiat_intent scheme for secure, compliant processing of traditional payments through providers like Stripe and PayPal.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎛️</div>
+                        <div class="feature-title">Server-Driven UI Logic</div>
+                        <div class="feature-description">Radically Simplified Client Logic. Stop hardcoding payment provider logic. The OCS server tells your client exactly what payment options are available, how to display them (with names and icons), and what to do next. Your app becomes future-proof by default.</div>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">🔍</div>
                         <div class="feature-title">Dynamic Capability Discovery</div>
-                        <div class="feature-description">The <span class="inline-code">GET /capabilities</span> endpoint allows a client to understand a server's full feature set, enabling truly adaptive applications.</div>
+                        <div class="feature-description">An API That Adapts to Any Business. OCS is more than payments. A powerful discovery mechanism allows your client to dynamically adapt to any feature the server supports—from product variants and customizations to real-time delivery tracking.</div>
                     </div>
+                </div>
+            </section>
 
-                    <div class="feature-card">
-                        <div class="feature-icon">⚡</div>
-                        <div class="feature-title">Real-time Order Updates</div>
-                        <div class="feature-description">A built-in Server-Sent Events (SSE) endpoint provides efficient, real-time order status changes using standardized JSON Patch.</div>
-                    </div>
+            <!-- How It Works -->
+            <section id="how-it-works">
+                <h2>How It Works: The x402 Payment Flow</h2>
 
-                    <div class="feature-card">
-                        <div class="feature-icon">📦</div>
-                        <div class="feature-title">Structured, Extensible Metadata</div>
-                        <div class="feature-description">Go beyond simple key-value pairs. OCS provides a system for servers to link to official JSON Schemas that define the structure of their metadata.</div>
-                    </div>
+                <p>Here's the "aha!" moment for technical users. The x402 protocol handles payments through a simple request/retry cycle, with extensible schemes that support any payment method.</p>
 
-                    <div class="feature-card">
-                        <div class="feature-icon">💎</div>
-                        <div class="feature-title">Web3-Native Payments</div>
-                        <div class="feature-description">Includes a complete, protocol-compliant implementation for handling payments via the x402 Protocol.</div>
-                    </div>
+                <h3>The Payment Flow</h3>
 
-                    <div class="feature-card">
-                        <div class="feature-icon">🔒</div>
-                        <div class="feature-title">Formal Security Model</div>
-                        <div class="feature-description">Recommends and formalizes a Bearer token authentication scheme for all protected resources.</div>
-                    </div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <pre style="display: inline-block; text-align: left; background: var(--bg-secondary); padding: 1rem; border-radius: 0.5rem; font-family: monospace; font-size: 0.875rem;">
+Client POST /orders → Server
+Server → 402 Payment Required → Client
+
+Path A (Fiat): Client uses clientSecret → Stripe.js → Gets paymentIntentId
+Path B (Crypto): Client uses Wallet → Signs Message → Gets signature
+
+Paths converge:
+Client POST /orders (with X-PAYMENT header) → Server
+Server → 201 Created → Client
+                    </pre>
+                </div>
+
+                <h3>The Server's 402 Response: A Blueprint for Your UI</h3>
+
+                <p>The server's 402 response is the most powerful piece of code to show. It tells the client everything it needs to know—no hardcoding required!</p>
+
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">// The server tells the client everything it needs to know.
+// No hardcoding required!
+{
+  "x402Version": 1,
+  "accepts": [
+    {
+      // Option 1: A traditional payment via Stripe
+      "scheme": "fiat_intent",
+      "network": "stripe",
+      "extra": {
+        // The secret key for the Stripe.js SDK
+        "clientSecret": "pi_3Pq..._secret_XYZ...",
+        // The text for the button in your app
+        "displayName": "Credit / Debit Card",
+        // The text for the final submit button in the Stripe UI
+        "inputAction": "Pay $25.00"
+      }
+    },
+    {
+      // Option 2: A web3-native payment
+      "scheme": "exact",
+      "network": "base-sepolia",
+      "extra": {
+        // The text for the other button in your app
+        "displayName": "Pay with Crypto"
+      }
+    }
+  ]
+}</code></pre></div>
                 </div>
             </section>
 

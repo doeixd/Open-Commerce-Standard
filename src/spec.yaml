@@ -317,23 +317,23 @@ components:
         longitude: { type: number }
       required: [address]
 
-     Store:
-       type: object
-       properties:
-         id: { type: string, format: uuid }
-         name: { type: string }
-         location: { $ref: '#/components/schemas/Location' }
-         catalogIds: { type: array, items: { type: string } }
-         metadata:
-           type: object
-           description: |
-             Namespaced key-value pairs. The structure of this object may be defined
-             by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
-             will use their ID as a key.
-             Examples:
-             - "dev.ocs.restaurant.profile@1.0"
-             - "dev.ocs.store.constraints@1.0"
-       required: [id, name, location]
+    Store:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        location: { $ref: '#/components/schemas/Location' }
+        catalogIds: { type: array, items: { type: string } }
+        metadata:
+          type: object
+          description: |
+            Namespaced key-value pairs. The structure of this object may be defined
+            by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
+            will use their ID as a key.
+            Examples:
+            - "dev.ocs.restaurant.profile@1.0"
+            - "dev.ocs.store.constraints@1.0"
+      required: [id, name, location]
 
     CatalogSummary:
       type: object
@@ -343,21 +343,21 @@ components:
         version: { type: string, description: "Version identifier for the catalog." }
       required: [id, name, version]
 
-     Catalog:
-       allOf:
-         - $ref: '#/components/schemas/CatalogSummary'
-         - type: object
-           properties:
-             items: { type: array, items: { $ref: '#/components/schemas/CatalogItem' } }
-             metadata:
-               type: object
-               description: |
-                 Namespaced key-value pairs. The structure of this object may be defined
-                 by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
-                 will use their ID as a key.
-                 Examples:
-                 - "dev.ocs.promotions.discoverable@1.0"
-           required: [items]
+    Catalog:
+      allOf:
+        - $ref: '#/components/schemas/CatalogSummary'
+        - type: object
+          properties:
+            items: { type: array, items: { $ref: '#/components/schemas/CatalogItem' } }
+            metadata:
+              type: object
+              description: |
+                Namespaced key-value pairs. The structure of this object may be defined
+                by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
+                will use their ID as a key.
+                Examples:
+                - "dev.ocs.promotions.discoverable@1.0"
+          required: [items]
 
     CatalogItem:
       type: object
@@ -437,26 +437,26 @@ components:
         updatedAt: { type: string, format: date-time }
       required: [id, items, subtotal, tax, total, createdAt, updatedAt]
 
-     CartItem:
-       allOf:
-         - $ref: '#/components/schemas/CartItemRequest'
-         - type: object
-           properties:
-             cartItemId: { type: string, format: uuid, description: "Unique identifier for this item instance in the cart." }
-             price: { $ref: '#/components/schemas/Money' }
-             metadata: { type: object, description: "Namespaced key-value pairs." }
-           required: [cartItemId, price]
+    CartItem:
+      allOf:
+        - $ref: '#/components/schemas/CartItemRequest'
+        - type: object
+          properties:
+            cartItemId: { type: string, format: uuid, description: "Unique identifier for this item instance in the cart." }
+            price: { $ref: '#/components/schemas/Money' }
+            metadata: { type: object, description: "Namespaced key-value pairs." }
+          required: [cartItemId, price]
 
-     CreateOrderRequest:
-       type: object
-       properties:
-         cartId: { type: string, format: uuid }
-         deliveryAddress:
-           $ref: '#/components/schemas/Location'
-           description: "A delivery address is required if, and only if, the referenced cart contains at least one item with a fulfillmentType of 'physical'."
-         notes: { type: string }
-         metadata: { type: object }
-       required: [cartId]
+    CreateOrderRequest:
+      type: object
+      properties:
+        cartId: { type: string, format: uuid }
+        deliveryAddress:
+          $ref: '#/components/schemas/Location'
+          description: "A delivery address is required if, and only if, the referenced cart contains at least one item with a fulfillmentType of 'physical'."
+        notes: { type: string }
+        metadata: { type: object }
+      required: [cartId]
 
      PromotionRequest:
        type: object
@@ -513,74 +513,74 @@ components:
          reason: { type: string, description: "A description of the business rule that was violated (e.g., 'The requested item has 0 stock remaining')." }
        required: [type, resourceId, reason]
 
-     Order:
-       type: object
-       properties:
-         id: { type: string, format: uuid }
-         status:
-           type: string
-           description: |
-             A required, standardized status code representing the programmatic state category of the order.
-             This is intended for client-side logic (e.g., state machines), NOT for direct display to the user.
-             For rich, human-readable status, clients should check for the 'dev.ocs.order.detailed_status@1.0' capability.
-           enum:
-             - pending     # Order created, but not yet confirmed by the system (e.g., awaiting inventory check).
-             - confirmed   # The order is accepted and will be processed.
-             - processing  # The order is actively being worked on (e.g., kitchen is preparing, item is being manufactured).
-             - in_transit  # The order has left the origin and is on its way to the destination.
-             - completed   # The order has been successfully fulfilled (delivered, picked up, or digitally accessed).
-             - cancelled   # The order has been cancelled by the user or the system.
-          actions:
-            type: array
-            description: |
-              A list of actions the client can perform on this order in its current state.
-              The presence of an action indicates the user should be shown the corresponding UI control.
-            items:
-              type: object
-              properties:
-                id: { type: "string", enum: ["cancel", "initiate_return", "add_rating"] }
-                href: { type: "string", format: "uri", description: "The API endpoint to call to perform this action." }
-              required: [id, href]
-          returns:
-            type: array
-            description: "A list of summaries for any returns associated with this order."
-            items:
-              $ref: '#/components/schemas/ReturnSummary'
-         items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
-         total: { $ref: '#/components/schemas/Money' }
-         deliveryAddress: { $ref: '#/components/schemas/Location' }
-         createdAt: { type: string, format: date-time }
-         updatedAt: { type: string, format: date-time }
-         metadata:
-           type: object
-           description: |
-             Namespaced key-value pairs. The structure of this object may be defined
-             by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
-             will use their ID as a key.
-             Examples:
-             - "dev.ocs.order.shipment_tracking@1.0"
-             - "dev.ocs.order.kitchen_status@1.0"
-             - "dev.ocs.order.delivery_tracking@1.0"
-             - "dev.ocs.order.tipping@1.0"
-             - "dev.ocs.order.digital_access@1.0"
-             - "dev.ocs.order.detailed_status@1.0"
-        required: [id, status, items, total, createdAt, updatedAt]
-
-     InitiateReturnRequest:
-       type: object
-       description: "The request body for initiating a return for items from an order."
-       properties:
-         items:
+    Order:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        status:
+          type: string
+          description: |
+            A required, standardized status code representing the programmatic state category of the order.
+            This is intended for client-side logic (e.g., state machines), NOT for direct display to the user.
+            For rich, human-readable status, clients should check for the 'dev.ocs.order.detailed_status@1.0' capability.
+          enum:
+            - pending     # Order created, but not yet confirmed by the system (e.g., awaiting inventory check).
+            - confirmed   # The order is accepted and will be processed.
+            - processing  # The order is actively being worked on (e.g., kitchen is preparing, item is being manufactured).
+            - in_transit  # The order has left the origin and is on its way to the destination.
+            - completed   # The order has been successfully fulfilled (delivered, picked up, or digitally accessed).
+            - cancelled   # The order has been cancelled by the user or the system.
+         actions:
            type: array
-           description: "The list of items and quantities to be returned."
+           description: |
+             A list of actions the client can perform on this order in its current state.
+             The presence of an action indicates the user should be shown the corresponding UI control.
            items:
              type: object
              properties:
-               cartItemId: { type: string, description: "The ID of the item from the original order." }
-               quantity: { type: integer, minimum: 1 }
-             required: [cartItemId, quantity]
-         reason: { type: string, description: "The user-provided reason for the return." }
-       required: [items, reason]
+               id: { type: "string", enum: ["cancel", "initiate_return", "add_rating"] }
+               href: { type: "string", format: "uri", description: "The API endpoint to call to perform this action." }
+             required: [id, href]
+         returns:
+           type: array
+           description: "A list of summaries for any returns associated with this order."
+           items:
+             $ref: '#/components/schemas/ReturnSummary'
+        items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
+        total: { $ref: '#/components/schemas/Money' }
+        deliveryAddress: { $ref: '#/components/schemas/Location' }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        metadata:
+          type: object
+          description: |
+            Namespaced key-value pairs. The structure of this object may be defined
+            by schemas discoverable at the `/capabilities` endpoint. Standard capabilities
+            will use their ID as a key.
+            Examples:
+            - "dev.ocs.order.shipment_tracking@1.0"
+            - "dev.ocs.order.kitchen_status@1.0"
+            - "dev.ocs.order.delivery_tracking@1.0"
+            - "dev.ocs.order.tipping@1.0"
+            - "dev.ocs.order.digital_access@1.0"
+            - "dev.ocs.order.detailed_status@1.0"
+       required: [id, status, items, total, createdAt, updatedAt]
+
+    InitiateReturnRequest:
+      type: object
+      description: "The request body for initiating a return for items from an order."
+      properties:
+        items:
+          type: array
+          description: "The list of items and quantities to be returned."
+          items:
+            type: object
+            properties:
+              cartItemId: { type: string, description: "The ID of the item from the original order." }
+              quantity: { type: integer, minimum: 1 }
+            required: [cartItemId, quantity]
+        reason: { type: string, description: "The user-provided reason for the return." }
+      required: [items, reason]
 
      ReturnSummary:
        type: object
@@ -689,74 +689,74 @@ components:
         payer: { type: string }
       required: [success, transaction, network, payer]
 
-     Error:
-       type: object
-       description: "A structured error response that communicates with the machine, the developer, and the end-user."
-       properties:
-         code:
-           type: string
-           description: "A specific, machine-readable error code for programmatic handling."
-           enum:
-             # General
-             - bad_request
-             - unauthorized
-             - forbidden
-             - not_found
-             - conflict
-             - server_error
-             # Idempotency
-             - idempotency_key_reused
-             # Cart & Product
-             - product_unavailable
-             - product_customization_invalid
-             # Promotions
-             - promotion_invalid
-             - promotion_expired
-             - promotion_not_applicable
-             - promotion_stacking_not_allowed
-             # Fulfillment & Ordering
-             - delivery_address_required
-             - delivery_address_invalid
-             - fulfillment_intent_incomplete
-             - fulfillment_intent_duplicate_item
-             - fulfillment_method_invalid
-             # Payments
-             - payment_failed
-             # Cancellation & Returns
-             - cancellation_window_expired
-             - return_policy_violated
-         message:
-           type: string
-           description: "A developer-facing, human-readable message, NOT for display to the end-user."
-         details:
-           type: array
-           description: "An array of structured objects providing deep context about the error."
-           items:
-             oneOf:
-               - $ref: '#/components/schemas/ValidationIssue'
-               - $ref: '#/components/schemas/BusinessLogicIssue'
-         userMessage:
-           type: object
-           description: "A localization-friendly, user-safe message. The client should use this to build the UI message."
-           properties:
-             localizationKey:
-               type: string
-               description: "An i18n key the client can use to look up a translated string."
-               example: "error.promotion.expired"
-             params:
-               type: object
-               description: "A key-value map of parameters to inject into the localized string."
-               example: { "code": "WINTER20", "expiryDate": "2024-01-31" }
-         nextActions:
-           type: array
-           description: "A list of suggested, valid actions the client can take to recover from this error."
-           items:
-             type: object
-             properties:
-               id: { type: string, description: "A programmatic identifier for the action." }
-               href: { type: string, format: "uri", description: "The endpoint to call for this action." }
-               method: { type: string, enum: ["GET", "POST", "PATCH", "DELETE"] }
-       required: [code, message]
+    Error:
+      type: object
+      description: "A structured error response that communicates with the machine, the developer, and the end-user."
+      properties:
+        code:
+          type: string
+          description: "A specific, machine-readable error code for programmatic handling."
+          enum:
+            # General
+            - bad_request
+            - unauthorized
+            - forbidden
+            - not_found
+            - conflict
+            - server_error
+            # Idempotency
+            - idempotency_key_reused
+            # Cart & Product
+            - product_unavailable
+            - product_customization_invalid
+            # Promotions
+            - promotion_invalid
+            - promotion_expired
+            - promotion_not_applicable
+            - promotion_stacking_not_allowed
+            # Fulfillment & Ordering
+            - delivery_address_required
+            - delivery_address_invalid
+            - fulfillment_intent_incomplete
+            - fulfillment_intent_duplicate_item
+            - fulfillment_method_invalid
+            # Payments
+            - payment_failed
+            # Cancellation & Returns
+            - cancellation_window_expired
+            - return_policy_violated
+        message:
+          type: string
+          description: "A developer-facing, human-readable message, NOT for display to the end-user."
+        details:
+          type: array
+          description: "An array of structured objects providing deep context about the error."
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/ValidationIssue'
+              - $ref: '#/components/schemas/BusinessLogicIssue'
+        userMessage:
+          type: object
+          description: "A localization-friendly, user-safe message. The client should use this to build the UI message."
+          properties:
+            localizationKey:
+              type: string
+              description: "An i18n key the client can use to look up a translated string."
+              example: "error.promotion.expired"
+            params:
+              type: object
+              description: "A key-value map of parameters to inject into the localized string."
+              example: { "code": "WINTER20", "expiryDate": "2024-01-31" }
+        nextActions:
+          type: array
+          description: "A list of suggested, valid actions the client can take to recover from this error."
+          items:
+            type: object
+            properties:
+              id: { type: string, description: "A programmatic identifier for the action." }
+              href: { type: string, format: "uri", description: "The endpoint to call for this action." }
+              method: { type: string, enum: ["GET", "POST", "PATCH", "DELETE"] }
+      required: [code, message]
 
   securitySchemes:
     bearerAuth:
