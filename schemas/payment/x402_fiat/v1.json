@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "description": "Schema for the dev.ocs.payment.x402_fiat@1.0 capability. Defines a list of supported fiat providers and their required client-side configuration.",
+  "items": {
+    "type": "object",
+    "properties": {
+      "network": {
+        "type": "string",
+        "description": "The network identifier for the provider (e.g., 'stripe', 'paypal')."
+      },
+      "publishableKey": {
+        "type": "string",
+        "description": "The public API key required by the client to initialize the provider's SDK."
+      }
+    },
+    "required": ["network", "publishableKey"]
+  }
+}

@@ -437,81 +437,81 @@ components:
         updatedAt: { type: string, format: date-time }
       required: [id, items, subtotal, tax, total, createdAt, updatedAt]
 
-    CartItem:
-      allOf:
-        - $ref: '#/components/schemas/CartItemRequest'
-        - type: object
-          properties:
-            cartItemId: { type: string, format: uuid, description: "Unique identifier for this item instance in the cart." }
-            price: { $ref: '#/components/schemas/Money' }
-            metadata: { type: object, description: "Namespaced key-value pairs." }
-          required: [cartItemId, price]
+     CartItem:
+       allOf:
+         - $ref: '#/components/schemas/CartItemRequest'
+         - type: object
+           properties:
+             cartItemId: { type: string, format: uuid, description: "Unique identifier for this item instance in the cart." }
+             price: { $ref: '#/components/schemas/Money' }
+             metadata: { type: object, description: "Namespaced key-value pairs." }
+           required: [cartItemId, price]
 
-      CreateOrderRequest:
-        type: object
-        properties:
-          cartId: { type: string, format: uuid }
-          deliveryAddress:
-            $ref: '#/components/schemas/Location'
-            description: "A delivery address is required if, and only if, the referenced cart contains at least one item with a fulfillmentType of 'physical'."
-          notes: { type: string }
-          metadata: { type: object }
-        required: [cartId]
+     CreateOrderRequest:
+       type: object
+       properties:
+         cartId: { type: string, format: uuid }
+         deliveryAddress:
+           $ref: '#/components/schemas/Location'
+           description: "A delivery address is required if, and only if, the referenced cart contains at least one item with a fulfillmentType of 'physical'."
+         notes: { type: string }
+         metadata: { type: object }
+       required: [cartId]
 
-      PromotionRequest:
-        type: object
-        description: A request to apply or validate a promotion on a cart.
-        properties:
-          type:
-            type: string
-            enum: [promo_code, gift_card, loyalty_points]
-            description: "The type of promotion being applied."
-          value:
-            type: string
-            description: "The value for the promotion (e.g., the code 'SUMMER10')."
-        required: [type, value]
+     PromotionRequest:
+       type: object
+       description: A request to apply or validate a promotion on a cart.
+       properties:
+         type:
+           type: string
+           enum: [promo_code, gift_card, loyalty_points]
+           description: "The type of promotion being applied."
+         value:
+           type: string
+           description: "The value for the promotion (e.g., the code 'SUMMER10')."
+       required: [type, value]
 
-      RatingRequest:
-        type: object
-        description: A request to submit ratings for a completed order.
-        properties:
-          food:
-            type: integer
-            minimum: 1
-            maximum: 5
-            description: "Rating for the food quality (1-5 stars)."
-          delivery:
-            type: integer
-            minimum: 1
-            maximum: 5
-            description: "Rating for the delivery service (1-5 stars)."
-          restaurant:
-            type: integer
-            minimum: 1
-            maximum: 5
-            description: "Overall rating for the restaurant (1-5 stars)."
-          comment:
-            type: string
-            description: "Optional text comment from the customer."
+     RatingRequest:
+       type: object
+       description: A request to submit ratings for a completed order.
+       properties:
+         food:
+           type: integer
+           minimum: 1
+           maximum: 5
+           description: "Rating for the food quality (1-5 stars)."
+         delivery:
+           type: integer
+           minimum: 1
+           maximum: 5
+           description: "Rating for the delivery service (1-5 stars)."
+         restaurant:
+           type: integer
+           minimum: 1
+           maximum: 5
+           description: "Overall rating for the restaurant (1-5 stars)."
+         comment:
+           type: string
+           description: "Optional text comment from the customer."
 
-      ValidationIssue:
-        type: object
-        description: "Details a failed validation rule on a specific field."
-        properties:
-          type: { type: string, enum: ["validation"] }
-          field: { type: string, description: "A JSON Pointer to the invalid field in the request body." }
-          value: { description: "The invalid value that was provided by the client." }
-          reason: { type: string, description: "A description of the validation rule that failed (e.g., 'String must be a valid UUID')." }
-        required: [type, field, reason]
+     ValidationIssue:
+       type: object
+       description: "Details a failed validation rule on a specific field."
+       properties:
+         type: { type: string, enum: ["validation"] }
+         field: { type: string, description: "A JSON Pointer to the invalid field in the request body." }
+         value: { description: "The invalid value that was provided by the client." }
+         reason: { type: string, description: "A description of the validation rule that failed (e.g., 'String must be a valid UUID')." }
+       required: [type, field, reason]
 
-      BusinessLogicIssue:
-        type: object
-        description: "Details a failed business rule involving one or more resources."
-        properties:
-          type: { type: string, enum: ["business_logic"] }
-          resourceId: { type: string, description: "The ID of the resource that caused the issue (e.g., an out-of-stock itemId)." }
-          reason: { type: string, description: "A description of the business rule that was violated (e.g., 'The requested item has 0 stock remaining')." }
-        required: [type, resourceId, reason]
+     BusinessLogicIssue:
+       type: object
+       description: "Details a failed business rule involving one or more resources."
+       properties:
+         type: { type: string, enum: ["business_logic"] }
+         resourceId: { type: string, description: "The ID of the resource that caused the issue (e.g., an out-of-stock itemId)." }
+         reason: { type: string, description: "A description of the business rule that was violated (e.g., 'The requested item has 0 stock remaining')." }
+       required: [type, resourceId, reason]
 
      Order:
        type: object
@@ -546,7 +546,7 @@ components:
             description: "A list of summaries for any returns associated with this order."
             items:
               $ref: '#/components/schemas/ReturnSummary'
-          items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
+         items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
          total: { $ref: '#/components/schemas/Money' }
          deliveryAddress: { $ref: '#/components/schemas/Location' }
          createdAt: { type: string, format: date-time }
@@ -561,55 +561,55 @@ components:
              - "dev.ocs.order.shipment_tracking@1.0"
              - "dev.ocs.order.kitchen_status@1.0"
              - "dev.ocs.order.delivery_tracking@1.0"
-             - "dev.ocs.order.tipping_and_ratings@1.0"
+             - "dev.ocs.order.tipping@1.0"
              - "dev.ocs.order.digital_access@1.0"
              - "dev.ocs.order.detailed_status@1.0"
         required: [id, status, items, total, createdAt, updatedAt]
 
-      InitiateReturnRequest:
-        type: object
-        description: "The request body for initiating a return for items from an order."
-        properties:
-          items:
-            type: array
-            description: "The list of items and quantities to be returned."
-            items:
-              type: object
-              properties:
-                cartItemId: { type: string, description: "The ID of the item from the original order." }
-                quantity: { type: integer, minimum: 1 }
-              required: [cartItemId, quantity]
-          reason: { type: string, description: "The user-provided reason for the return." }
-        required: [items, reason]
+     InitiateReturnRequest:
+       type: object
+       description: "The request body for initiating a return for items from an order."
+       properties:
+         items:
+           type: array
+           description: "The list of items and quantities to be returned."
+           items:
+             type: object
+             properties:
+               cartItemId: { type: string, description: "The ID of the item from the original order." }
+               quantity: { type: integer, minimum: 1 }
+             required: [cartItemId, quantity]
+         reason: { type: string, description: "The user-provided reason for the return." }
+       required: [items, reason]
 
-      ReturnSummary:
-        type: object
-        description: "A summary of a return, intended for embedding in the Order object."
-        properties:
-          id: { type: string, format: "uuid", description: "The unique ID of the return." }
-          status: { type: string, enum: ["requested", "approved", "rejected", "in_transit", "received", "processed", "completed"] }
-          href: { type: string, format: "uri", description: "The URL to fetch the full Return object." }
-        required: [id, status, href]
+     ReturnSummary:
+       type: object
+       description: "A summary of a return, intended for embedding in the Order object."
+       properties:
+         id: { type: string, format: "uuid", description: "The unique ID of the return." }
+         status: { type: string, enum: ["requested", "approved", "rejected", "in_transit", "received", "processed", "completed"] }
+         href: { type: string, format: "uri", description: "The URL to fetch the full Return object." }
+       required: [id, status, href]
 
-      Return:
-        type: object
-        description: "The full Return object, representing the complete state of a return workflow."
-        properties:
-          id: { type: string, format: "uuid" }
-          orderHref: { type: string, format: "uri", description: "A link back to the original Order." }
-          status: { type: string, enum: ["requested", "approved", "rejected", "in_transit", "received", "processed", "completed"] }
-          items:
-            type: array
-            items:
-              type: object
-              properties:
-                cartItemId: { type: string, description: "The ID of the item from the original order." }
-                quantity: { type: integer }
-          reason: { type: string }
-          returnLabelUrl: { type: string, format: "uri", description: "A URL to a printable shipping label." }
-          createdAt: { type: string, format: "date-time" }
-          updatedAt: { type: string, format: "date-time" }
-        required: [id, orderHref, status, items, createdAt, updatedAt]
+     Return:
+       type: object
+       description: "The full Return object, representing the complete state of a return workflow."
+       properties:
+         id: { type: string, format: "uuid" }
+         orderHref: { type: string, format: "uri", description: "A link back to the original Order." }
+         status: { type: string, enum: ["requested", "approved", "rejected", "in_transit", "received", "processed", "completed"] }
+         items:
+           type: array
+           items:
+             type: object
+             properties:
+               cartItemId: { type: string, description: "The ID of the item from the original order." }
+               quantity: { type: integer }
+         reason: { type: string }
+         returnLabelUrl: { type: string, format: "uri", description: "A URL to a printable shipping label." }
+         createdAt: { type: string, format: "date-time" }
+         updatedAt: { type: string, format: "date-time" }
+       required: [id, orderHref, status, items, createdAt, updatedAt]
 
      JsonPatchOperation:
       type: object

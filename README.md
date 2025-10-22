@@ -58,6 +58,8 @@ The full OpenAPI 3.0 specification is available in [`spec.yaml`](./src/spec.yaml
 
 OCS integrates the [x402 Protocol](https://github.com/coinbase/x402), Coinbase's open standard for internet-native payments, to enable seamless, blockchain-based transactions within the order lifecycle. This makes OCS "web3-native," allowing for instant, programmable payments using stablecoins like USDC.
 
+**Furthermore, OCS leverages the x402 protocol's extensibility to support traditional fiat payments.** Through the `fiat_intent` scheme, servers can handle secure, modern payment flows from providers like Stripe and PayPal, all within the same elegant request/retry cycle. This provides implementers with a single, unified protocol for both web3 and traditional e-commerce.
+
 ### Why X402?
 
 Traditional payment systems (credit cards, PayPal) suffer from high fees (2-3% + processing costs), slow settlement (days), chargeback risks, and friction for machine-to-machine transactions. X402 addresses these by:
@@ -89,6 +91,113 @@ OCS's power lies in **delegating complexity to `metadata` and making it discover
 Core schemas stay lean—no endless optional fields for variants, sizes, or weights. Domain-specific data resides in a generic `metadata` object.
 
 To avoid chaos, `GET /capabilities` provides a "table of contents" for metadata, linking to standardized JSON Schemas. Clients adapt dynamically, creating a system that's simple by default, complex by choice.
+
+<br />
+
+## The OCS Hypermedia Engine: An API That Guides You
+
+In many APIs, the developer's first step is to read the documentation and hardcode a long list of URL paths into their application. The Open Commerce Standard (OCS) is designed on a more powerful and resilient principle: **Hypermedia as the Engine of Application State (HATEOAS)**.
+
+This sounds complex, but the idea is simple: **instead of memorizing paths, your client "discovers" them.** The API itself tells you what you can do next and provides the exact URLs needed to do it.
+
+### Why Work This Way?
+
+This isn't just an academic exercise; it creates a fundamentally better and more robust integration.
+
+#### 1. No More Brittle URLs
+If a server needs to evolve its URL structure (e.g., from `/v1/returns` to `/v2/return-requests`), a client that follows links will **never break**. A client with hardcoded URLs would fail instantly. This makes the entire ecosystem more resilient.
+
+#### 2. A Self-Discovering API
+Your application learns the API as it uses it. The presence of a link or an action is the signal that a feature is available. This removes guesswork and the need to constantly consult documentation for every endpoint.
+
+#### 3. Dynamic, Context-Aware UIs
+The API provides the logic for your UI. Instead of your client code deciding when to show a "Write a Review" button, the API makes the decision. If the action is present in the response, you show the button. If not, you don't.
+
+#### 4. True Server Freedom
+OCS doesn't dictate a server's internal architecture. Your returns system can live on a completely different microservice with a different URL structure, and as long as you provide the correct links, any OCS client can use it seamlessly.
+
+### How It Works: Two Types of Discovery
+
+OCS uses two primary mechanisms for this hypermedia-driven discovery.
+
+#### 1. Global Discovery: The `/capabilities` Endpoint
+
+The first thing your client does is ask the server what it's capable of. This is for server-wide features that aren't tied to a specific product or order.
+
+**Example: Discovering Authentication and Search**
+
+A client makes a `GET /capabilities` request and receives the "table of contents" for the API:
+
+```json
+{
+  "capabilities": [
+    {
+      "id": "dev.ocs.auth.flows@1.0",
+      "metadata": {
+        "signInUrl": "https://auth.example.com/login",
+        "profileUrl": "https://api.example.com/users/me"
+      }
+    },
+    {
+      "id": "dev.ocs.product.search@1.0",
+      "metadata": {
+        "urlTemplate": "https://api.example.com/search?q={query}"
+      }
+    }
+  ]
+}
+```
+
+From this single response, your client now knows:
+* **How to sign in:** It doesn't need to know the path is `/login`; it just uses the `signInUrl` provided.
+* **How to search:** It doesn't need to guess the query parameter is `q`; it uses the `urlTemplate` to construct a valid search request.
+
+#### 2. Contextual Discovery: The `actions` Array
+
+This is the most powerful feature. Core resources like `Order` and `CatalogItem` will tell you what actions you can perform on them *in their current state*.
+
+**Example: A Discoverable Returns Workflow**
+
+1. A user views a recently delivered order. Your client makes a `GET /orders/order_123`.
+
+2. The server checks its business logic. Because the order is within the 30-day return window, it includes an `initiate_return` action in the response:
+
+```json
+{
+  "id": "order_123",
+  "status": "completed",
+  "actions": [
+    {
+      "id": "initiate_return",
+      "href": "https://api.example.com/v2/order/order_123/return-requests"
+    }
+  ],
+  "items": [...]
+}
+```
+
+3. Your client's logic is now incredibly simple:
+
+```javascript
+// Pseudo-code for a UI component
+const returnAction = order.actions.find(action => action.id === 'initiate_return');
+
+if (returnAction) {
+  // The action is present, so we show the button
+  showReturnButton({
+    // We tell the button exactly which URL to POST to
+    onClick: () => postTo(returnAction.href)
+  });
+}
+```
+
+If the same order were 60 days old, the server would simply omit the `initiate_return` action from the `actions` array. The exact same client code would run, find nothing, and the "Return Items" button would never be rendered. The business logic lives on the server, where it belongs, and the client intelligently adapts.
+
+This same pattern is used for:
+* **Cancellations:** The `cancel` action only appears if an order is cancellable.
+* **Writing Reviews:** The `add_review` action only appears on a `CatalogItem` if the logged-in user has purchased it.
+
+By embracing this hypermedia-driven approach, the Open Commerce Standard provides a blueprint for a truly modern, resilient, and intelligent commerce ecosystem.
 
 <br />
 
@@ -230,7 +339,7 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | **`dev.ocs.order.kitchen_status@1.0`** | Order | Provides real-time updates on an order's status within the kitchen. | [restaurant/kitchen_status/v1.json](./schemas/restaurant/kitchen_status/v1.json) |
 | **`dev.ocs.order.delivery_tracking@1.0`** | Order | Provides a real-time data structure for tracking a delivery, including driver info, GPS, and ETA. | [order/delivery_tracking/v1.json](./schemas/order/delivery_tracking/v1.json) |
 | **`dev.ocs.order.shipment_tracking@1.0`** | Order | Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package. | [order/shipment_tracking/v1.json](./schemas/order/shipment_tracking/v1.json) |
-| **`dev.ocs.order.tipping_and_ratings@1.0`** | Order | Allows for adding tips to the order. Ratings are submitted via a dedicated action endpoint. | [order/tipping_and_ratings/v1.json](./schemas/order/tipping_and_ratings/v1.json) |
+| **`dev.ocs.order.tipping@1.0`** | Order | Allows for adding tips to the order. Ratings are submitted via a dedicated action endpoint. | [order/tipping/v1.json](./schemas/order/tipping/v1.json) |
 | **`dev.ocs.order.digital_access@1.0`** | Order | Provides an array of objects containing access details for digital goods, such as download URLs or license keys. | [order/digital_access/v1.json](./schemas/order/digital_access/v1.json) |
 | **`dev.ocs.order.detailed_status@1.0`** | Order | Provides a rich, human-readable status (title, description, progress) for display in a UI, augmenting the core `status` field. | [order/detailed_status/v1.json](./schemas/order/detailed_status/v1.json) |
 | **`dev.ocs.order.cancellation@1.0`** | Order (Action) | Enables the workflow for cancelling an order via a dedicated endpoint, discoverable through the `Order.actions` field. | N/A (Workflow) |
@@ -244,16 +353,17 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | **`dev.ocs.product.search@1.0`** | Server-wide | Provides a URL template for product search with supported sort options. | [product/search/v1.json](./schemas/product/search/v1.json) |
 | **`dev.ocs.product.categorization@1.0`** | Product (`CatalogItem`) | Provides an ordered category path (breadcrumb) for navigation. | [product/categorization/v1.json](./schemas/product/categorization/v1.json) |
 | **`dev.ocs.product.relations@1.0`** | Product (`CatalogItem`) | Provides related products (recommendations, accessories, alternatives). | [product/relations/v1.json](./schemas/product/relations/v1.json) |
+| **`dev.ocs.payment.x402_fiat@1.0`** | Server-wide | Advertises support for fiat payments via the x402 `fiat_intent` scheme and provides public keys for payment providers. | [payment/x402_fiat/v1.json](./schemas/payment/x402_fiat/v1.json) |
 
 <br />
 
 ## Future Direction
 
 OCS is a living standard. The future direction includes:
-*   **A Richer Capability Library:** Developing more standard schemas for concepts like `product.reviews`, `order.returns`, and `service.bookings`.
+*   **Developing official Client SDKs and Server Middleware:** Building high-quality, open-source libraries that make implementing OCS trivial for both client and server developers.
+*   **Expanding the Capability Library:** Adding new standard schemas for emerging commerce concepts like subscriptions, bookings, and advanced personalization.
+*   **Formalizing a Community Governance Model:** Establishing processes for proposing, reviewing, and adopting new capabilities to ensure the standard evolves responsibly.
 *   **Alternative Transport Layers:** Exploring implementations over transports beyond HTTP, such as asynchronous message queues or other protocols.
-*   **Tooling and SDKs:** Fostering a community to build server middleware and client libraries that make implementing OCS trivial.
-*   **Authentication Capabilities:** Defining standard capabilities for advertising supported authentication methods (e.g., `dev.ocs.auth.oauth2.pkce@1.0`).
 
 <br />
 
