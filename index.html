@@ -187,8 +187,8 @@
         }
 
         h2 {
-            font-size: 2rem;
-            margin-top: 3rem;
+            font-size: 2.11rem;
+            margin-top: 3.2rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--border);
         }
@@ -474,9 +474,9 @@
         .step-number {
             position: absolute;
             left: 1.1rem;
-            top: 1.4rem;
-            width: 32px;
-            height: 32px;
+            top: 1.55rem;
+            width: 30px;
+            height: 30px;
             background: var(--primary);
             color: white;
             border-radius: 50%;
@@ -1585,6 +1585,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                     </div>
                 </div>
 
+                <span style="padding-inline: 1rem;">
                 <h3>Step 2: View a Product with Structured Metadata</h3>
                 <p>The client fetches a catalog (<span class="inline-code">/catalogs/{id}</span>) and gets a product (<span class="inline-code">CatalogItem</span>).</p>
 
@@ -1676,6 +1677,8 @@ data: [
                         </div>
                     </div>
                 </div>
+                </div>
+                </span>
             </section>
 
             <!-- Capabilities Reference -->
