@@ -757,7 +757,7 @@
 
                 <div class="card">
                     <h4>Why OCS?</h4>
-                    <p>Traditional e-commerce APIs are fragmented and vendor-specific. OCS provides a consistent, extensible framework that adapts to any business model—from simple catalogs to complex apparel stores—without dictating internal logic. It prioritizes implementer freedom while enabling universal, adaptive clients.</p>
+                    <p>Traditional e-commerce APIs are fragmented and vendor-specific. OCS provides a consistent, extensible framework that adapts to any business model—from simple catalogs to food delivery platforms to complex apparel stores—without dictating internal logic. It prioritizes implementer freedom while enabling universal, adaptive clients.</p>
                 </div>
 
                 <div class="card">
@@ -778,6 +778,11 @@
                 <div class="card">
                     <h4>Who is OCS for?</h4>
                     <p>API providers monetizing digital commerce, client developers building universal shopping apps, and AI agents requiring autonomous transactions.</p>
+                </div>
+
+                <div class="card">
+                    <h4>How do promotions work?</h4>
+                    <p>Promotions are handled through discoverable capabilities. Servers advertise available promotions via <span class="inline-code">dev.ocs.promotions.discoverable@1.0</span>, clients validate them using <span class="inline-code">POST /carts/{id}/promotions</span>, and applied promotions are recorded in order metadata via <span class="inline-code">dev.ocs.order.applied_promotions@1.0</span>. This flexible system supports discounts, BOGO deals, free shipping, and more.</p>
                 </div>
             </section>
 
@@ -832,12 +837,30 @@
                         <div class="description">Real-time SSE updates</div>
                     </div>
 
-                    <div class="quick-ref-card">
-                        <h4>Get Order</h4>
-                        <div class="method">GET /orders/{id}</div>
-                        <div class="description">Fetch current order state</div>
-                    </div>
-                </div>
+                     <div class="quick-ref-card">
+                         <h4>Get Order</h4>
+                         <div class="method">GET /orders/{id}</div>
+                         <div class="description">Fetch current order state</div>
+                     </div>
+
+                     <div class="quick-ref-card">
+                         <h4>Cancel Order</h4>
+                         <div class="method">POST /orders/{id}/cancel</div>
+                         <div class="description">Request to cancel an order</div>
+                     </div>
+
+                     <div class="quick-ref-card">
+                         <h4>Initiate Return</h4>
+                         <div class="method">POST /returns</div>
+                         <div class="description">Start a return for order items</div>
+                     </div>
+
+                     <div class="quick-ref-card">
+                         <h4>Get Return Status</h4>
+                         <div class="method">GET /returns/{id}</div>
+                         <div class="description">Check return progress</div>
+                     </div>
+                 </div>
 
                 <h3>Quick Start Code</h3>
 
@@ -882,7 +905,7 @@ const order = await fetch(`${API_BASE}/orders`, {
     'Content-Type': 'application/ocs+json; version=1.0',
     'Idempotency-Key': crypto.randomUUID()
   },
-  body: JSON.stringify({ cartId: cart.id, orderType: 'delivery' })
+  body: JSON.stringify({ cartId: cart.id })
 }).then(r => r.json());
 
 // 6. Track order
@@ -1210,14 +1233,13 @@ console.log('Added item to cart!');</code></pre></div>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-javascript">// Place an order
-async function placeOrder(cartId, orderType, deliveryAddress = null) {
+async function placeOrder(cartId, deliveryAddress = null) {
   const body = {
-    cartId: cartId,
-    orderType: orderType // "delivery", "pickup", or "digital"
+    cartId: cartId
   };
-  
-  // If it's a delivery order, include the address
-  if (orderType === 'delivery' && deliveryAddress) {
+
+  // Include delivery address if provided (required for physical items)
+  if (deliveryAddress) {
     body.deliveryAddress = deliveryAddress;
   }
   
@@ -1244,8 +1266,8 @@ async function placeOrder(cartId, orderType, deliveryAddress = null) {
   return await response.json();
 }
 
-// Place a delivery order
-const order = await placeOrder(cart.id, 'delivery', {
+// Place an order (type inferred from cart contents)
+const order = await placeOrder(cart.id, {
   address: '123 Main St, City, State 12345',
   latitude: 37.7749,
   longitude: -122.4194
@@ -1671,7 +1693,6 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                         <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                             <div class="code-block"><pre><code class="language-json">{
   "cartId": "cart_abc",
-  "orderType": "delivery",
   "deliveryAddress": {
     "address": "123 OCS Lane, Protocol City, 1337"
   }
@@ -1692,19 +1713,28 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                         <strong>Response Stream:</strong>
                         <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                             <div class="code-block"><pre><code class="language-http">event: order.patch
-data: [{"op": "replace", "path": "/status", "value": "confirmed"}]
+data: [
+  {"op": "replace", "path": "/status", "value": "confirmed"},
+  {"op": "add", "path": "/metadata/dev.ocs.order.detailed_status@1.0", "value": {
+    "title": "Order Confirmed",
+    "description": "Your order has been confirmed and will be processed soon."
+  }}
+]
 
 event: order.patch
 data: [
-  {"op": "replace", "path": "/status", "value": "shipped"},
-  {"op": "add", "path": "/metadata/dev.ocs.order.shipment_tracking@1.0", "value": [
-    {
-      "carrier": "UPS",
-      "trackingNumber": "1Z999ABCDEFG",
-      "trackingUrl": "https://www.ups.com/track?tracknum=1Z999ABCDEFG"
-    }
-  ]}
-]</code></pre></div>
+  {"op": "replace", "path": "/status", "value": "in_transit"},
+  {"op": "replace", "path": "/metadata/dev.ocs.order.detailed_status@1.0/title", "value": "Out for Delivery"},
+  {"op": "add", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0", "value": {
+    "driver": { "name": "Jane D.", "vehicle": "Blue Sedan" },
+    "status": "en_route_to_customer",
+    "liveLocation": { "latitude": 40.7135, "longitude": -74.0050 },
+    "estimatedArrivalAt": "2025-10-22T19:30:00Z"
+  }}
+]
+
+event: order.patch
+data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]</code></pre></div>
                         <div class="info-box">
                             <strong>Client Insight:</strong>
                             The client's UI updates the status to "Shipped." Because it saw the <span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span> capability in Step 1, it knows to look for that key in the metadata and can now display a "Track Your Shipment" button that links to the <span class="inline-code">trackingUrl</span>.
@@ -1737,9 +1767,44 @@ data: [
                                 <td>Defines user-selectable options (e.g., size, color) and their corresponding variants, each with its own ID, price, and stock.</td>
                             </tr>
                             <tr>
+                                <td><span class="inline-code">dev.ocs.product.customization@1.0</span></td>
+                                <td>Product (CatalogItem)</td>
+                                <td>Defines complex, selectable modifiers for a menu item (e.g., toppings, sides, customizations).</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.product.addons@1.0</span></td>
+                                <td>Product (CatalogItem)</td>
+                                <td>Defines simple, selectable add-ons for a product, such as gift wrapping, extended warranty, or side dishes.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.product.physical_properties@1.0</span></td>
+                                <td>Product (CatalogItem)</td>
+                                <td>Defines physical properties like weight and dimensions, primarily for shipping estimation.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.restaurant.profile@1.0</span></td>
+                                <td>Store</td>
+                                <td>Adds restaurant-specific data like cuisine, hours, price range, and ratings.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.order.kitchen_status@1.0</span></td>
+                                <td>Order</td>
+                                <td>Provides real-time updates on an order's status within the kitchen.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.order.delivery_tracking@1.0</span></td>
+                                <td>Order</td>
+                                <td>Provides a real-time data structure for tracking a delivery, including driver info, GPS, and ETA.</td>
+                            </tr>
+                            <tr>
                                 <td><span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span></td>
                                 <td>Order</td>
                                 <td>Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.order.tipping_and_ratings@1.0</span></td>
+                                <td>Order</td>
+                                <td>Allows for adding tips and rating the order after completion.</td>
                             </tr>
                             <tr>
                                 <td><span class="inline-code">dev.ocs.order.digital_access@1.0</span></td>
@@ -1747,9 +1812,24 @@ data: [
                                 <td>Provides an array of objects containing access details for digital goods, such as download URLs or license keys.</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.product.physical_properties@1.0</span></td>
-                                <td>Product (CatalogItem)</td>
-                                <td>Defines physical properties like weight and dimensions, primarily for shipping estimation.</td>
+                                <td><span class="inline-code">dev.ocs.order.detailed_status@1.0</span></td>
+                                <td>Order</td>
+                                <td>Provides a rich, human-readable status (title, description, progress) for display in a UI, augmenting the core status field.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.order.cancellation@1.0</span></td>
+                                <td>Order (Action)</td>
+                                <td>Enables the workflow for cancelling an order via a dedicated endpoint, discoverable through the Order.actions field.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.order.returns@1.0</span></td>
+                                <td>Order (Action)</td>
+                                <td>Enables a full lifecycle for item returns, including initiation and tracking via new /returns endpoints.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">dev.ocs.order.refunds@1.0</span></td>
+                                <td>Order (Metadata)</td>
+                                <td>Provides a standardized, auditable record of all monetary refunds associated with an order.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1854,18 +1934,29 @@ data: [
                     </div>
                 </div>
 
-                <div class="endpoint-card">
-                    <div class="endpoint-header">
-                        <span class="http-method http-delete">DELETE</span>
-                        <span class="endpoint-path">/carts/{id}/items/{itemId}</span>
-                        <span class="badge badge-warning">Auth Required</span>
-                    </div>
-                    <div class="endpoint-body">
-                        <p>Remove an item from the cart.</p>
-                    </div>
-                </div>
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-delete">DELETE</span>
+                         <span class="endpoint-path">/carts/{id}/items/{itemId}</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>Remove an item from the cart.</p>
+                     </div>
+                 </div>
 
-                <h3>Ordering</h3>
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-post">POST</span>
+                         <span class="endpoint-path">/carts/{id}/promotions</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>Apply or validate a promotion on a cart.</p>
+                     </div>
+                 </div>
+
+                 <h3>Ordering</h3>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
@@ -1874,7 +1965,7 @@ data: [
                         <span class="badge badge-warning">Auth Required</span>
                     </div>
                     <div class="endpoint-body">
-                        <p>Place an order from a cart. May return 402 if payment is required.</p>
+                        <p>Place an order from a cart. Order type is inferred from cart contents. May return 402 if payment is required.</p>
                     </div>
                 </div>
 
@@ -1889,17 +1980,50 @@ data: [
                     </div>
                 </div>
 
-                <div class="endpoint-card">
-                    <div class="endpoint-header">
-                        <span class="http-method http-get">GET</span>
-                        <span class="endpoint-path">/orders/{id}/updates</span>
-                        <span class="badge badge-warning">Auth Required</span>
-                    </div>
-                    <div class="endpoint-body">
-                        <p>Subscribe to real-time order updates via Server-Sent Events (SSE).</p>
-                    </div>
-                </div>
-            </section>
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-get">GET</span>
+                         <span class="endpoint-path">/orders/{id}/updates</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>Subscribe to real-time order updates via Server-Sent Events (SSE).</p>
+                     </div>
+                 </div>
+
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-post">POST</span>
+                         <span class="endpoint-path">/orders/{id}/cancel</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>Request to cancel an order.</p>
+                     </div>
+                 </div>
+
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-post">POST</span>
+                         <span class="endpoint-path">/returns</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>Initiate a return for items from an order.</p>
+                     </div>
+                 </div>
+
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-get">GET</span>
+                         <span class="endpoint-path">/returns/{id}</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>Get the status of a specific return.</p>
+                     </div>
+                 </div>
+             </section>
 
             <!-- Authentication -->
             <section id="authentication">
@@ -2107,7 +2231,6 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
                 "status": "confirmed",
                 "items": [...],
                 "total": { "amount": "59.98", "currency": "USD" },
-                "orderType": "delivery",
                 "deliveryAddress": {...},
                 "createdAt": "2025-01-15T10:30:00Z",
                 "updatedAt": "2025-01-15T10:35:00Z",

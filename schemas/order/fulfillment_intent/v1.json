@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "description": "Schema for declaring explicit fulfillment intent (dev.ocs.order.fulfillment_intent@1.0). Allows for splitting a single cart into multiple fulfillment methods.",
+  "items": {
+    "type": "object",
+    "properties": {
+      "method": {
+        "type": "string",
+        "enum": ["delivery", "pickup"],
+        "description": "The fulfillment method for this group of items."
+      },
+      "cartItemIds": {
+        "type": "array",
+        "items": { "type": "string", "format": "uuid" },
+        "description": "An array of the unique `cartItemId`s that belong to this fulfillment group."
+      },
+      "deliveryAddress": {
+        "$ref": "https://raw.githubusercontent.com/doeixd/Open-Commerce-Standard/main/src/spec.yaml#/components/schemas/Location",
+        "description": "Required if, and only if, the method for this group is 'delivery'."
+      },
+      "pickupDetails": {
+        "type": "object",
+        "properties": {
+          "pickupAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "An optional, specific time for the scheduled pickup."
+          }
+        },
+        "description": "Optional details relevant to a 'pickup' method."
+      }
+    },
+    "required": ["method", "cartItemIds"]
+  }
+}

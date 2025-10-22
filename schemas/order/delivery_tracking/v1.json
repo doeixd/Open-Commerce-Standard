@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for real-time delivery driver tracking (dev.ocs.order.delivery_tracking@1.0).",
+  "properties": {
+    "driver": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The driver's first name and last initial (e.g., 'Jane D.')." },
+        "vehicle": { "type": "string", "description": "A short description of the driver's vehicle (e.g., 'Blue Sedan')." }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["driver_assigned", "en_route_to_restaurant", "at_restaurant", "en_route_to_customer", "arriving_soon"],
+      "description": "The current stage of the driver's journey."
+    },
+    "liveLocation": {
+      "type": "object",
+      "properties": {
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" }
+      },
+      "description": "The driver's live GPS coordinates."
+    },
+    "estimatedArrivalAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The real-time estimated time of arrival at the customer's location."
+    }
+  }
+}

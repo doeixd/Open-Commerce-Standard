@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "description": "Schema for product add-ons capability (dev.ocs.product.addons@1.0). Defines a list of optional, secondary items that can be attached to a primary product.",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Unique identifier for this add-on (e.g., 'addon_gift_wrap'). Used in the cart via the addOnIds field."
+      },
+      "name": {
+        "type": "string",
+        "description": "Display name of the add-on (e.g., 'Gift Wrapping')."
+      },
+      "description": {
+        "type": "string",
+        "description": "A short description of the add-on, suitable for displaying in a UI."
+      },
+      "price": {
+        "$ref": "#/$defs/Money"
+      }
+    },
+    "required": ["id", "name", "price"]
+  },
+  "$defs": {
+    "Money": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Monetary amount as string (e.g., '5.00')"
+        },
+        "currency": {
+          "type": "string",
+          "description": "ISO 4217 currency code (e.g., 'USD')"
+        }
+      },
+      "required": ["amount", "currency"]
+    }
+  }
+}

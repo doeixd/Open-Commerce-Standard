@@ -166,7 +166,6 @@ The user adds `var_large_black` to the cart. During checkout, the client places 
 ```json
 {
   "cartId": "cart_abc",
-  "orderType": "delivery",
   // This field is included because the cart contains a 'physical' item.
   "deliveryAddress": {
     "address": "123 OCS Lane, Protocol City, 1337"
@@ -183,23 +182,29 @@ The client immediately opens a connection to the SSE endpoint.
 
 **Response Stream:**
 ```
-// The server confirms the order
-event: order.patch
-data: [{"op": "replace", "path": "/status", "value": "confirmed"}]
-
-// A few hours later, the order is shipped. The server adds the tracking info
-// to the metadata, which is sent as another patch.
 event: order.patch
 data: [
-  {"op": "replace", "path": "/status", "value": "shipped"},
-  {"op": "add", "path": "/metadata/dev.ocs.order.shipment_tracking@1.0", "value": [
-    {
-      "carrier": "UPS",
-      "trackingNumber": "1Z999ABCDEFG",
-      "trackingUrl": "https://www.ups.com/track?tracknum=1Z999ABCDEFG"
-    }
-  ]}
+  {"op": "replace", "path": "/status", "value": "confirmed"},
+  {"op": "add", "path": "/metadata/dev.ocs.order.detailed_status@1.0", "value": {
+    "title": "Order Confirmed",
+    "description": "Your order has been confirmed and will be processed soon."
+  }}
 ]
+
+event: order.patch
+data: [
+  {"op": "replace", "path": "/status", "value": "in_transit"},
+  {"op": "replace", "path": "/metadata/dev.ocs.order.detailed_status@1.0/title", "value": "Out for Delivery"},
+  {"op": "add", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0", "value": {
+    "driver": { "name": "Jane D.", "vehicle": "Blue Sedan" },
+    "status": "en_route_to_customer",
+    "liveLocation": { "latitude": 40.7135, "longitude": -74.0050 },
+    "estimatedArrivalAt": "2025-10-22T19:30:00Z"
+  }}
+]
+
+event: order.patch
+data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]
 ```
 * **Client Insight:** The client's UI updates the status to "Shipped." Because it saw the `dev.ocs.order.shipment_tracking@1.0` capability in Step 1, it knows to look for that key in the metadata and can now display a "Track Your Shipment" button that links to the `trackingUrl`.
 
@@ -212,9 +217,22 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | Capability ID | Applies To | Description | Schema URL |
 | :--- | :--- | :--- | :--- |
 | **`dev.ocs.product.variants@1.0`** | Product (`CatalogItem`) | Defines user-selectable options (e.g., size, color) and their corresponding variants, each with its own ID, price, and stock. | [product/variants/v1.json](./schemas/product/variants/v1.json) |
-| **`dev.ocs.order.shipment_tracking@1.0`** | Order | Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package. | [order/shipment_tracking/v1.json](./schemas/order/shipment_tracking/v1.json) |
-| **`dev.ocs.order.digital_access@1.0`** | Order | Provides an array of objects containing access details for digital goods, such as download URLs or license keys. | [order/digital_access/v1.json](./schemas/order/digital_access/v1.json) |
+| **`dev.ocs.product.customization@1.0`** | Product (`CatalogItem`) | Defines complex, selectable modifiers for a menu item (e.g., toppings, sides). | [product/customization/v1.json](./schemas/product/customization/v1.json) |
+| **`dev.ocs.product.addons@1.0`** | Product (`CatalogItem`) | Defines simple, selectable add-ons for a product, such as gift wrapping, extended warranty, or side dishes. | [product/addons/v1.json](./schemas/product/addons/v1.json) |
 | **`dev.ocs.product.physical_properties@1.0`** | Product (`CatalogItem`) | Defines physical properties like weight and dimensions, primarily for shipping estimation. | [product/physical_properties/v1.json](./schemas/product/physical_properties/v1.json) |
+| **`dev.ocs.restaurant.profile@1.0`** | Store | Adds restaurant-specific data like cuisine, hours, price range, and ratings. | [restaurant/profile/v1.json](./schemas/restaurant/profile/v1.json) |
+| **`dev.ocs.order.kitchen_status@1.0`** | Order | Provides real-time updates on an order's status within the kitchen. | [order/kitchen_status/v1.json](./schemas/order/kitchen_status/v1.json) |
+| **`dev.ocs.order.delivery_tracking@1.0`** | Order | Provides a real-time data structure for tracking a delivery, including driver info, GPS, and ETA. | [order/delivery_tracking/v1.json](./schemas/order/delivery_tracking/v1.json) |
+| **`dev.ocs.order.shipment_tracking@1.0`** | Order | Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package. | [order/shipment_tracking/v1.json](./schemas/order/shipment_tracking/v1.json) |
+| **`dev.ocs.order.tipping_and_ratings@1.0`** | Order | Allows for adding tips and rating the order after completion. | [order/tipping_and_ratings/v1.json](./schemas/order/tipping_and_ratings/v1.json) |
+| **`dev.ocs.order.digital_access@1.0`** | Order | Provides an array of objects containing access details for digital goods, such as download URLs or license keys. | [order/digital_access/v1.json](./schemas/order/digital_access/v1.json) |
+| **`dev.ocs.order.detailed_status@1.0`** | Order | Provides a rich, human-readable status (title, description, progress) for display in a UI, augmenting the core `status` field. | [order/detailed_status/v1.json](./schemas/order/detailed_status/v1.json) |
+| **`dev.ocs.order.cancellation@1.0`** | Order (Action) | Enables the workflow for cancelling an order via a dedicated endpoint, discoverable through the `Order.actions` field. | N/A (Workflow) |
+| **`dev.ocs.order.returns@1.0`** | Order (Action) | Enables a full lifecycle for item returns, including initiation and tracking via new `/returns` endpoints. | [order/returns/v1.json](./schemas/order/returns/v1.json) |
+| **`dev.ocs.order.refunds@1.0`** | Order (Metadata) | Provides a standardized, auditable record of all monetary refunds associated with an order. | [order/refunds/v1.json](./schemas/order/refunds/v1.json) |
+| **`dev.ocs.promotions.discoverable@1.0`** | Store, Catalog | Allows a server to advertise publicly available promotions to clients. | [promotions/discoverable/v1.json](./schemas/promotions/discoverable/v1.json) |
+| **`dev.ocs.order.applied_promotions@1.0`** | Order | Provides a final, authoritative record of all value modifications on the completed order. | [order/applied_promotions/v1.json](./schemas/order/applied_promotions/v1.json) |
+| **`dev.ocs.order.fulfillment_intent@1.0`** | CreateOrderRequest | Allows a client to specify a precise fulfillment plan for the items in a cart, supporting mixed fulfillment and split orders. | [order/fulfillment_intent/v1.json](./schemas/order/fulfillment_intent/v1.json) |
 
 <br />
 
@@ -250,9 +268,13 @@ OCS is a living standard. The future direction includes:
 | `/carts/{id}` | `GET` | Get a cart by ID. | Yes |
 | `/carts/{id}/items` | `POST` | Add an item to the cart. | Yes |
 | `/carts/{id}/items/{itemId}` | `PATCH`/`DELETE` | Update or remove an item. | Yes |
-| `/orders` | `POST` | Place an order from a cart. | Yes |
+| `/orders` | `POST` | Place an order from a cart. Order type is inferred from cart contents. May return 402 if payment is required. | Yes |
 | `/orders/{id}` | `GET` | Get the current state of an order. | Yes |
 | `/orders/{id}/updates` | `GET` | **Subscribe to real-time order updates via SSE.** | Yes |
+| `/orders/{id}/cancel` | `POST` | Request to cancel an order. | Yes |
+| `/returns` | `POST` | Initiate a return for items from an order. | Yes |
+| `/returns/{id}` | `GET` | Get the status of a specific return. | Yes |
+| `/carts/{id}/promotions` | `POST` | Apply or validate a promotion on a cart. | Yes |
 
 <br />
 

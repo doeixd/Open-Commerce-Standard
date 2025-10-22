@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "description": "Schema for advertising discoverable promotions (dev.ocs.promotions.discoverable@1.0).",
+  "items": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "Short, catchy title for the promotion (e.g., 'Summer Sale')."
+      },
+      "description": {
+        "type": "string",
+        "description": "A longer, human-readable description of how the promotion works."
+      },
+      "appliesTo": {
+        "type": "string",
+        "enum": ["order", "item", "shipping"],
+        "description": "What part of the order the promotion generally affects."
+      }
+    },
+    "required": ["title", "description"]
+  }
+}

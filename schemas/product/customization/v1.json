@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for product (menu item) customization capability (dev.ocs.product.customization@1.0)",
+  "properties": {
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Unique ID for the customization group (e.g., 'group_size')." },
+          "name": { "type": "string", "description": "Display name for the group (e.g., 'Choose Your Size')." },
+          "selectionType": { "type": "string", "enum": ["single", "multiple"], "description": "'single' for radio buttons, 'multiple' for checkboxes." },
+          "required": { "type": "boolean", "default": false, "description": "Whether selecting an option from this group is required." },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "description": "Unique ID for the option (e.g., 'size_large')." },
+                "name": { "type": "string", "description": "Display name for the option (e.g., 'Large (16-inch)')." },
+                "priceModifier": {
+                  "$ref": "#/$defs/Money",
+                  "description": "Price to add to the base price of the item. Can be zero."
+                }
+              },
+              "required": ["id", "name", "priceModifier"]
+            }
+          }
+        },
+        "required": ["id", "name", "selectionType", "options"]
+      }
+    }
+  },
+  "required": ["groups"],
+  "$defs": {
+    "Money": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Monetary amount as string (e.g., '2.00')"
+        },
+        "currency": {
+          "type": "string",
+          "description": "ISO 4217 currency code (e.g., 'USD')"
+        }
+      },
+      "required": ["amount", "currency"]
+    }
+  }
+}

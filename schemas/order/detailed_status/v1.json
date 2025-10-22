@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for providing rich, human-readable, and domain-specific status updates (dev.ocs.order.detailed_status@1.0).",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "The primary, human-readable status text to display to the user (e.g., 'In the Oven', 'Awaiting Proof Approval')."
+    },
+    "description": {
+      "type": "string",
+      "description": "An optional, longer description providing more context (e.g., 'Your pizza is being baked to perfection and will be ready soon!')."
+    },
+    "progressPercentage": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "An optional value from 0-100 to power UI elements like progress bars."
+    },
+    "estimatedCompletionAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "An optional timestamp for when this specific stage is expected to be complete."
+    }
+  },
+  "required": ["title"]
+}

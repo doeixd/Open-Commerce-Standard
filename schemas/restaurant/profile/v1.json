@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for restaurant profile capability (dev.ocs.restaurant.profile@1.0)",
+  "properties": {
+    "cuisine": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of cuisine types (e.g., 'Italian', 'Pizza')"
+    },
+    "operatingHours": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "day": { "type": "string", "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] },
+          "open": { "type": "string", "format": "time" },
+          "close": { "type": "string", "format": "time" }
+        },
+        "required": ["day", "open", "close"]
+      }
+    },
+    "priceRange": {
+      "type": "string",
+      "description": "Price range indicator (e.g., '$', '$$', '$$$')"
+    },
+    "ratings": {
+      "type": "object",
+      "properties": {
+        "average": { "type": "number" },
+        "count": { "type": "integer" }
+      }
+    }
+  },
+  "required": ["cuisine", "operatingHours"]
+}

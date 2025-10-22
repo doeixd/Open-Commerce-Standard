@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for order tipping and post-delivery ratings (dev.ocs.order.tipping_and_ratings@1.0)",
+  "properties": {
+    "tip": {
+      "$ref": "#/$defs/Money",
+      "description": "Tip amount included in the order."
+    },
+    "ratings": {
+      "type": "object",
+      "properties": {
+        "food": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Rating for the food quality (1-5 stars)."
+        },
+        "delivery": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Rating for the delivery service (1-5 stars)."
+        },
+        "restaurant": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Overall rating for the restaurant (1-5 stars)."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional text comment from the customer."
+        }
+      },
+      "description": "Ratings provided by the customer after the order is completed."
+    }
+  },
+  "$defs": {
+    "Money": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Monetary amount as string (e.g., '5.00')"
+        },
+        "currency": {
+          "type": "string",
+          "description": "ISO 4217 currency code (e.g., 'USD')"
+        }
+      },
+      "required": ["amount", "currency"]
+    }
+  }
+}

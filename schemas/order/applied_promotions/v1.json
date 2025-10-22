@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "description": "Schema for describing applied promotions (dev.ocs.order.applied_promotions@1.0). Returned on the final Order object.",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": { "type": "string", "description": "A unique ID for this specific application of the promotion." },
+      "source": { "type": "string", "description": "The code or identifier used to trigger the promotion (e.g., 'SUMMER10')." },
+      "description": { "type": "string", "description": "A human-readable description of the discount (e.g., '10% Off Summer Sale')." },
+      "effect": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["monetary_discount", "item_added", "state_change"] },
+          "value": { "description": "The value of the effect. Could be a Money object, an array of added CartItems, or a string like 'free_shipping'." }
+        },
+        "required": ["type", "value"]
+      }
+    },
+    "required": ["id", "source", "description", "effect"]
+  }
+}

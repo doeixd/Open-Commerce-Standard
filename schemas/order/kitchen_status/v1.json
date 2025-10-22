@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for real-time kitchen status (dev.ocs.order.kitchen_status@1.0)",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["confirmed", "preparing", "ready_for_pickup"],
+      "description": "Live status of the order in the kitchen."
+    },
+    "estimatedReadyAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The estimated time the order will be ready for pickup by the driver."
+    }
+  },
+  "required": ["status"]
+}
