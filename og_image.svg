@@ -47,14 +47,14 @@
     </text>
 
     <!-- Description -->
-    <text x="0" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="400" fill="#475569" line-height="1.6">
-      <tspan x="0" dy="0">An open, extensible API specification for digital commerce.</tspan>
-      <tspan x="0" dy="36">Universal clients for any compliant server—from catalogs</tspan>
-      <tspan x="0" dy="36">to complex e-commerce platforms.</tspan>
+    <text x="16" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="400" fill="#475569" line-height="1.6">
+      <tspan x="16" dy="0">An open, extensible API specification for digital commerce.</tspan>
+      <tspan x="16" dy="36">Universal clients for any compliant server—from catalogs</tspan>
+      <tspan x="16" dy="36">to complex e-commerce platforms.</tspan>
     </text>
 
     <!-- Features badges -->
-    <g transform="translate(0, 310)">
+    <g transform="translate(16, 310)">
       <!-- Badge 1 -->
       <rect x="0" y="0" width="180" height="40" rx="20" fill="#2563eb"/>
       <text x="90" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">
@@ -76,7 +76,7 @@
   </g>
 
   <!-- Footer -->
-  <text x="600" y="590" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="500" fill="#64748b" text-anchor="middle">
+  <text x="600" y="588" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="500" fill="#94a3b8" text-anchor="middle">
     v1.0.0 • MIT License • github.com/doeixd/Open-Commerce-Standard
   </text>
 </svg>
