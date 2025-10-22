@@ -1,4 +1,4 @@
-<div align="center">
+<div align="left">
   <img src="assets/logo.png" alt="Open Commerce Standard Logo" width="200">
 </div>
 
