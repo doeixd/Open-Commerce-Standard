@@ -684,12 +684,12 @@
 
                 <div class="card">
                     <h4>Why OCS?</h4>
-                    <p>Traditional e-commerce APIs are fragmented and vendor-specific. OCS provides a consistent, extensible framework that adapts to any business model—from simple menus to complex apparel stores—without dictating internal logic. It prioritizes implementer freedom while enabling universal, adaptive clients.</p>
+                    <p>Traditional e-commerce APIs are fragmented and vendor-specific. OCS provides a consistent, extensible framework that adapts to any business model—from simple catalogs to complex apparel stores—without dictating internal logic. It prioritizes implementer freedom while enabling universal, adaptive clients.</p>
                 </div>
 
                 <div class="card">
                     <h4>How does OCS work?</h4>
-                    <p>Clients begin by discovering server capabilities (<span class="inline-code">GET /capabilities</span>), then browse catalogs/menus, manage carts, and place orders. Real-time updates stream via Server-Sent Events. Complexity is delegated to structured <span class="inline-code">metadata</span> linked to JSON Schemas, allowing clients to adapt dynamically without hardcoding features.</p>
+                    <p>Clients begin by discovering server capabilities (<span class="inline-code">GET /capabilities</span>), then browse catalogs, manage carts, and place orders. Real-time updates stream via Server-Sent Events. Complexity is delegated to structured <span class="inline-code">metadata</span> linked to JSON Schemas, allowing clients to adapt dynamically without hardcoding features.</p>
                 </div>
 
                 <div class="card">
@@ -725,14 +725,14 @@
 
                     <div class="quick-ref-card">
                         <h4>List Vendors</h4>
-                        <div class="method">GET /restaurants</div>
+                        <div class="method">GET /stores</div>
                         <div class="description">Get available stores/vendors</div>
                     </div>
 
                     <div class="quick-ref-card">
                         <h4>Get Catalog</h4>
-                        <div class="method">GET /menus/{id}</div>
-                        <div class="description">Fetch products from a menu</div>
+                        <div class="method">GET /catalogs/{id}</div>
+                        <div class="description">Fetch products from a catalog</div>
                     </div>
 
                     <div class="quick-ref-card">
@@ -777,8 +777,8 @@ const AUTH_TOKEN = 'your_token';
 // 1. Discover capabilities
 const caps = await fetch(`${API_BASE}/capabilities`).then(r => r.json());
 
-// 2. Get menu
-const menu = await fetch(`${API_BASE}/menus/menu_123`).then(r => r.json());
+// 2. Get catalog
+const catalog = await fetch(`${API_BASE}/catalogs/catalog_123`).then(r => r.json());
 
 // 3. Create cart
 const cart = await fetch(`${API_BASE}/carts`, {
@@ -787,7 +787,7 @@ const cart = await fetch(`${API_BASE}/carts`, {
     'Authorization': `Bearer ${AUTH_TOKEN}`,
     'Content-Type': 'application/ocs+json; version=1.0'
   },
-  body: JSON.stringify({ restaurantId: 'store_123' })
+  body: JSON.stringify({ storeId: 'store_123' })
 }).then(r => r.json());
 
 // 4. Add item
@@ -934,11 +934,11 @@ eventSource.addEventListener('order.patch', (event) => {
 
                 <h3>Let's Build Something: Your First OCS Client</h3>
 
-                <p>Enough theory. Let's write some code. I'm going to walk you through building a simple client that browses a menu and places an order. We'll use plain JavaScript and <span class="inline-code">fetch</span>—no frameworks, no magic.</p>
+                <p>Enough theory. Let's write some code. I'm going to walk you through building a simple client that browses a catalog and places an order. We'll use plain JavaScript and <span class="inline-code">fetch</span>—no frameworks, no magic.</p>
 
                 <h4>Step 1: Discover What the Server Can Do</h4>
 
-                <p>Every OCS interaction starts the same way: ask the server what it supports. This is like walking into a restaurant and asking for the menu before you order.</p>
+                <p>Every OCS interaction starts the same way: ask the server what it supports. This is like walking into a store and asking for the catalog before you order.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre>// First, let's see what this server can do
@@ -969,14 +969,14 @@ const capabilities = await discoverCapabilities();
 
                 <p>See what we did there? We now know this server supports product variants and shipment tracking. We can use this information to enable features in our UI. No hardcoding, no guessing.</p>
 
-                <h4>Step 2: Browse the Menu</h4>
+                <h4>Step 2: Browse the Catalog</h4>
 
-                <p>Now let's get the actual products. In OCS, products live in "menus" (we use restaurant terminology because it's universal, but this works for any kind of commerce).</p>
+                <p>Now let's get the actual products. In OCS, products live in "catalogs".</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre>// First, let's see what menus are available
-async function getMenus() {
-  const response = await fetch(`${API_BASE}/menus`, {
+                    <div class="code-block"><pre>// First, let's see what catalogs are available
+async function getCatalogs() {
+  const response = await fetch(`${API_BASE}/catalogs`, {
     headers: {
       'Accept': 'application/ocs+json; version=1.0'
     }
@@ -985,9 +985,9 @@ async function getMenus() {
   return await response.json();
 }
 
-// Get the first menu's details
-async function getMenu(menuId) {
-  const response = await fetch(`${API_BASE}/menus/${menuId}`, {
+// Get the first catalog's details
+async function getCatalog(catalogId) {
+  const response = await fetch(`${API_BASE}/catalogs/${catalogId}`, {
     headers: {
       'Accept': 'application/ocs+json; version=1.0'
     }
@@ -997,10 +997,10 @@ async function getMenu(menuId) {
 }
 
 // Let's use it
-const menus = await getMenus();
-const menu = await getMenu(menus[0].id);
+const catalogs = await getCatalogs();
+const catalog = await getCatalog(catalogs[0].id);
 
-console.log('Products:', menu.items);
+console.log('Products:', catalog.items);
 
 // Each item looks like:
 // {
@@ -1087,7 +1087,7 @@ async function createCart() {
       'Accept': 'application/ocs+json; version=1.0'
     },
     body: JSON.stringify({
-      restaurantId: 'store_123' // Which store/vendor
+      storeId: 'store_123' // Which store/vendor
     })
   });
   
@@ -1261,7 +1261,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                     <li>Track orders in real-time</li>
                 </ul>
 
-                <p>And here's the kicker: <strong>this same code works with any OCS-compliant server</strong>. A restaurant, a clothing store, a digital goods marketplace—doesn't matter. The API is the same.</p>
+                <p>And here's the kicker: <strong>this same code works with any OCS-compliant server</strong>. A grocery store, a clothing store, a digital goods marketplace—doesn't matter. The API is the same.</p>
 
                 <div class="info-box success">
                     <strong>The OCS Promise</strong>
@@ -1327,7 +1327,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                 <div class="step-card">
                     <div class="step-number">2</div>
                     <div class="step-title">Implement Core Endpoints</div>
-                    <p>Start with discovery (<span class="inline-code">/capabilities</span>, <span class="inline-code">/restaurants</span>, <span class="inline-code">/menus</span>) and cart/order flows.</p>
+                    <p>Start with discovery (<span class="inline-code">/capabilities</span>, <span class="inline-code">/stores</span>, <span class="inline-code">/catalogs</span>) and cart/order flows.</p>
                 </div>
 
                 <div class="step-card">
@@ -1542,7 +1542,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                 </div>
 
                 <h3>Step 2: View a Product with Structured Metadata</h3>
-                <p>The client fetches a catalog (<span class="inline-code">/menus/{id}</span>) and gets a product (<span class="inline-code">MenuItem</span>).</p>
+                <p>The client fetches a catalog (<span class="inline-code">/catalogs/{id}</span>) and gets a product (<span class="inline-code">CatalogItem</span>).</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre>{
@@ -1652,7 +1652,7 @@ data: [
                         <tbody>
                             <tr>
                                 <td><span class="inline-code">dev.ocs.product.variants@1.0</span></td>
-                                <td>Product (MenuItem)</td>
+                                <td>Product (CatalogItem)</td>
                                 <td>Defines user-selectable options (e.g., size, color) and their corresponding variants, each with its own ID, price, and stock.</td>
                             </tr>
                             <tr>
@@ -1667,7 +1667,7 @@ data: [
                             </tr>
                             <tr>
                                 <td><span class="inline-code">dev.ocs.product.physical_properties@1.0</span></td>
-                                <td>Product (MenuItem)</td>
+                                <td>Product (CatalogItem)</td>
                                 <td>Defines physical properties like weight and dimensions, primarily for shipping estimation.</td>
                             </tr>
                         </tbody>
@@ -1695,7 +1695,7 @@ data: [
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="http-method http-get">GET</span>
-                        <span class="endpoint-path">/restaurants</span>
+                        <span class="endpoint-path">/stores</span>
                         <span class="badge badge-success">Public</span>
                     </div>
                     <div class="endpoint-body">
@@ -1706,22 +1706,22 @@ data: [
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="http-method http-get">GET</span>
-                        <span class="endpoint-path">/menus</span>
+                        <span class="endpoint-path">/catalogs</span>
                         <span class="badge badge-success">Public</span>
                     </div>
                     <div class="endpoint-body">
-                        <p>List available catalogs/menus.</p>
+                        <p>List available catalogs.</p>
                     </div>
                 </div>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="http-method http-get">GET</span>
-                        <span class="endpoint-path">/menus/{id}</span>
+                        <span class="endpoint-path">/catalogs/{id}</span>
                         <span class="badge badge-success">Public</span>
                     </div>
                     <div class="endpoint-body">
-                        <p>Get a full product catalog/menu.</p>
+                        <p>Get a full product catalog.</p>
                     </div>
                 </div>
 
@@ -1830,7 +1830,7 @@ data: [
 
                 <div class="info-box">
                     <strong>Implementation Note</strong>
-                    Token formats (e.g., JWT, API keys, OAuth2) are implementation-specific and may be discoverable via the capabilities endpoint. Discovery endpoints (<span class="inline-code">/capabilities</span>, <span class="inline-code">/restaurants</span>, <span class="inline-code">/menus</span>) are public; all other endpoints require authentication.
+                    Token formats (e.g., JWT, API keys, OAuth2) are implementation-specific and may be discoverable via the capabilities endpoint. Discovery endpoints (<span class="inline-code">/capabilities</span>, <span class="inline-code">/stores</span>, <span class="inline-code">/catalogs</span>) are public; all other endpoints require authentication.
                 </div>
             </section>
 
@@ -1867,7 +1867,7 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
 }</code></pre></div>
                 </div>
 
-                <h3>MenuItem</h3>
+                <h3>CatalogItem</h3>
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <div class="code-block"><pre><code class="language-json">{
                 "id": "item_123",

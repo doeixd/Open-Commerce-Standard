@@ -13,11 +13,11 @@ The Open Commerce Standard (OCS) is an open, extensible API specification for di
 **What is OCS?**  
 An open, minimal, and extensible standard for digital commerce. It defines a universal HTTP API for the entire transaction lifecycle: product discovery, cart management, ordering, and real-time updates—supporting physical goods, digital services, and in-store pickup.
 
-**Why OCS?**  
-Traditional e-commerce APIs are fragmented and vendor-specific. OCS provides a consistent, extensible framework that adapts to any business model—from simple menus to complex apparel stores—without dictating internal logic. It prioritizes implementer freedom while enabling universal, adaptive clients.
+**Why OCS?**
+Traditional e-commerce APIs are fragmented and vendor-specific. OCS provides a consistent, extensible framework that adapts to any business model—from simple catalogs to complex apparel stores—without dictating internal logic. It prioritizes implementer freedom while enabling universal, adaptive clients.
 
-**How does OCS work?**  
-Clients begin by discovering server capabilities (`GET /capabilities`), then browse catalogs/menus, manage carts, and place orders. Real-time updates stream via Server-Sent Events. Complexity is delegated to structured `metadata` linked to JSON Schemas, allowing clients to adapt dynamically without hardcoding features.
+**How does OCS work?**
+Clients begin by discovering server capabilities (`GET /capabilities`), then browse catalogs, manage carts, and place orders. Real-time updates stream via Server-Sent Events. Complexity is delegated to structured `metadata` linked to JSON Schemas, allowing clients to adapt dynamically without hardcoding features.
 
 **Why X402 for payments?**  
 OCS integrates the [x402 Protocol](https://github.com/coinbase/x402) for web3-native payments, enabling instant, low-fee blockchain transactions with stablecoins like USDC. Unlike credit cards (high fees, slow settlement, chargebacks), X402 supports micropayments, AI agents, and programmable commerce.
@@ -35,7 +35,7 @@ The full OpenAPI 3.0 specification is available in [`spec.yaml`](./src/spec.yaml
 ## Getting Started
 
 1. **Review the Specification:** Read the [OpenAPI spec](./src/spec.yaml) for the full API details.
-2. **Implement Core Endpoints:** Start with discovery (`/capabilities`, `/restaurants`, `/menus`) and cart/order flows.
+2. **Implement Core Endpoints:** Start with discovery (`/capabilities`, `/stores`, `/catalogs`) and cart/order flows.
 3. **Add Capabilities:** Implement optional features like variants or tracking via standard schemas.
 4. **Build Clients:** Use capability discovery for adaptive apps compatible with any OCS server.
 
@@ -118,7 +118,7 @@ The client's first action is to understand the server's features.
 
 ### Step 2: View a Product with Structured Metadata
 
-The client fetches a catalog (`/menus/{id}`) and gets a product (`MenuItem`).
+The client fetches a catalog (`/catalogs/{id}`) and gets a product (`CatalogItem`).
 
 **Product Data:**
 ```json
@@ -207,10 +207,10 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 
 | Capability ID | Applies To | Description | Schema URL |
 | :--- | :--- | :--- | :--- |
-| **`dev.ocs.product.variants@1.0`** | Product (`MenuItem`) | Defines user-selectable options (e.g., size, color) and their corresponding variants, each with its own ID, price, and stock. | [product/variants/v1.json](./schemas/product/variants/v1.json) |
+| **`dev.ocs.product.variants@1.0`** | Product (`CatalogItem`) | Defines user-selectable options (e.g., size, color) and their corresponding variants, each with its own ID, price, and stock. | [product/variants/v1.json](./schemas/product/variants/v1.json) |
 | **`dev.ocs.order.shipment_tracking@1.0`** | Order | Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package. | [order/shipment_tracking/v1.json](./schemas/order/shipment_tracking/v1.json) |
 | **`dev.ocs.order.digital_access@1.0`** | Order | Provides an array of objects containing access details for digital goods, such as download URLs or license keys. | [order/digital_access/v1.json](./schemas/order/digital_access/v1.json) |
-| **`dev.ocs.product.physical_properties@1.0`** | Product (`MenuItem`) | Defines physical properties like weight and dimensions, primarily for shipping estimation. | [product/physical_properties/v1.json](./schemas/product/physical_properties/v1.json) |
+| **`dev.ocs.product.physical_properties@1.0`** | Product (`CatalogItem`) | Defines physical properties like weight and dimensions, primarily for shipping estimation. | [product/physical_properties/v1.json](./schemas/product/physical_properties/v1.json) |
 
 <br />
 
@@ -239,9 +239,9 @@ OCS is a living standard. The future direction includes:
 | Endpoint | Verb | Description | Auth |
 | :--- | :--- | :--- | :--- |
 | `/capabilities` | `GET` | **Discover server features and metadata schemas.** | No |
-| `/restaurants` | `GET` | List available vendors/stores. | No |
-| `/menus` | `GET` | List available catalogs/menus. | No |
-| `/menus/{id}` | `GET` | Get a full product catalog/menu. | No |
+| `/stores` | `GET` | List available vendors/stores. | No |
+| `/catalogs` | `GET` | List available catalogs. | No |
+| `/catalogs/{id}` | `GET` | Get a full product catalog. | No |
 | `/carts` | `POST` | Create a new shopping cart. | Yes |
 | `/carts/{id}` | `GET` | Get a cart by ID. | Yes |
 | `/carts/{id}/items` | `POST` | Add an item to the cart. | Yes |

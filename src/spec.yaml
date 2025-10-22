@@ -47,16 +47,16 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /restaurants:
+  /stores:
     get:
       tags: [Discovery]
-      summary: List available vendors/restaurants
+      summary: List available vendors/stores
       parameters:
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Cursor'
       responses:
         '200':
-          description: A paginated list of restaurants.
+          description: A paginated list of stores.
           content:
             application/ocs+json; version=1.0:
               schema:
@@ -65,19 +65,19 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Restaurant'
+                      $ref: '#/components/schemas/Store'
                   nextCursor:
                     type: string
                     nullable: true
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /menus:
+  /catalogs:
     get:
       tags: [Discovery]
-      summary: List available catalogs/menus
+      summary: List available catalogs
       parameters:
-        - name: restaurantId
+        - name: storeId
           in: query
           required: true
           schema:
@@ -86,7 +86,7 @@ paths:
         - $ref: '#/components/parameters/Cursor'
       responses:
         '200':
-          description: A paginated list of menu summaries.
+          description: A paginated list of catalog summaries.
           content:
             application/ocs+json; version=1.0:
               schema:
@@ -95,7 +95,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/MenuSummary'
+                      $ref: '#/components/schemas/CatalogSummary'
                   nextCursor:
                     type: string
                     nullable: true
@@ -104,23 +104,23 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /menus/{menuId}:
+  /catalogs/{catalogId}:
     get:
       tags: [Discovery]
-      summary: Get a full catalog/menu by ID
+      summary: Get a full catalog by ID
       parameters:
-        - name: menuId
+        - name: catalogId
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: The complete menu object.
+          description: The complete catalog object.
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/Menu'
+                $ref: '#/components/schemas/Catalog'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -453,32 +453,32 @@ components:
         longitude: { type: number }
       required: [address]
 
-    Restaurant:
+    Store:
       type: object
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
         location: { $ref: '#/components/schemas/Location' }
-        menuIds: { type: array, items: { type: string } }
+        catalogIds: { type: array, items: { type: string } }
       required: [id, name, location]
 
-    MenuSummary:
+    CatalogSummary:
       type: object
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        version: { type: string, description: "Version identifier for the menu." }
+        version: { type: string, description: "Version identifier for the catalog." }
       required: [id, name, version]
 
-    Menu:
+    Catalog:
       allOf:
-        - $ref: '#/components/schemas/MenuSummary'
+        - $ref: '#/components/schemas/CatalogSummary'
         - type: object
           properties:
-            items: { type: array, items: { $ref: '#/components/schemas/MenuItem' } }
+            items: { type: array, items: { $ref: '#/components/schemas/CatalogItem' } }
           required: [items]
 
-    MenuItem:
+    CatalogItem:
       type: object
       properties:
         id: { type: string }
@@ -510,8 +510,8 @@ components:
     CreateCartRequest:
       type: object
       properties:
-        restaurantId: { type: string, format: uuid }
-      required: [restaurantId]
+        storeId: { type: string, format: uuid }
+      required: [storeId]
 
     CartItemRequest:
       type: object
