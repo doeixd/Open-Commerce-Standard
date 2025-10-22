@@ -267,6 +267,31 @@
             margin: 0;
         }
 
+        /* Custom scrollbar styling for code blocks */
+        .code-block {
+            scrollbar-width: thin;
+            scrollbar-color: #3e4451 #282c34;
+        }
+
+        .code-block::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        .code-block::-webkit-scrollbar-track {
+            background: #282c34;
+            border-radius: 4px;
+        }
+
+        .code-block::-webkit-scrollbar-thumb {
+            background: #3e4451;
+            border-radius: 4px;
+        }
+
+        .code-block::-webkit-scrollbar-thumb:hover {
+            background: #4b5263;
+        }
+
         .copy-btn {
             position: absolute;
             top: 0.75rem;
