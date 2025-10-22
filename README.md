@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/logo.png" alt="Open Commerce Standard Logo" width="200">
+</div>
+
 # Open Commerce Standard (OCS)
 
 | Spec Version | Status | License |
