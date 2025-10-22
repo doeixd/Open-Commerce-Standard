@@ -189,8 +189,8 @@
         h2 {
             font-size: 2.11rem;
             margin-top: 3.2rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+            border-bottom: 1.7px solid var(--border);
         }
 
         h3 {
@@ -569,7 +569,7 @@
             background: var(--bg-main);
             border: 1px solid var(--border);
             border-radius: 0.5rem;
-            /* margin-bottom: 1rem; */
+            margin-bottom: 1rem;
             overflow: hidden;
         }
 
@@ -715,6 +715,11 @@
                 </div>
 
                 <p>The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. It integrates web3-native payments via the x402 Protocol for instant, low-fee blockchain transactions.</p>
+
+                <div class="info-box">
+                    <strong>OpenAPI Specification</strong>
+                    The complete, machine-readable OpenAPI 3.0 specification is available on GitHub: <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">spec.yaml</a>
+                </div>
             </section>
 
             <!-- Overview & FAQ -->
@@ -1365,7 +1370,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                 <div class="step-card">
                     <div class="step-number">1</div>
                     <div class="step-title">Review the Specification</div>
-                    <p>Read the OpenAPI spec for the full API details. The specification defines all endpoints, schemas, and behaviors.</p>
+                    <p>Read the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">OpenAPI spec</a> for the full API details. The specification defines all endpoints, schemas, and behaviors.</p>
                 </div>
 
                 <div class="step-card">
@@ -1435,6 +1440,11 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                 <h2>X402 Protocol Compliance</h2>
 
                 <p>OCS integrates the <a href="https://github.com/coinbase/x402" target="_blank">x402 Protocol</a>, Coinbase's open standard for internet-native payments. Here's the key thing to understand: <strong>x402 is payment-method agnostic</strong>. It works with traditional payment processors (Stripe, PayPal, etc.) AND blockchain-based payments (USDC, ETH, etc.). You're not locked into crypto—you can use whatever payment method makes sense for your business.</p>
+
+                <div class="info-box">
+                    <strong>X402 Schemas</strong>
+                    Complete x402 payment schemas including <span class="inline-code">PaymentRequiredResponse</span>, <span class="inline-code">PaymentPayload</span>, and <span class="inline-code">SettlementResponse</span> are defined in the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L596-L663" target="_blank" style="color: var(--primary); text-decoration: underline;">X402 Protocol Schemas section</a> of the spec.
+                </div>
 
                 <div class="info-box">
                     <strong>Payment Flexibility</strong>
@@ -1685,7 +1695,7 @@ data: [
             <section id="capabilities">
                 <h2>Capabilities Reference</h2>
 
-                <p>Capabilities are the heart of OCS's extensibility. The following standard capabilities are defined:</p>
+                <p>Capabilities are the heart of OCS's extensibility. The following standard capabilities are defined. For implementation details on the capabilities endpoint and response format, see the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L32-L48" target="_blank" style="color: var(--primary); text-decoration: underline;">/capabilities endpoint</a> in the spec.</p>
 
                 <div class="table-container">
                     <table>
@@ -1725,6 +1735,8 @@ data: [
             <!-- Endpoints -->
             <section id="endpoints">
                 <h2>API Endpoints</h2>
+
+                <p>This section provides an overview of the core OCS endpoints. For complete details including request/response schemas, parameters, and error codes, refer to the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">OpenAPI specification</a>.</p>
 
                 <h3>Discovery Endpoints</h3>
 
@@ -1869,15 +1881,145 @@ data: [
             <section id="authentication">
                 <h2>Authentication</h2>
 
-                <p>OCS uses Bearer token authentication for all protected endpoints.</p>
+                <p>OCS uses Bearer token authentication for all protected endpoints. This provides a flexible, standardized way to secure API resources while allowing implementers to choose their preferred authentication method.</p>
+
+                <h3>How It Works</h3>
+
+                <p>Authenticated requests must include the <span class="inline-code">Authorization</span> header with a Bearer token:</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <div class="code-block"><pre><code class="language-text">Authorization: Bearer &lt;token&gt;</code></pre></div>
                 </div>
 
+                <h3>Token Format Flexibility</h3>
+
+                <p>OCS doesn't mandate a specific token format. The authentication method is determined by the server implementation and may include:</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-title">JWT (JSON Web Tokens)</div>
+                        <div class="feature-description">Stateless tokens containing encoded claims, signed by the server. Ideal for distributed systems.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-title">API Keys</div>
+                        <div class="feature-description">Simple, long-lived tokens for server-to-server communication or developer access.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-title">OAuth 2.0</div>
+                        <div class="feature-description">Industry-standard authorization framework for delegated access and third-party integrations.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-title">SIWE (Sign-In With Ethereum)</div>
+                        <div class="feature-description">Web3-native authentication using blockchain wallet signatures, no passwords required.</div>
+                    </div>
+                </div>
+
+                <h3>Public vs Protected Endpoints</h3>
+
+                <p>Not all OCS endpoints require authentication. Discovery endpoints are intentionally public to allow clients to explore available products and services before authenticating.</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Endpoint Type</th>
+                                <th>Authentication</th>
+                                <th>Examples</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Public (No Auth)</strong></td>
+                                <td>Not required</td>
+                                <td><span class="inline-code">/capabilities</span>, <span class="inline-code">/stores</span>, <span class="inline-code">/catalogs</span>, <span class="inline-code">/catalogs/{id}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Protected (Auth Required)</strong></td>
+                                <td>Bearer token required</td>
+                                <td><span class="inline-code">/carts</span>, <span class="inline-code">/orders</span>, <span class="inline-code">/orders/{id}/updates</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Example: Making an Authenticated Request</h3>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><pre><code class="language-javascript">// Example: Creating a cart with authentication
+const API_BASE = 'https://api.example.com';
+const AUTH_TOKEN = 'your_bearer_token_here';
+
+const response = await fetch(`${API_BASE}/carts`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${AUTH_TOKEN}`,
+    'Content-Type': 'application/ocs+json; version=1.0',
+    'Accept': 'application/ocs+json; version=1.0'
+  },
+  body: JSON.stringify({
+    storeId: 'store_123'
+  })
+});
+
+if (response.status === 401) {
+  console.error('Authentication failed - token invalid or expired');
+} else if (response.status === 403) {
+  console.error('Forbidden - insufficient permissions');
+} else {
+  const cart = await response.json();
+  console.log('Cart created:', cart);
+}</code></pre></div>
+                </div>
+
+                <h3>Error Responses</h3>
+
+                <div class="card">
+                    <h4>401 Unauthorized</h4>
+                    <p>Returned when the token is missing, invalid, or expired. The client should prompt the user to re-authenticate.</p>
+                    <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "code": "unauthorized",
+  "message": "Authentication credentials are required and are missing or invalid"
+}</code></pre></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>403 Forbidden</h4>
+                    <p>Returned when the token is valid but the user lacks permission to perform the requested action.</p>
+                    <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "code": "forbidden",
+  "message": "The client is not authorized to perform this action"
+}</code></pre></div>
+                    </div>
+                </div>
+
+                <h3>Discoverable Authentication Methods</h3>
+
+                <p>As OCS evolves, servers will be able to advertise their supported authentication methods via the capabilities endpoint. This allows clients to automatically adapt to different authentication requirements.</p>
+
                 <div class="info-box">
-                    <strong>Implementation Note</strong>
-                    Token formats (e.g., JWT, API keys, OAuth2) are implementation-specific and may be discoverable via the capabilities endpoint. Discovery endpoints (<span class="inline-code">/capabilities</span>, <span class="inline-code">/stores</span>, <span class="inline-code">/catalogs</span>) are public; all other endpoints require authentication.
+                    <strong>Future Direction</strong>
+                    Standard authentication capabilities are planned, such as <span class="inline-code">dev.ocs.auth.oauth2.pkce@1.0</span> or <span class="inline-code">dev.ocs.auth.siwe@1.0</span>. When implemented, clients will be able to discover authentication flows dynamically via <span class="inline-code">GET /capabilities</span>.
+                </div>
+
+                <h3>Best Practices</h3>
+
+                <ul>
+                    <li><strong>Secure token storage:</strong> Store tokens securely using platform-appropriate mechanisms (keychain, secure storage, etc.)</li>
+                    <li><strong>Token expiration:</strong> Handle token expiration gracefully with automatic refresh flows when possible</li>
+                    <li><strong>HTTPS only:</strong> Always use HTTPS in production to prevent token interception</li>
+                    <li><strong>Minimal scope:</strong> Request only the permissions needed for your application</li>
+                    <li><strong>Token rotation:</strong> Implement token rotation strategies for long-lived applications</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>Specification Reference</strong>
+                    For complete details on the security scheme and authentication flow, see the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L672-L677" target="_blank" style="color: var(--primary); text-decoration: underline;">securitySchemes section</a> in the OpenAPI spec.
                 </div>
             </section>
 
@@ -1891,11 +2033,18 @@ data: [
                 <div class="code-block"><pre><code class="language-text">Accept: application/ocs+json; version=1.0
 Content-Type: application/ocs+json; version=1.0</code></pre></div>
                 </div>
+
+                <div class="info-box">
+                    <strong>Note</strong>
+                    This content type is used throughout the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">OpenAPI specification</a> for all request and response bodies.
+                </div>
             </section>
 
             <!-- Schemas -->
             <section id="schemas">
                 <h2>Core Schemas</h2>
+
+                <p>OCS defines several core data structures used throughout the API. Below are examples of the most important schemas. For complete schema definitions including all fields, validation rules, and examples, consult the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L418" target="_blank" style="color: var(--primary); text-decoration: underline;">components/schemas section</a> of the OpenAPI spec.</p>
 
                 <h3>Money</h3>
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
@@ -1992,7 +2141,7 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
             <section id="error-handling">
                 <h2>Error Handling</h2>
 
-                <p>OCS uses standard HTTP status codes and provides detailed error responses:</p>
+                <p>OCS uses standard HTTP status codes and provides detailed error responses. For the complete list of error codes and response schemas, see the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L664-L670" target="_blank" style="color: var(--primary); text-decoration: underline;">Error schema</a> and <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L697-L727" target="_blank" style="color: var(--primary); text-decoration: underline;">responses section</a> in the OpenAPI spec.</p>
 
                 <div class="table-container">
                     <table>
