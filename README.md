@@ -234,12 +234,16 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | **`dev.ocs.order.digital_access@1.0`** | Order | Provides an array of objects containing access details for digital goods, such as download URLs or license keys. | [order/digital_access/v1.json](./schemas/order/digital_access/v1.json) |
 | **`dev.ocs.order.detailed_status@1.0`** | Order | Provides a rich, human-readable status (title, description, progress) for display in a UI, augmenting the core `status` field. | [order/detailed_status/v1.json](./schemas/order/detailed_status/v1.json) |
 | **`dev.ocs.order.cancellation@1.0`** | Order (Action) | Enables the workflow for cancelling an order via a dedicated endpoint, discoverable through the `Order.actions` field. | N/A (Workflow) |
-| **`dev.ocs.order.returns@1.0`** | Order (Action) | Enables a full lifecycle for item returns, including initiation and tracking via new `/returns` endpoints. | [order/returns/v1.json](./schemas/order/returns/v1.json) |
+| **`dev.ocs.order.returns@1.0`** | Order (Action) | Enables a discoverable workflow for item returns, initiated via an action on the Order and navigated via hypermedia links. | N/A (Workflow) |
 | **`dev.ocs.order.refunds@1.0`** | Order (Metadata) | Provides a standardized, auditable record of all monetary refunds associated with an order. | [order/refunds/v1.json](./schemas/order/refunds/v1.json) |
 | **`dev.ocs.promotions.discoverable@1.0`** | Store, Catalog | Allows a server to advertise publicly available promotions to clients. | [promotions/discoverable/v1.json](./schemas/promotions/discoverable/v1.json) |
 | **`dev.ocs.order.applied_promotions@1.0`** | Order | Provides a final, authoritative record of all value modifications on the completed order. | [order/applied_promotions/v1.json](./schemas/order/applied_promotions/v1.json) |
 | **`dev.ocs.order.fulfillment_intent@1.0`** | CreateOrderRequest | Allows a client to specify a precise fulfillment plan for the items in a cart, supporting mixed fulfillment and split orders. | [order/fulfillment_intent/v1.json](./schemas/order/fulfillment_intent/v1.json) |
 | **`dev.ocs.store.constraints@1.0`** | Store | Advertises server-side business rules (e.g., promotion policies, return windows) to help clients prevent errors. | [store/constraints/v1.json](./schemas/store/constraints/v1.json) |
+| **`dev.ocs.auth.flows@1.0`** | Server-wide | Provides URLs for authentication flows (sign-in, sign-out, profile, registration). | [auth/flows/v1.json](./schemas/auth/flows/v1.json) |
+| **`dev.ocs.product.search@1.0`** | Server-wide | Provides a URL template for product search with supported sort options. | [product/search/v1.json](./schemas/product/search/v1.json) |
+| **`dev.ocs.product.categorization@1.0`** | Product (`CatalogItem`) | Provides an ordered category path (breadcrumb) for navigation. | [product/categorization/v1.json](./schemas/product/categorization/v1.json) |
+| **`dev.ocs.product.relations@1.0`** | Product (`CatalogItem`) | Provides related products (recommendations, accessories, alternatives). | [product/relations/v1.json](./schemas/product/relations/v1.json) |
 
 <br />
 
@@ -279,8 +283,7 @@ OCS is a living standard. The future direction includes:
 | `/orders/{id}` | `GET` | Get the current state of an order. | Yes |
 | `/orders/{id}/updates` | `GET` | **Subscribe to real-time order updates via SSE.** | Yes |
 | `/orders/{id}/cancel` | `POST` | Request to cancel an order. | Yes |
-| `/returns` | `POST` | Initiate a return for items from an order. | Yes |
-| `/returns/{id}` | `GET` | Get the status of a specific return. | Yes |
+
 | `/carts/{cartId}/promotions` | `POST` | Apply or validate a promotion on a cart. | Yes |
 
 <br />

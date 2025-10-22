@@ -275,55 +275,6 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-    /returns:
-     post:
-       tags: [Ordering]
-       summary: Initiate a return for one or more items from an order
-       description: Creates a new Return object. This action is only available if advertised in the order's `actions` array.
-       security:
-         - bearerAuth: []
-       requestBody:
-         required: true
-         content:
-           application/ocs+json; version=1.0:
-             schema:
-               type: object
-               properties:
-                 orderId: { type: string, format: uuid }
-                 items:
-                   type: array
-                   items:
-                     type: object
-                     properties:
-                       cartItemId: { type: string }
-                       quantity: { type: integer }
-                 reason: { type: string }
-               required: [orderId, items]
-       responses:
-         '201':
-           description: The return request was successfully created.
-           content:
-             application/ocs+json; version=1.0:
-               schema: { $ref: '#/components/schemas/Return' }
-
-   /returns/{returnId}:
-     get:
-       tags: [Ordering]
-       summary: Get the status of a specific return
-       security:
-         - bearerAuth: []
-       parameters:
-         - name: returnId
-           in: path
-           required: true
-           schema: { type: string }
-       responses:
-         '200':
-           description: The Return object.
-           content:
-             application/ocs+json; version=1.0:
-               schema: { $ref: '#/components/schemas/Return' }
-
 components:
   schemas:
     # --- Capability Discovery Schemas ---
@@ -346,6 +297,9 @@ components:
           format: uri
           description: "The URL pointing to the JSON Schema that defines the structure for this capability's metadata."
           example: "https://schemas.ocs.dev/product/variants/v1.json"
+        metadata:
+          type: object
+          description: "Optional metadata providing implementation-specific details for this capability, such as endpoint URLs or configuration options."
 
     # --- OCS Core Schemas ---
     Money:
@@ -587,12 +541,11 @@ components:
                 id: { type: "string", enum: ["cancel", "initiate_return", "add_rating"] }
                 href: { type: "string", format: "uri", description: "The API endpoint to call to perform this action." }
               required: [id, href]
-          returnIds:
+          returns:
             type: array
-            description: "An array of IDs for any Return objects associated with this order."
+            description: "A list of summaries for any returns associated with this order."
             items:
-              type: string
-              format: uuid
+              $ref: '#/components/schemas/ReturnSummary'
           items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
          total: { $ref: '#/components/schemas/Money' }
          deliveryAddress: { $ref: '#/components/schemas/Location' }
@@ -613,28 +566,50 @@ components:
              - "dev.ocs.order.detailed_status@1.0"
         required: [id, status, items, total, createdAt, updatedAt]
 
-     Return:
-       type: object
-       description: "A Return object representing a return request and its lifecycle."
-       properties:
-         id: { type: string, format: uuid, description: "The unique identifier for this return." }
-         originalOrderId: { type: string, format: uuid }
-         status:
-           type: string
-           enum: [requested, approved, rejected, in_transit, received, processed, completed]
-           description: "The current status of the return workflow."
-         items:
-           type: array
-           items:
-             type: object
-             properties:
-               cartItemId: { type: string, description: "The ID of the item from the original order." }
-               quantity: { type: integer }
-         reason: { type: string, description: "The reason the user provided for the return." }
-         returnLabelUrl: { type: string, format: uri, description: "A URL to a printable shipping label for the user." }
-         createdAt: { type: string, format: date-time }
-         updatedAt: { type: string, format: date-time }
-       required: [id, originalOrderId, status, items, createdAt, updatedAt]
+      InitiateReturnRequest:
+        type: object
+        description: "The request body for initiating a return for items from an order."
+        properties:
+          items:
+            type: array
+            description: "The list of items and quantities to be returned."
+            items:
+              type: object
+              properties:
+                cartItemId: { type: string, description: "The ID of the item from the original order." }
+                quantity: { type: integer, minimum: 1 }
+              required: [cartItemId, quantity]
+          reason: { type: string, description: "The user-provided reason for the return." }
+        required: [items, reason]
+
+      ReturnSummary:
+        type: object
+        description: "A summary of a return, intended for embedding in the Order object."
+        properties:
+          id: { type: string, format: "uuid", description: "The unique ID of the return." }
+          status: { type: string, enum: ["requested", "approved", "rejected", "in_transit", "received", "processed", "completed"] }
+          href: { type: string, format: "uri", description: "The URL to fetch the full Return object." }
+        required: [id, status, href]
+
+      Return:
+        type: object
+        description: "The full Return object, representing the complete state of a return workflow."
+        properties:
+          id: { type: string, format: "uuid" }
+          orderHref: { type: string, format: "uri", description: "A link back to the original Order." }
+          status: { type: string, enum: ["requested", "approved", "rejected", "in_transit", "received", "processed", "completed"] }
+          items:
+            type: array
+            items:
+              type: object
+              properties:
+                cartItemId: { type: string, description: "The ID of the item from the original order." }
+                quantity: { type: integer }
+          reason: { type: string }
+          returnLabelUrl: { type: string, format: "uri", description: "A URL to a printable shipping label." }
+          createdAt: { type: string, format: "date-time" }
+          updatedAt: { type: string, format: "date-time" }
+        required: [id, orderHref, status, items, createdAt, updatedAt]
 
      JsonPatchOperation:
       type: object

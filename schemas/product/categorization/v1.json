@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "description": "Schema for providing an ordered category path (breadcrumb) for a product (dev.ocs.product.categorization@1.0).",
+  "items": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The display name of the category (e.g., 'Men's Footwear')."
+      },
+      "href": {
+        "type": "string",
+        "format": "uri",
+        "description": "A link to the category page, which could be an OCS search endpoint (e.g., '/search?category=mens-footwear')."
+      }
+    },
+    "required": ["name", "href"]
+  }
+}

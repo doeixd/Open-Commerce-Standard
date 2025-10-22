@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for discovering the product search endpoint (dev.ocs.product.search@1.0).",
+  "properties": {
+    "urlTemplate": {
+      "type": "string",
+      "description": "An RFC 6570 URL Template for the search endpoint. The client should substitute the required variables.",
+      "example": "https://api.example.com/products/search?q={query}&sort={sortBy}"
+    },
+    "supportedSorts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "A list of valid values for the {sortBy} variable.",
+      "example": ["relevance", "price_asc", "price_desc"]
+    }
+  },
+  "required": ["urlTemplate"]
+}

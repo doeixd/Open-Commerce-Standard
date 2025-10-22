@@ -688,8 +688,8 @@
 
             <div class="nav-section">
                 <div class="nav-section-title">Core Concepts</div>
-                <a href="#x402-protocol" class="nav-link">X402 Protocol</a>
                 <a href="#core-concepts" class="nav-link">Core Concepts</a>
+                <a href="#hypermedia-engine" class="nav-link">Hypermedia Engine</a>
                 <a href="#universal-client" class="nav-link">Universal Client Example</a>
                 <a href="#capabilities" class="nav-link">Capabilities Reference</a>
             </div>
@@ -849,17 +849,7 @@
                          <div class="description">Request to cancel an order</div>
                      </div>
 
-                     <div class="quick-ref-card">
-                         <h4>Initiate Return</h4>
-                         <div class="method">POST /returns</div>
-                         <div class="description">Start a return for order items</div>
-                     </div>
 
-                     <div class="quick-ref-card">
-                         <h4>Get Return Status</h4>
-                         <div class="method">GET /returns/{id}</div>
-                         <div class="description">Check return progress</div>
-                     </div>
                  </div>
 
                 <h3>Quick Start Code</h3>
@@ -1605,6 +1595,143 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                 </div>
             </section>
 
+            <!-- The OCS Hypermedia Engine -->
+            <section id="hypermedia-engine">
+                <h2>The OCS Hypermedia Engine: An API That Guides You</h2>
+
+                <p>In many APIs, the developer's first step is to read the documentation and hardcode a long list of URL paths into their application. The Open Commerce Standard (OCS) is designed on a more powerful and resilient principle: <strong>Hypermedia as the Engine of Application State (HATEOAS)</strong>.</p>
+
+                <p>This sounds complex, but the idea is simple: <strong>instead of memorizing paths, your client "discovers" them.</strong> The API itself tells you what you can do next and provides the exact URLs needed to do it.</p>
+
+                <div class="info-box">
+                    <strong>Core Principle:</strong>
+                    A client should only need to know a single, fixed entry point (e.g., <code>https://api.example.com</code>). Every other action and resource should be discoverable by following links and actions provided by the API in its responses.
+                </div>
+
+                <h3>Why Work This Way?</h3>
+
+                <p>This isn't just an academic exercise; it creates a fundamentally better and more robust integration.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔗</div>
+                        <div class="feature-title">1. No More Brittle URLs</div>
+                        <div class="feature-description">If a server needs to evolve its URL structure (e.g., from <code>/v1/returns</code> to <code>/v2/return-requests</code>), a client that follows links will <strong>never break</strong>. A client with hardcoded URLs would fail instantly. This makes the entire ecosystem more resilient.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-title">2. A Self-Discovering API</div>
+                        <div class="feature-description">Your application learns the API as it uses it. The presence of a link or an action is the signal that a feature is available. This removes guesswork and the need to constantly consult documentation for every endpoint.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-title">3. Dynamic, Context-Aware UIs</div>
+                        <div class="feature-description">The API provides the logic for your UI. Instead of your client code deciding when to show a "Write a Review" button, the API makes the decision. If the action is present in the response, you show the button. If not, you don't.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <div class="feature-title">4. True Server Freedom</div>
+                        <div class="feature-description">OCS doesn't dictate a server's internal architecture. Your returns system can live on a completely different microservice with a different URL structure, and as long as you provide the correct links, any OCS client can use it seamlessly.</div>
+                    </div>
+                </div>
+
+                <h3>How It Works: Two Types of Discovery</h3>
+
+                <p>OCS uses two primary mechanisms for this hypermedia-driven discovery.</p>
+
+                <h4>1. Global Discovery: The <code>/capabilities</code> Endpoint</h4>
+
+                <p>The first thing your client does is ask the server what it's capable of. This is for server-wide features that aren't tied to a specific product or order.</p>
+
+                <p><strong>Example: Discovering Authentication and Search</strong></p>
+
+                <p>A client makes a <code>GET /capabilities</code> request and receives the "table of contents" for the API:</p>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><pre><code class="language-json">{
+  "capabilities": [
+    {
+      "id": "dev.ocs.auth.flows@1.0",
+      "metadata": {
+        "signInUrl": "https://auth.example.com/login",
+        "profileUrl": "https://api.example.com/users/me"
+      }
+    },
+    {
+      "id": "dev.ocs.product.search@1.0",
+      "metadata": {
+        "urlTemplate": "https://api.example.com/search?q={query}"
+      }
+    }
+  ]
+}</code></pre></div>
+                </div>
+
+                <p>From this single response, your client now knows:</p>
+                <ul>
+                    <li><strong>How to sign in:</strong> It doesn't need to know the path is <code>/login</code>; it just uses the <code>signInUrl</code> provided.</li>
+                    <li><strong>How to search:</strong> It doesn't need to guess the query parameter is <code>q</code>; it uses the <code>urlTemplate</code> to construct a valid search request.</li>
+                </ul>
+
+                <h4>2. Contextual Discovery: The <code>actions</code> Array</h4>
+
+                <p>This is the most powerful feature. Core resources like <code>Order</code> and <code>CatalogItem</code> will tell you what actions you can perform on them <em>in their current state</em>.</p>
+
+                <p><strong>Example: A Discoverable Returns Workflow</strong></p>
+
+                <ol>
+                    <li>A user views a recently delivered order. Your client makes a <code>GET /orders/order_123</code>.</li>
+                    <li>The server checks its business logic. Because the order is within the 30-day return window, it includes an <code>initiate_return</code> action in the response:</li>
+                </ol>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><pre><code class="language-json">{
+  "id": "order_123",
+  "status": "completed",
+  "actions": [
+    {
+      "id": "initiate_return",
+      "href": "https://api.example.com/v2/order/order_123/return-requests"
+    }
+  ],
+  "items": [...]
+}</code></pre></div>
+                </div>
+
+                <ol start="3">
+                    <li>Your client's logic is now incredibly simple:</li>
+                </ol>
+
+                <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><pre><code class="language-javascript">// Pseudo-code for a UI component
+const returnAction = order.actions.find(action => action.id === 'initiate_return');
+
+if (returnAction) {
+  // The action is present, so we show the button
+  showReturnButton({
+    // We tell the button exactly which URL to POST to
+    onClick: () => postTo(returnAction.href)
+  });
+}</code></pre></div>
+                </div>
+
+                <p>If the same order were 60 days old, the server would simply omit the <code>initiate_return</code> action from the <code>actions</code> array. The exact same client code would run, find nothing, and the "Return Items" button would never be rendered. The business logic lives on the server, where it belongs, and the client intelligently adapts.</p>
+
+                <p>This same pattern is used for:</p>
+                <ul>
+                    <li><strong>Cancellations:</strong> The <code>cancel</code> action only appears if an order is cancellable.</li>
+                    <li><strong>Writing Reviews:</strong> The <code>add_review</code> action only appears on a <code>CatalogItem</code> if the logged-in user has purchased it.</li>
+                </ul>
+
+                <div class="info-box success">
+                    <strong>The Result</strong>
+                    By embracing this hypermedia-driven approach, the Open Commerce Standard provides a blueprint for a truly modern, resilient, and intelligent commerce ecosystem.
+                </div>
+            </section>
+
             <!-- Universal Client Example -->
             <section id="universal-client">
                 <h2>Example: A Universal Client Buys a T-Shirt</h2>
@@ -1821,11 +1948,11 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/
                                 <td>Order (Action)</td>
                                 <td>Enables the workflow for cancelling an order via a dedicated endpoint, discoverable through the Order.actions field.</td>
                             </tr>
-                            <tr>
-                                <td><span class="inline-code">dev.ocs.order.returns@1.0</span></td>
-                                <td>Order (Action)</td>
-                                <td>Enables a full lifecycle for item returns, including initiation and tracking via new /returns endpoints.</td>
-                            </tr>
+                             <tr>
+                                 <td><span class="inline-code">dev.ocs.order.returns@1.0</span></td>
+                                 <td>Order (Action)</td>
+                                 <td>Enables a discoverable workflow for item returns, initiated via an action on the Order and navigated via hypermedia links.</td>
+                             </tr>
                              <tr>
                                  <td><span class="inline-code">dev.ocs.order.refunds@1.0</span></td>
                                  <td>Order (Metadata)</td>
@@ -1835,6 +1962,26 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking@1.0/
                                  <td><span class="inline-code">dev.ocs.store.constraints@1.0</span></td>
                                  <td>Store</td>
                                  <td>Advertises server-side business rules (e.g., promotion policies, return windows) to help clients prevent errors.</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">dev.ocs.auth.flows@1.0</span></td>
+                                 <td>Server-wide</td>
+                                 <td>Provides URLs for authentication flows (sign-in, sign-out, profile, registration).</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">dev.ocs.product.search@1.0</span></td>
+                                 <td>Server-wide</td>
+                                 <td>Provides a URL template for product search with supported sort options.</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">dev.ocs.product.categorization@1.0</span></td>
+                                 <td>Product (CatalogItem)</td>
+                                 <td>Provides an ordered category path (breadcrumb) for navigation.</td>
+                             </tr>
+                             <tr>
+                                 <td><span class="inline-code">dev.ocs.product.relations@1.0</span></td>
+                                 <td>Product (CatalogItem)</td>
+                                 <td>Provides related products (recommendations, accessories, alternatives).</td>
                              </tr>
                          </tbody>
                     </table>

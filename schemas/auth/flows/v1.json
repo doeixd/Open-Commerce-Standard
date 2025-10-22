@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "description": "Schema for discovering authentication-related endpoints (dev.ocs.auth.flows@1.0).",
+  "properties": {
+    "signInUrl": { "type": "string", "format": "uri", "description": "The endpoint to initiate a sign-in flow." },
+    "signOutUrl": { "type": "string", "format": "uri", "description": "The endpoint to call to sign the user out." },
+    "profileUrl": { "type": "string", "format": "uri", "description": "The endpoint to fetch the current user's profile." },
+    "registrationUrl": { "type": "string", "format": "uri", "description": "The endpoint to initiate a new user registration flow." }
+  },
+  "required": ["signInUrl", "signOutUrl", "profileUrl"]
+}
