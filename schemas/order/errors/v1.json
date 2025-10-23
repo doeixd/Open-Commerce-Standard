@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/order/errors/v1.json",
+  "title": "Order Error Schema (RFC 9457 Compliant)",
+  "description": "Standard problem details for order operations, aligned with RFC 9457 for consistent HTTP API error handling.",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI reference identifying the problem type (e.g., https://schemas.ocs.dev/errors/order-not-found)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short, human-readable summary of the problem"
+    },
+    "status": {
+      "type": "integer",
+      "description": "HTTP status code for this occurrence"
+    },
+    "detail": {
+      "type": "string",
+      "description": "Human-readable explanation specific to this occurrence"
+    },
+    "instance": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI reference identifying the specific occurrence (optional)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the error occurred (optional)"
+    },
+    "localizationKey": {
+      "type": "string",
+      "description": "I18n key for localized user messages (extension)"
+    },
+    "nextActions": {
+      "type": "array",
+      "description": "Suggested recovery actions (extension)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Programmatic identifier for the action"
+          },
+          "href": {
+            "type": "string",
+            "format": "uri",
+            "description": "Endpoint to call for this action"
+          },
+          "method": {
+            "type": "string",
+            "enum": ["GET", "POST", "PATCH", "DELETE"],
+            "description": "HTTP method for the action"
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-readable title for the action"
+          },
+          "requestSchema": {
+            "type": "object",
+            "description": "JSON Schema for the request body (if applicable)"
+          },
+          "responseSchema": {
+            "type": "object",
+            "description": "JSON Schema for the expected response"
+          }
+        },
+        "required": ["id", "href", "method"]
+      }
+    },
+
+  },
+  "required": ["type", "title"],
+  "examples": [
+    {
+      "type": "https://schemas.ocs.dev/errors/order-not-found",
+      "title": "Order Not Found",
+      "status": 404,
+      "detail": "The requested order does not exist.",
+      "instance": "https://api.example.com/orders/123",
+      "timestamp": "2023-10-23T12:00:00Z"
+    },
+    {
+      "type": "https://schemas.ocs.dev/errors/order-not-cancellable",
+      "title": "Order Not Cancellable",
+      "status": 400,
+      "detail": "Order cannot be cancelled in its current state.",
+      "instance": "https://api.example.com/orders/123/cancel",
+      "timestamp": "2023-10-23T12:00:00Z",
+      "localizationKey": "error.order.not_cancellable"
+    }
+  ]
+}

@@ -42,14 +42,16 @@ info:
     X-RateLimit-Remaining: 0
     X-RateLimit-Reset: 1698105600
     Retry-After: 120
-    Content-Type: application/ocs+json; version=1.0
+    Content-Type: application/problem+json
 
     {
-      "code": "rate_limit_exceeded",
-      "message": "Rate limit of 100 requests per minute exceeded",
-      "userMessage": {
-        "localizationKey": "error.rate_limit.exceeded"
-      }
+      "type": "https://schemas.ocs.dev/errors/rate-limit-exceeded",
+      "title": "Rate Limit Exceeded",
+      "status": 429,
+      "detail": "Rate limit of 100 requests per minute exceeded",
+      "instance": "https://api.example.com/some-endpoint",
+      "timestamp": "2023-10-23T12:00:00Z",
+      "localizationKey": "error.rate_limit.exceeded"
     }
     ```
 
@@ -268,29 +270,35 @@ paths:
         '404':
           description: Cart not found
           content:
-            application/ocs+json; version=1.0:
+            application/problem+json:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                code: "cart_not_found"
-                message: "Cart does not exist or has been submitted"
+                type: "https://schemas.ocs.dev/errors/cart-not-found"
+                title: "Cart Not Found"
+                status: 404
+                detail: "Cart does not exist or has been submitted"
+                instance: "https://api.example.com/carts/123"
+                timestamp: "2023-10-23T12:00:00Z"
         '410':
           description: Cart expired
           content:
-            application/ocs+json; version=1.0:
+            application/problem+json:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                code: "cart_expired"
-                message: "Cart expired after 3600 seconds of inactivity"
-                userMessage:
-                  localizationKey: "error.cart.expired"
-                  params:
-                    lifetimeSeconds: 3600
+                type: "https://schemas.ocs.dev/errors/cart-expired"
+                title: "Cart Expired"
+                status: 410
+                detail: "Cart expired after 3600 seconds of inactivity"
+                instance: "https://api.example.com/carts/123"
+                timestamp: "2023-10-23T12:00:00Z"
+                localizationKey: "error.cart.expired"
                 nextActions:
                   - id: "create_new_cart"
                     href: "/carts"
                     method: "POST"
+                    title: "Create New Cart"
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -1597,92 +1605,62 @@ components:
     Error:
       type: object
       description: |
-        A structured error response that communicates with the machine, the developer, and the end-user.
+        RFC 9457-compliant problem detail object for structured error responses.
 
         See `x-error-catalog` in components for comprehensive specifications of all error codes, including HTTP status codes, retry strategies, common causes, and suggested recovery actions.
       properties:
-        code:
+        type:
           type: string
-          description: "A specific, machine-readable error code for programmatic handling."
-          enum:
-            # General
-            - bad_request
-            - unauthorized
-            - forbidden
-            - not_found
-            - conflict
-            - server_error
-            # Idempotency
-            - idempotency_key_reused
-            # Cart & Product
-            - cart_not_found
-            - cart_expired
-            - cart_already_submitted
-            - cart_empty
-            - cart_multi_store_limit_exceeded
-            - product_unavailable
-            - product_customization_invalid
-            # Promotions
-            - promotion_invalid
-            - promotion_expired
-            - promotion_not_applicable
-            - promotion_stacking_not_allowed
-            # Fulfillment & Ordering
-            - delivery_address_required
-            - delivery_address_invalid
-            - fulfillment_intent_incomplete
-            - fulfillment_intent_duplicate_item
-             - fulfillment_method_invalid
-             - order_request_invalid
-             - order_items_unavailable
-             - insufficient_stock
-             - invalid_quantity
-             - geographic_restriction
-             - minimum_order_value
-             - service_unavailable
-             - payment_method_unsupported
-             # Payments
-            - payment_failed
-            # Cancellation & Returns
-            - cancellation_window_expired
-            - order_already_cancelled
-            - order_not_cancellable
-            - return_policy_violated
-            - return_window_expired
-            # Rate Limiting
-            - rate_limit_exceeded
-        message:
+          format: uri
+          description: "URI reference identifying the problem type."
+        title:
           type: string
-          description: "A developer-facing, human-readable message, NOT for display to the end-user."
-        details:
-          type: array
-          description: "An array of structured objects providing deep context about the error."
-          items:
-            oneOf:
-              - $ref: '#/components/schemas/ValidationIssue'
-              - $ref: '#/components/schemas/BusinessLogicIssue'
-        userMessage:
-          type: object
-          description: "A localization-friendly, user-safe message. The client should use this to build the UI message."
-          properties:
-            localizationKey:
-              type: string
-              description: "An i18n key the client can use to look up a translated string."
-              example: "error.promotion.expired"
-            params:
-              type: object
-              description: "A key-value map of parameters to inject into the localized string."
-              example: { "code": "WINTER20", "expiryDate": "2024-01-31" }
+          description: "Short, human-readable summary of the problem."
+        status:
+          type: integer
+          description: "HTTP status code for this occurrence."
+        detail:
+          type: string
+          description: "Human-readable explanation specific to this occurrence."
+        instance:
+          type: string
+          format: uri
+          description: "URI reference identifying the specific occurrence (optional)."
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp when the error occurred (optional)."
+        localizationKey:
+          type: string
+          description: "I18n key for localized user messages (extension)."
         nextActions:
           type: array
-          description: "A list of suggested, valid actions the client can take to recover from this error."
+          description: "Suggested recovery actions (extension)."
           items:
             type: object
             properties:
-              id: { type: string, description: "A programmatic identifier for the action." }
-              href: { type: string, format: "uri", description: "The endpoint to call for this action." }
-              method: { type: string, enum: ["GET", "POST", "PATCH", "DELETE"] }
-      required: [code, message]
+              id:
+                type: string
+                description: "Programmatic identifier for the action."
+              href:
+                type: string
+                format: uri
+                description: "Endpoint to call for this action."
+              method:
+                type: string
+                enum: [GET, POST, PATCH, DELETE]
+                description: "HTTP method for the action."
+              title:
+                type: string
+                description: "Human-readable title for the action."
+              requestSchema:
+                type: object
+                description: "JSON Schema for the request body (if applicable)."
+              responseSchema:
+                type: object
+                description: "JSON Schema for the expected response."
+            required: [id, href, method]
+      required: [type, title]
 
   # --- Error Catalog ---
   # Machine-readable error specifications providing detailed context for every error code.
@@ -2241,25 +2219,25 @@ components:
     Unauthorized:
       description: Authentication credentials are required and are missing or invalid.
       content:
-        application/ocs+json; version=1.0:
+        application/problem+json:
           schema: { $ref: '#/components/schemas/Error' }
     Forbidden:
       description: The client is not authorized to perform this action.
       content:
-        application/ocs+json; version=1.0:
+        application/problem+json:
           schema: { $ref: '#/components/schemas/Error' }
     NotFound:
       description: The requested resource could not be found.
       content:
-        application/ocs+json; version=1.0:
+        application/problem+json:
           schema: { $ref: '#/components/schemas/Error' }
     Conflict:
       description: A conflict occurred, such as a reused idempotency key with a different request body.
       content:
-        application/ocs+json; version=1.0:
+        application/problem+json:
           schema: { $ref: '#/components/schemas/Error' }
     ServerError:
       description: An unexpected server error occurred.
       content:
-        application/ocs+json; version=1.0:
+        application/problem+json:
           schema: { $ref: '#/components/schemas/Error' }

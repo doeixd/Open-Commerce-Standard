@@ -26,7 +26,7 @@
     "watch": "pridepack watch",
     "start": "pridepack start",
     "dev": "pridepack dev",
-    "test": "vitest"
+    "test": "vitest --run"
   },
   "private": false,
   "description": "Open Commerce Standard (OCS) - HTTP-native API for digital commerce",

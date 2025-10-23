@@ -26,6 +26,27 @@
     "autoMergeOnLogin": {
       "type": "boolean",
       "description": "Whether anonymous carts are automatically merged with authenticated user carts upon login. If omitted, merge behavior is server-specific."
+    },
+    "errorSchemas": {
+      "type": "array",
+      "description": "Standard RFC 9457-compliant error schemas for cart operations.",
+      "items": {
+        "$ref": "https://schemas.ocs.dev/cart/errors/v1.json"
+      },
+      "example": [
+        {
+          "type": "https://schemas.ocs.dev/errors/cart-not-found",
+          "title": "Cart Not Found",
+          "status": 404,
+          "detail": "Cart not found or has expired"
+        },
+        {
+          "type": "https://schemas.ocs.dev/errors/invalid-quantity",
+          "title": "Invalid Quantity",
+          "status": 400,
+          "detail": "Validation error in cart item"
+        }
+      ]
     }
   }
 }

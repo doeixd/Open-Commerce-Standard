@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/cart/errors/v1.json",
+  "title": "Cart Error Schema (RFC 9457 Compliant)",
+  "description": "Standard problem details for cart operations, aligned with RFC 9457 for consistent HTTP API error handling.",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI reference identifying the problem type (e.g., https://schemas.ocs.dev/errors/cart-not-found)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short, human-readable summary of the problem"
+    },
+    "status": {
+      "type": "integer",
+      "description": "HTTP status code for this occurrence"
+    },
+    "detail": {
+      "type": "string",
+      "description": "Human-readable explanation specific to this occurrence"
+    },
+    "instance": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI reference identifying the specific occurrence (optional)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the error occurred (optional)"
+    },
+    "localizationKey": {
+      "type": "string",
+      "description": "I18n key for localized user messages (extension)"
+    },
+    "nextActions": {
+      "type": "array",
+      "description": "Suggested recovery actions (extension)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Programmatic identifier for the action"
+          },
+          "href": {
+            "type": "string",
+            "format": "uri",
+            "description": "Endpoint to call for this action"
+          },
+          "method": {
+            "type": "string",
+            "enum": ["GET", "POST", "PATCH", "DELETE"],
+            "description": "HTTP method for the action"
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-readable title for the action"
+          },
+          "requestSchema": {
+            "type": "object",
+            "description": "JSON Schema for the request body (if applicable)"
+          },
+          "responseSchema": {
+            "type": "object",
+            "description": "JSON Schema for the expected response"
+          }
+        },
+        "required": ["id", "href", "method"]
+      }
+    }
+  },
+    "title": {
+      "type": "string",
+      "description": "Short, human-readable summary of the problem"
+    },
+    "status": {
+      "type": "integer",
+      "description": "HTTP status code for this occurrence"
+    },
+    "detail": {
+      "type": "string",
+      "description": "Human-readable explanation specific to this occurrence"
+    },
+    "instance": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI reference identifying the specific occurrence (optional)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the error occurred (optional)"
+    },
+    "code": {
+      "type": "string",
+      "description": "Legacy error code for backward compatibility (extension)"
+    },
+    "details": {
+      "type": "object",
+      "description": "Additional error details, such as field-specific validation errors (extension)",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The field that caused the error"
+        },
+        "value": {
+          "type": "string",
+          "description": "The invalid value provided"
+        },
+        "constraint": {
+          "type": "string",
+          "description": "The constraint that was violated"
+        }
+      }
+    }
+  },
+  "required": ["type", "title"],
+  "examples": [
+    {
+      "type": "https://schemas.ocs.dev/errors/item-not-available",
+      "title": "Item Not Available",
+      "status": 400,
+      "detail": "The requested item is no longer available for purchase.",
+      "instance": "https://api.example.com/carts/123/items/add/456",
+      "timestamp": "2023-10-23T12:00:00Z"
+    },
+    {
+      "type": "https://schemas.ocs.dev/errors/invalid-quantity",
+      "title": "Invalid Quantity",
+      "status": 400,
+      "detail": "Quantity must be a positive integer.",
+      "instance": "https://api.example.com/carts/123/items/add/456",
+      "timestamp": "2023-10-23T12:00:00Z"
+    },
+    {
+      "type": "https://schemas.ocs.dev/errors/cart-expired",
+      "title": "Cart Expired",
+      "status": 410,
+      "detail": "Your cart has expired due to inactivity.",
+      "instance": "https://api.example.com/carts/123",
+      "timestamp": "2023-10-23T12:00:00Z",
+      "localizationKey": "error.cart.expired",
+      "nextActions": [
+        {
+          "id": "create_new_cart",
+          "href": "/carts",
+          "method": "POST",
+          "title": "Create New Cart",
+          "requestSchema": {
+            "type": "object",
+            "properties": {
+              "storeId": { "type": "string" }
+            }
+          },
+          "responseSchema": {
+            "$ref": "https://schemas.ocs.dev/cart/v1.json"
+          }
+        }
+      ]
+    }
+  ]
+}

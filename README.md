@@ -551,23 +551,34 @@ if (hasCart && hasDirect) {
 
 OCS provides a comprehensive, machine-readable error catalog in the OpenAPI specification that defines every error code's behavior, common causes, and recovery strategies.
 
-### Structured Error Response
+### RFC 9457 Compliant Error Response
 
-All errors follow a consistent structure:
+All errors follow RFC 9457 problem details format with extensions for backward compatibility:
 
 ```json
 {
-  "code": "cart_expired",
-  "message": "Cart expired after 3600 seconds of inactivity",
-  "userMessage": {
-    "localizationKey": "error.cart.expired",
-    "params": { "lifetimeSeconds": 3600 }
-  },
+  "type": "https://schemas.ocs.dev/errors/cart-expired",
+  "title": "Cart Expired",
+  "status": 410,
+  "detail": "Cart expired after 3600 seconds of inactivity",
+  "instance": "https://api.example.com/carts/123",
+  "timestamp": "2023-10-23T12:00:00Z",
+  "localizationKey": "error.cart.expired",
   "nextActions": [
     {
       "id": "create_new_cart",
       "href": "/carts",
-      "method": "POST"
+      "method": "POST",
+      "title": "Create New Cart",
+      "requestSchema": {
+        "type": "object",
+        "properties": {
+          "storeId": { "type": "string" }
+        }
+      },
+      "responseSchema": {
+        "$ref": "https://schemas.ocs.dev/cart/v1.json"
+      }
     }
   ]
 }
@@ -583,19 +594,17 @@ When a cart expires due to inactivity:
 try {
   await createOrder({ cartId });
 } catch (error) {
-  if (error.code === 'cart_expired') {
-    // Persist items locally
-    const items = getCurrentCartItems();
-    localStorage.setItem('pendingCartItems', JSON.stringify(items));
-
-    // Recreate cart
-    const newCart = await createCart({ storeId });
-    for (const item of items) {
-      await addToCart(newCart.id, item);
+  if (error.type?.endsWith('/cart-expired')) {
+    // Use nextActions for automated recovery
+    const createAction = error.nextActions?.find(a => a.id === 'create_new_cart');
+    if (createAction) {
+      const newCart = await ocsRequest(createAction.href, {
+        method: createAction.method,
+        body: JSON.stringify({ storeId: 'main' })
+      });
+      // Add items and retry
+      return createOrder({ cartId: newCart.id });
     }
-
-    // Retry order
-    return createOrder({ cartId: newCart.id });
   }
 }
 ```
@@ -607,7 +616,7 @@ try {
 The cart may have been converted to an order:
 
 ```javascript
-if (error.code === 'cart_not_found') {
+if (error.type?.endsWith('/cart-not-found')) {
   // Check if cart became an order
   const orders = await fetch('/orders').then(r => r.json());
   const recentOrder = orders.orders.find(o => o.createdAt > lastCartUpdate);

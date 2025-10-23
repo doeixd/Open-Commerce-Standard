@@ -21,6 +21,27 @@
     "splitOrders": {
       "type": "boolean",
       "description": "Whether checkout creates separate orders per store (true) or a single combined order (false)."
+    },
+    "errorSchemas": {
+      "type": "array",
+      "description": "Standard RFC 9457-compliant error schemas for multi-store cart operations.",
+      "items": {
+        "$ref": "https://schemas.ocs.dev/cart/errors/v1.json"
+      },
+      "example": [
+        {
+          "type": "https://schemas.ocs.dev/errors/max-stores-exceeded",
+          "title": "Max Stores Exceeded",
+          "status": 400,
+          "detail": "Cart exceeds maximum number of stores"
+        },
+        {
+          "type": "https://schemas.ocs.dev/errors/store-not-supported",
+          "title": "Store Not Supported",
+          "status": 400,
+          "detail": "One or more stores are not supported in this cart"
+        }
+      ]
     }
   },
   "required": ["taxCalculation", "shippingCalculation", "splitOrders"]

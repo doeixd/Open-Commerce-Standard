@@ -477,17 +477,20 @@ Use OCS structured errors with `nextActions` for recovery:
 
 ```json
 {
-  "code": "payment_auth_failed",
-  "message": "SPC authentication failed",
-  "userMessage": {
-    "localizationKey": "error.payment.auth_failed"
-  },
+  "type": "https://schemas.ocs.dev/errors/payment-auth-failed",
+  "title": "Payment Authentication Failed",
+  "status": 402,
+  "detail": "SPC authentication failed",
+  "instance": "https://api.example.com/orders/123/payment",
+  "timestamp": "2023-10-23T12:00:00Z",
+  "localizationKey": "error.payment.auth_failed",
   "nextActions": [
     {
       "id": "retry_with_fallback",
       "href": "/orders",
-      "method": "POST"
-    },
+      "method": "POST",
+      "title": "Retry with Fallback Payment"
+    }
     {
       "id": "use_manual_entry",
       "href": "/orders",

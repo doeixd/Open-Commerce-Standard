@@ -156,10 +156,16 @@ app.get('/catalogs', (req, res) => {
 // 4. Get Catalog with Products
 app.get('/catalogs/:id', (req, res) => {
   if (req.params.id !== 'main') {
-    return res.status(404).json({
-      code: 'catalog_not_found',
-      message: 'Catalog not found',
-    });
+    return res.status(404)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/catalog-not-found',
+        title: 'Catalog Not Found',
+        status: 404,
+        detail: 'Catalog not found',
+        instance: `http://localhost:${PORT}/catalogs/${req.params.id}`,
+        timestamp: new Date().toISOString()
+      });
   }
 
   res.json({
@@ -174,6 +180,21 @@ app.get('/catalogs/:id', (req, res) => {
 
 // 5. Create Cart
 app.post('/carts', requireAuth, (req, res) => {
+  // Check max concurrent carts
+  if (store.carts.length >= 5) { // Example limit
+    return res.status(400)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/max-concurrent-carts-exceeded',
+        title: 'Max Concurrent Carts Exceeded',
+        status: 400,
+        detail: 'Maximum number of concurrent carts exceeded',
+        instance: `http://localhost:${PORT}/carts`,
+        timestamp: new Date().toISOString(),
+        localizationKey: 'error.cart.max_concurrent_exceeded'
+      });
+  }
+
   const cart = {
     id: `cart_${Date.now()}`,
     storeId: req.body.storeId || 'demo_store',
@@ -191,10 +212,17 @@ app.get('/carts/:id', requireAuth, (req, res) => {
   const cart = store.carts.find(c => c.id === req.params.id);
 
   if (!cart) {
-    return res.status(404).json({
-      code: 'cart_not_found',
-      message: 'Cart not found or expired',
-    });
+    return res.status(404)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/cart-not-found',
+        title: 'Cart Not Found',
+        status: 404,
+        detail: 'Cart not found or expired',
+        instance: `http://localhost:${PORT}/carts/${req.params.id}`,
+        timestamp: new Date().toISOString(),
+        localizationKey: 'error.cart.not_found'
+      });
   }
 
   res.json(cart);
@@ -205,19 +233,96 @@ app.post('/carts/:id/items', requireAuth, (req, res) => {
   const cart = store.carts.find(c => c.id === req.params.id);
 
   if (!cart) {
-    return res.status(404).json({
-      code: 'cart_not_found',
-      message: 'Cart not found or expired',
-    });
+    return res.status(404)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/cart-not-found',
+        title: 'Cart Not Found',
+        status: 404,
+        detail: 'Cart not found or expired',
+        instance: `http://localhost:${PORT}/carts/${req.params.id}/items`,
+        timestamp: new Date().toISOString(),
+        code: 'cart_not_found'
+      });
   }
 
   const product = store.products.find(p => p.id === req.body.catalogItemId);
 
   if (!product) {
-    return res.status(404).json({
-      code: 'product_not_found',
-      message: 'Product not found',
-    });
+    return res.status(404)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/item-not-available',
+        title: 'Item Not Available',
+        status: 404,
+        detail: 'Product not found or not available',
+        instance: `http://localhost:${PORT}/carts/${req.params.id}/items`,
+        timestamp: new Date().toISOString(),
+        localizationKey: 'error.item.not_available'
+      });
+  }
+
+  if (!product.available) {
+    return res.status(400)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/item-out-of-stock',
+        title: 'Item Out of Stock',
+        status: 400,
+        detail: 'Item is out of stock',
+        instance: `http://localhost:${PORT}/carts/${req.params.id}/items`,
+        timestamp: new Date().toISOString(),
+        localizationKey: 'error.item.out_of_stock'
+      });
+  }
+
+  const quantity = req.body.quantity || 1;
+  if (quantity < 1) {
+    return res.status(400)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/invalid-quantity',
+        title: 'Invalid Quantity',
+        status: 400,
+        detail: 'Quantity must be at least 1',
+        instance: `http://localhost:${PORT}/carts/${req.params.id}/items`,
+        timestamp: new Date().toISOString(),
+        localizationKey: 'error.quantity.invalid',
+        nextActions: [
+          {
+            id: 'retry_with_valid_quantity',
+            href: `/carts/${req.params.id}/items`,
+            method: 'POST',
+            title: 'Retry with Valid Quantity',
+            requestSchema: {
+              type: 'object',
+              properties: {
+                catalogItemId: { type: 'string' },
+                quantity: { type: 'integer', minimum: 1 }
+              },
+              required: ['catalogItemId', 'quantity']
+            },
+            responseSchema: {
+              $ref: 'https://schemas.ocs.dev/cart/item/v1.json'
+            }
+          }
+        ]
+      });
+  }
+
+  // Check max items
+  if (cart.items.length >= 50) {
+    return res.status(400)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/max-items-exceeded',
+        title: 'Max Items Exceeded',
+        status: 400,
+        detail: 'Cart has reached maximum number of items',
+        instance: `http://localhost:${PORT}/carts/${req.params.id}/items`,
+        timestamp: new Date().toISOString(),
+        localizationKey: 'error.cart.max_items_exceeded'
+      });
   }
 
   // Add item
@@ -225,7 +330,7 @@ app.post('/carts/:id/items', requireAuth, (req, res) => {
     id: `item_${Date.now()}`,
     catalogItemId: product.id,
     name: product.name,
-    quantity: req.body.quantity || 1,
+    quantity: quantity,
     price: product.price,
     fulfillmentType: product.fulfillmentType,
   };
@@ -256,10 +361,16 @@ app.post('/orders', requireAuth, (req, res) => {
     const cart = store.carts.find(c => c.id === req.body.cartId);
 
     if (!cart) {
-      return res.status(404).json({
-        code: 'cart_not_found',
-        message: 'Cart not found or expired',
-      });
+      return res.status(404)
+        .header('Content-Type', 'application/problem+json')
+        .json({
+          type: 'https://schemas.ocs.dev/errors/cart-not-found',
+          title: 'Cart Not Found',
+          status: 404,
+          detail: 'Cart not found or expired',
+          instance: `http://localhost:${PORT}/orders`,
+          timestamp: new Date().toISOString()
+        });
     }
 
     orderItems = cart.items;
@@ -294,17 +405,29 @@ app.post('/orders', requireAuth, (req, res) => {
   const hasPickup = orderItems.some(i => i.fulfillmentType === 'pickup');
 
   if (hasPhysical && !req.body.deliveryAddress) {
-    return res.status(400).json({
-      code: 'delivery_address_required',
-      message: 'Order contains physical items but no delivery address provided',
-    });
+    return res.status(400)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/delivery-address-required',
+        title: 'Delivery Address Required',
+        status: 400,
+        detail: 'Order contains physical items but no delivery address provided',
+        instance: `http://localhost:${PORT}/orders`,
+        timestamp: new Date().toISOString()
+      });
   }
 
   if (hasPickup && !req.body.pickupLocation) {
-    return res.status(400).json({
-      code: 'pickup_location_required',
-      message: 'Order contains pickup items but no pickup location provided',
-    });
+    return res.status(400)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/pickup-location-required',
+        title: 'Pickup Location Required',
+        status: 400,
+        detail: 'Order contains pickup items but no pickup location provided',
+        instance: `http://localhost:${PORT}/orders`,
+        timestamp: new Date().toISOString()
+      });
   }
 
   // Create order
@@ -338,10 +461,16 @@ app.get('/orders/:id', requireAuth, (req, res) => {
   const order = store.orders.find(o => o.id === req.params.id);
 
   if (!order) {
-    return res.status(404).json({
-      code: 'order_not_found',
-      message: 'Order not found',
-    });
+    return res.status(404)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/order-not-found',
+        title: 'Order Not Found',
+        status: 404,
+        detail: 'Order not found',
+        instance: `http://localhost:${PORT}/orders/${req.params.id}`,
+        timestamp: new Date().toISOString()
+      });
   }
 
   // Add schema-aware actions based on current status
@@ -368,17 +497,30 @@ app.post('/orders/:id/cancel', requireAuth, (req, res) => {
   const order = store.orders.find(o => o.id === req.params.id);
 
   if (!order) {
-    return res.status(404).json({
-      code: 'order_not_found',
-      message: 'Order not found',
-    });
+    return res.status(404)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/order-not-found',
+        title: 'Order Not Found',
+        status: 404,
+        detail: 'Order not found',
+        instance: `http://localhost:${PORT}/orders/${req.params.id}/cancel`,
+        timestamp: new Date().toISOString()
+      });
   }
 
   if (order.status !== 'confirmed') {
-    return res.status(400).json({
-      code: 'order_not_cancellable',
-      message: 'Order cannot be cancelled in its current state',
-    });
+    return res.status(400)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/order-not-cancellable',
+        title: 'Order Not Cancellable',
+        status: 400,
+        detail: 'Order cannot be cancelled in its current state',
+        instance: `http://localhost:${PORT}/orders/${req.params.id}/cancel`,
+        timestamp: new Date().toISOString(),
+        localizationKey: 'error.order.not_cancellable'
+      });
   }
 
   order.status = 'cancelled';
@@ -529,10 +671,16 @@ function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({
-      code: 'unauthorized',
-      message: 'Valid authorization token required',
-    });
+    return res.status(401)
+      .header('Content-Type', 'application/problem+json')
+      .json({
+        type: 'https://schemas.ocs.dev/errors/unauthorized',
+        title: 'Unauthorized',
+        status: 401,
+        detail: 'Valid authorization token required',
+        instance: `http://localhost:${PORT}${req.path}`,
+        timestamp: new Date().toISOString()
+      });
   }
 
   // In production: validate token here

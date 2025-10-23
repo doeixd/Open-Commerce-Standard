@@ -146,7 +146,7 @@ Action:
       "errorSchemas": [
         {
           "statusCode": 400,
-          "schema": { "$ref": "https://schemas.ocs.dev/error/v1.json" },
+          "errorCodes": ["cancellation_window_expired"],
           "description": "Order cannot be cancelled (window expired)"
         }
       ],

@@ -2422,19 +2422,19 @@ Content-Type: application/ocs+json; version=1.0
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-json">{
-  "code": "cart_expired",
-  "message": "Cart expired after 3600 seconds of inactivity",
-  "userMessage": {
-    "localizationKey": "error.cart.expired",
-    "params": {
-      "seconds": 3600
-    }
-  },
+  "type": "https://schemas.ocs.dev/errors/cart-expired",
+  "title": "Cart Expired",
+  "status": 410,
+  "detail": "Cart expired after 3600 seconds of inactivity",
+  "instance": "https://api.example.com/carts/123",
+  "timestamp": "2023-10-23T12:00:00Z",
+  "localizationKey": "error.cart.expired",
   "nextActions": [
     {
-      "id": "recreate_cart",
+      "id": "create_new_cart",
       "href": "/carts",
-      "method": "POST"
+      "method": "POST",
+      "title": "Create New Cart"
     }
   ]
 }</code></pre></div>
@@ -3697,10 +3697,10 @@ if (constraints?.maxCartItems) {
 
                 <ul>
                     <li><strong>Check constraints first:</strong> Always fetch store constraints before building cart/checkout UIs.</li>
-                    <li><strong>Handle all error fields:</strong> Use <span class="inline-code">userMessage</span> for UI display, <span class="inline-code">details</span> for debugging, and <span class="inline-code">nextActions</span> for recovery.</li>
-                    <li><strong>Localize user messages:</strong> Use the <span class="inline-code">localizationKey</span> and <span class="inline-code">params</span> to show translated, context-aware messages.</li>
-                    <li><strong>Implement recovery flows:</strong> Use <span class="inline-code">nextActions</span> to provide one-click error resolution.</li>
-                    <li><strong>Log developer messages:</strong> Use the <span class="inline-code">message</span> field for server-side logging and debugging.</li>
+                    <li><strong>Handle RFC 9457 fields:</strong> Use <span class="inline-code">title</span> for error type, <span class="inline-code">detail</span> for specifics, and <span class="inline-code">status</span> for HTTP code.</li>
+                    <li><strong>Use extensions:</strong> Leverage <span class="inline-code">localizationKey</span> for i18n and <span class="inline-code">nextActions</span> for recovery flows.</li>
+                    <li><strong>Automate recovery:</strong> Use <span class="inline-code">nextActions</span> with <span class="inline-code">requestSchema</span> and <span class="inline-code">responseSchema</span> for programmatic error resolution.</li>
+                    <li><strong>Log with instance:</strong> Use <span class="inline-code">instance</span> and <span class="inline-code">timestamp</span> for debugging and tracing.</li>
                 </ul>
 
                 <div class="info-box success">

@@ -27,7 +27,16 @@ async function ocsRequest(endpoint, options = {}) {
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(`OCS Error: ${error.code} - ${error.message}`);
+    // RFC 9457 compliant error handling with extensions
+    console.error(`Error (${error.status}): ${error.title}`);
+    console.error(`Detail: ${error.detail}`);
+    if (error.localizationKey) {
+      console.error(`Localization Key: ${error.localizationKey}`);
+    }
+    if (error.nextActions) {
+      console.error('Suggested Actions:', error.nextActions.map(a => `${a.title} (${a.method} ${a.href})`).join(', '));
+    }
+    throw new Error(`${error.title}: ${error.detail}`);
   }
 
   return response.json();
@@ -271,6 +280,65 @@ function subscribeToOrderUpdates(orderId) {
   return eventSource;
 }
 
+// --- Example: Client-Only (Stateless) Cart Simulation ---
+
+// For client-only carts, errors are handled locally without server persistence
+function simulateClientOnlyCart() {
+  console.log('🛒 Simulating client-only cart (stateless)\n');
+
+  let localCart = {
+    items: [],
+    total: 0,
+    currency: 'USD'
+  };
+
+  // Simulate adding item with RFC 9457-style validation
+  function addItem(product, quantity = 1) {
+    if (!product.available) {
+      console.error('Error (400): Item Not Available');
+      console.error('Detail: Item is not available');
+      return false;
+    }
+    if (quantity < 1) {
+      console.error('Error (400): Invalid Quantity');
+      console.error('Detail: Quantity must be at least 1');
+      return false;
+    }
+    if (localCart.items.length >= 10) { // Simulate max items
+      console.error('Error (400): Max Items Exceeded');
+      console.error('Detail: Cart has reached maximum number of items');
+      return false;
+    }
+
+    localCart.items.push({ ...product, quantity });
+    localCart.total += parseFloat(product.price.amount) * quantity;
+    console.log(`✅ Added ${product.name} (qty: ${quantity})`);
+    return true;
+  }
+
+  // Simulate checkout
+  function checkout() {
+    if (localCart.items.length === 0) {
+      console.error('Error (400): Cart Validation Failed');
+      console.error('Detail: Cart is empty');
+      return false;
+    }
+    console.log(`📦 Checking out with total: ${localCart.total.toFixed(2)} ${localCart.currency}`);
+    return true;
+  }
+
+  // Example usage
+  const products = [
+    { id: 'mug', name: 'Coffee Mug', price: { amount: '15.00' }, available: true },
+    { id: 'guide', name: 'Guide', price: { amount: '9.99' }, available: false },
+  ];
+
+  addItem(products[0], 2);
+  addItem(products[1], 1); // Should error
+  addItem(products[0], -1); // Should error
+  checkout();
+}
+
 // --- Export for use in other scripts ---
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -283,6 +351,7 @@ if (typeof module !== 'undefined' && module.exports) {
     cartBasedFlow,
     variantExample,
     subscribeToOrderUpdates,
+    simulateClientOnlyCart,
   };
 }
 

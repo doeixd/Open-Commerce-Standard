@@ -392,21 +392,23 @@ eventSource.addEventListener('order.patch', (event) => {
 });
 ```
 
-## Error Response Format
+## Error Response Format (RFC 9457)
 
 ```json
 {
-  "code": "cart_expired",
-  "message": "Cart expired after 3600 seconds",
-  "userMessage": {
-    "localizationKey": "error.cart.expired",
-    "params": { "lifetimeSeconds": 3600 }
-  },
+  "type": "https://schemas.ocs.dev/errors/cart-expired",
+  "title": "Cart Expired",
+  "status": 410,
+  "detail": "Cart expired after 3600 seconds",
+  "instance": "https://api.example.com/carts/123",
+  "timestamp": "2023-10-23T12:00:00Z",
+  "localizationKey": "error.cart.expired",
   "nextActions": [
     {
       "id": "create_new_cart",
       "href": "/carts",
-      "method": "POST"
+      "method": "POST",
+      "title": "Create New Cart"
     }
   ]
 }
@@ -513,16 +515,17 @@ Always use full capability ID as metadata key:
 try {
   const order = await createOrder({ cartId });
 } catch (error) {
-  if (error.code === 'cart_expired') {
-    // Get items from local storage
-    const items = localStorage.getItem('cartItems');
-
-    // Recreate cart
-    const newCart = await createCart();
-    await addItemsToCart(newCart.id, items);
-
-    // Retry
-    return createOrder({ cartId: newCart.id });
+  if (error.type?.endsWith('/cart-expired')) {
+    // Use nextActions for recovery
+    const action = error.nextActions?.find(a => a.id === 'create_new_cart');
+    if (action) {
+      const newCart = await fetch(action.href, {
+        method: action.method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storeId: 'main' })
+      }).then(r => r.json());
+      // Retry with new cart
+      return createOrder({ cartId: newCart.id });
   }
 }
 ```
