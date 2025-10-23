@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schemas.ocs.dev/capabilities/discovery/v1.json",
+  "title": "OCS Discovery Capability",
+  "description": "Defines standardized discovery metadata for OCS endpoints via HTML meta tags, JSON-LD blocks, HTTP headers, and .well-known URLs.",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version for this capability"
+    },
+    "wellKnownUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL of the .well-known/ocs discovery endpoint",
+      "example": "https://shop.example.com/.well-known/ocs"
+    },
+    "htmlMetaEnabled": {
+      "type": "boolean",
+      "description": "Whether HTML meta tags are included in served pages",
+      "default": true
+    },
+    "jsonLdEnabled": {
+      "type": "boolean",
+      "description": "Whether JSON-LD discovery blocks are included in served pages",
+      "default": true
+    },
+    "httpHeadersEnabled": {
+      "type": "boolean",
+      "description": "Whether OCS-Discovery HTTP headers are included in responses",
+      "default": true
+    }
+  },
+  "required": ["_version"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "_version": "1.0",
+      "wellKnownUrl": "https://shop.example.com/.well-known/ocs",
+      "htmlMetaEnabled": true,
+      "jsonLdEnabled": true,
+      "httpHeadersEnabled": true
+    }
+  ]
+}

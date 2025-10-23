@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/hypermedia/schema_aware_actions/v1.json",
+  "title": "Schema-Aware Actions",
+  "description": "Extends OCS hypermedia actions to include request/response schema references, enabling dynamic client generation, form building, and true self-documenting APIs.",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version for this capability metadata."
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether schema-aware actions are enabled server-wide."
+    },
+    "schemaFormat": {
+      "type": "string",
+      "enum": ["json-schema", "openapi-schema"],
+      "default": "json-schema",
+      "description": "Format of schema references in actions."
+    },
+    "inlineSchemas": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to inline small schemas in action objects (true) or always reference by URL (false)."
+    },
+    "includeExamples": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to include example request/response payloads in action schemas."
+    }
+  },
+  "required": ["_version"],
+  "examples": [
+    {
+      "_version": "1.0",
+      "enabled": true,
+      "schemaFormat": "json-schema",
+      "inlineSchemas": false,
+      "includeExamples": true
+    }
+  ]
+}

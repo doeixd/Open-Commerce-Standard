@@ -8,6 +8,12 @@
 | :--- | :--- | :--- |
 | **1.0.0** | **Active & Ready for Implementation** | **MIT** |
 
+---
+
+> **🆕 New to OCS?** Start with the **[Getting Started Lite Guide](./docs/getting-started-lite.md)** for a beginner-friendly introduction that skips the advanced concepts. Or jump to **[5-Minute Quickstart](#5-minute-quickstart)** below.
+
+---
+
 ## Introduction
 
 The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. It integrates the powerful and extensible x402 Protocol for payments. This allows OCS to function as a unified payment gateway, supporting both web3-native assets (like USDC for instant, low-fee blockchain transactions) and traditional fiat currencies (via providers like Stripe and PayPal) through a single, elegant, and stateless API flow.
@@ -36,12 +42,69 @@ The full OpenAPI 3.0 specification is available in [`spec.yaml`](./src/spec.yaml
 
 <br />
 
+## 5-Minute Quickstart
+
+**Just want to see it work?** Here's the bare minimum:
+
+### For Clients (Using an OCS API)
+
+```javascript
+// 1. Browse products
+const catalog = await fetch('https://shop.example.com/catalogs/main')
+  .then(r => r.json());
+
+// 2. Buy something
+const order = await fetch('https://shop.example.com/orders', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/ocs+json; version=1.0',
+    'Authorization': 'Bearer YOUR_TOKEN'
+  },
+  body: JSON.stringify({
+    items: [{ catalogItemId: 'prod_1', quantity: 1 }],
+    deliveryAddress: { address: '123 Main St' }
+  })
+}).then(r => r.json());
+
+console.log('Order placed:', order.id);
+```
+
+**That's it.** See [simple-client.js](./examples/simple-client.js) for complete working examples.
+
+### For Servers (Building an OCS API)
+
+Implement 3 endpoints:
+
+1. **`GET /capabilities`** - List what you support (can be empty)
+2. **`GET /catalogs/{id}`** - Show your products
+3. **`POST /orders`** - Accept orders
+
+**Example minimal server:** [simple-server.js](./examples/simple-server.js) (Node.js/Express)
+
+**Need more help?**
+- 📚 **Beginner:** [Getting Started Lite](./docs/getting-started-lite.md) - No jargon, just the basics
+- 📈 **Progressive:** [Progressive Guide](./docs/progressive-guide.md) - Add features step-by-step
+- 🗺️ **Not sure?** [Learning Path Guide](./docs/learning-path.md) - Choose your path based on experience
+- 📁 **Examples:** [Code Examples](./examples/README.md) - Runnable client and server code
+- 🔧 **Reference:** Continue reading below for complete documentation
+
+<br />
+
 ## Getting Started
 
 1. **Review the Specification:** Read the [OpenAPI spec](./src/spec.yaml) for the full API details.
-2. **Implement Core Endpoints:** Start with discovery (`/capabilities`, `/stores`, `/catalogs`) and cart/order flows.
-3. **Add Capabilities:** Implement optional features like variants or tracking via standard schemas.
-4. **Build Clients:** Use capability discovery for adaptive apps compatible with any OCS server.
+2. **Implement Discovery:** Set up OCS discovery mechanisms (see [OCS Discovery Specification](./docs/ocs-discovery.md)) to make your API discoverable.
+3. **Implement Core Endpoints:** Start with discovery (`/.well-known/ocs`, `/capabilities`, `/stores`, `/catalogs`) and cart/order flows.
+4. **Add Capabilities:** Implement optional features like variants or tracking via standard schemas.
+5. **Build Clients:** Use capability discovery for adaptive apps compatible with any OCS server.
+
+---
+
+## 📖 Complete Documentation
+
+*The sections below provide in-depth coverage of OCS architecture, advanced features, and design patterns. New users may want to start with the [quickstart](#5-minute-quickstart) or [lite guide](./docs/getting-started-lite.md) first.*
+
+---
 
 ## Key Features
 
@@ -102,6 +165,44 @@ OCS's power lies in **delegating complexity to `metadata` and making it discover
 Core schemas stay lean—no endless optional fields for variants, sizes, or weights. Domain-specific data resides in a generic `metadata` object.
 
 To avoid chaos, `GET /capabilities` provides a "table of contents" for metadata, linking to standardized JSON Schemas. Clients adapt dynamically, creating a system that's simple by default, complex by choice.
+
+<br />
+
+## API Discovery
+
+OCS provides a comprehensive discovery system that allows clients to locate and bootstrap API endpoints automatically, whether starting from an HTML page, a domain name, or direct API access. Discovery happens through four complementary mechanisms:
+
+1. **`.well-known/ocs` endpoint** (RFC 8615) - The canonical, domain-level source of truth
+2. **HTTP headers** (`OCS-Discovery`) - Fast discovery from any HTTP response
+3. **JSON-LD blocks** - Machine-readable semantic metadata for crawlers and AI agents
+4. **HTML meta tags** - Lightweight hints for browsers and extensions
+
+### Discovery Hierarchy
+
+When multiple sources are available, clients should follow this precedence order:
+
+| Priority | Source | Use Case |
+|----------|--------|----------|
+| **1** | `/.well-known/ocs` | Authoritative discovery for SDKs and automated clients |
+| **2** | `OCS-Discovery` header | Fast discovery when already making HTTP requests |
+| **3** | JSON-LD block | Semantic web agents and search engines |
+| **4** | HTML meta tags | Browser extensions and manual inspection |
+
+### Example Discovery Flow
+
+```javascript
+// 1. Try canonical .well-known endpoint first
+const discovery = await fetch('https://shop.example.com/.well-known/ocs')
+  .then(r => r.json());
+
+// 2. Use discovered capabilities endpoint
+const capabilities = await fetch(discovery.ocs.capabilities)
+  .then(r => r.json());
+
+// 3. Proceed with capability-aware client logic
+```
+
+For complete details on implementing and using OCS discovery, see the **[OCS Discovery Specification](./docs/ocs-discovery.md)**.
 
 <br />
 
@@ -533,6 +634,7 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 
 | Capability ID | Applies To | Description | Schema URL |
 | :--- | :--- | :--- | :--- |
+| **`dev.ocs.discovery@1.0`** | Server-wide | Defines standardized discovery metadata for OCS endpoints via HTML, JSON-LD, HTTP headers, and `.well-known` URLs. See [OCS Discovery Specification](./docs/ocs-discovery.md). | [capabilities/discovery/v1.json](./schemas/capabilities/discovery/v1.json) |
 | **`dev.ocs.product.variants@1.0`** | Product (`CatalogItem`) | Defines user-selectable options (e.g., size, color) and their corresponding variants, each with its own ID, price, and stock. | [product/variants/v1.json](./schemas/product/variants/v1.json) |
 | **`dev.ocs.product.customization@1.0`** | Product (`CatalogItem`) | Defines complex, selectable modifiers for a menu item (e.g., toppings, sides). | [product/customization/v1.json](./schemas/product/customization/v1.json) |
 | **`dev.ocs.product.addons@1.0`** | Product (`CatalogItem`) | Defines simple, selectable add-ons for a product, such as gift wrapping, extended warranty, or side dishes. | [product/addons/v1.json](./schemas/product/addons/v1.json) |
@@ -563,12 +665,16 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | **`dev.ocs.product.categorization@1.0`** | Product (`CatalogItem`) | Provides an ordered category path (breadcrumb) for navigation. | [product/categorization/v1.json](./schemas/product/categorization/v1.json) |
 | **`dev.ocs.product.relations@1.0`** | Product (`CatalogItem`) | Provides related products (recommendations, accessories, alternatives). | [product/relations/v1.json](./schemas/product/relations/v1.json) |
 | **`dev.ocs.payment.x402_fiat@1.0`** | Server-wide | Advertises support for fiat payments via the x402 `fiat_intent` scheme and provides public keys for payment providers. | [payment/x402_fiat/v1.json](./schemas/payment/x402_fiat/v1.json) |
+| **`dev.ocs.payment.web_payments@1.0`** | Server-wide | Enables W3C Payment Request API integration for streamlined checkout with saved payment methods and native browser UIs. See [Web Payments & SPC Guide](./docs/web-payments-spc.md). | [payment/web_payments/v1.json](./schemas/payment/web_payments/v1.json) |
+| **`dev.ocs.payment.spc@1.0`** | Server-wide | Enables W3C Secure Payment Confirmation for biometric payment authorization via WebAuthn, reducing fraud and improving conversion. See [Web Payments & SPC Guide](./docs/web-payments-spc.md). | [payment/spc/v1.json](./schemas/payment/spc/v1.json) |
+| **`dev.ocs.auth.webauthn@1.0`** | Server-wide | Provides WebAuthn/FIDO2 configuration for phishing-resistant biometric authentication (passkeys). Extends `dev.ocs.auth.flows@1.0` when 'webauthn' is included in methods. | [auth/webauthn/v1.json](./schemas/auth/webauthn/v1.json) |
 | **`dev.ocs.cart@1.0`** | Server-wide | Indicates support for stateful, server-side shopping carts with configurable lifecycle policies (expiration, limits, persistence). | [cart/v1.json](./schemas/cart/v1.json) |
 | **`dev.ocs.order.direct@1.0`** | Server-wide | Indicates support for cart-less "Buy Now" orders created directly from items, bypassing the cart entirely. | [order/direct/v1.json](./schemas/order/direct/v1.json) |
 | **`dev.ocs.i18n@1.0`** | Server-wide | Provides internationalization support including supported locales, default locale, and formatting rules for numbers, currencies, and dates. | [i18n/v1.json](./schemas/i18n/v1.json) |
 | **`dev.ocs.order.subscription@1.0`** | Order | Defines recurring subscription orders with frequency, billing cycles, and cancellation policies. | [order/subscription/v1.json](./schemas/order/subscription/v1.json) |
 | **`dev.ocs.order.preorder@1.0`** | Product (`CatalogItem`) | Defines preorder information for items not yet available, including release dates and payment timing. | [order/preorder/v1.json](./schemas/order/preorder/v1.json) |
 | **`dev.ocs.service.scheduling@1.0`** | Product (`CatalogItem`) | Defines scheduling information for service-based items like appointments, including time slots and booking constraints. | [service/scheduling/v1.json](./schemas/service/scheduling/v1.json) |
+| **`dev.ocs.hypermedia.schema_aware_actions@1.0`** | Actions | Extends hypermedia actions to include request/response schema references, enabling dynamic client generation, form building, and truly self-documenting APIs. See [Schema-Aware Actions Guide](./docs/schema-aware-actions.md). | [hypermedia/schema_aware_actions/v1.json](./schemas/hypermedia/schema_aware_actions/v1.json) |
 
 <br />
 
@@ -608,6 +714,7 @@ OCS is a living standard. The future direction includes:
 
 | Endpoint | Verb | Description | Auth |
 | :--- | :--- | :--- | :--- |
+| `/.well-known/ocs` | `GET` | **OCS Discovery endpoint - canonical location of API resources.** | No |
 | `/capabilities` | `GET` | **Discover server features and metadata schemas.** | No |
 | `/stores` | `GET` | List available vendors/stores. | No |
 | `/catalogs` | `GET` | List available catalogs. | No |

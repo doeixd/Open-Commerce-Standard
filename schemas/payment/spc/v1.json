@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/payment/spc/v1.json",
+  "title": "Secure Payment Confirmation (SPC) Capability",
+  "description": "Capability for W3C Secure Payment Confirmation, enabling biometric authentication during payments via WebAuthn. See https://www.w3.org/TR/secure-payment-confirmation/",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version for this capability metadata."
+    },
+    "supportedRps": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "hostname",
+        "examples": ["bank.example.com", "issuer.example.org"]
+      },
+      "minItems": 1,
+      "description": "List of Relying Party (RP) domains that this server coordinates with for SPC authentication. These are typically banks or card issuers."
+    },
+    "registrationUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL for RP credential registration, typically loaded in an iframe. Required for first-time users without existing credentials."
+    },
+    "registrationFlow": {
+      "type": "string",
+      "enum": ["iframe", "redirect", "popup"],
+      "default": "iframe",
+      "description": "How the registration flow should be presented to users."
+    },
+    "timeout": {
+      "type": "integer",
+      "minimum": 30000,
+      "maximum": 600000,
+      "default": 300000,
+      "description": "Timeout in milliseconds for SPC authentication prompts (30s-10min)."
+    },
+    "requiresEnrollment": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether users must enroll with the RP before using SPC."
+    },
+    "fallbackMethods": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["otp", "password", "web_payments", "manual_entry"]
+      },
+      "description": "Alternative authentication methods if SPC is unavailable or user opts out."
+    }
+  },
+  "required": ["_version", "supportedRps"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "_version": "1.0",
+      "supportedRps": ["bank.example.com"],
+      "registrationUrl": "https://bank.example.com/register-spc",
+      "registrationFlow": "iframe",
+      "timeout": 300000,
+      "fallbackMethods": ["otp", "web_payments"]
+    },
+    {
+      "_version": "1.0",
+      "supportedRps": ["issuer1.example.com", "issuer2.example.org"],
+      "registrationUrl": "https://shop.example.com/spc-enroll",
+      "requiresEnrollment": true,
+      "fallbackMethods": ["password", "manual_entry"]
+    }
+  ]
+}

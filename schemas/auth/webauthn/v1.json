@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/auth/webauthn/v1.json",
+  "title": "WebAuthn Authentication Configuration",
+  "description": "Configuration for WebAuthn authentication (FIDO2/passkeys), which provides phishing-resistant biometric and hardware key authentication. This capability extends dev.ocs.auth.flows@1.0 when 'webauthn' is included in the methods array.",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version for this capability metadata."
+    },
+    "rpId": {
+      "type": "string",
+      "format": "hostname",
+      "description": "Relying Party ID - typically the domain of the service. Must match or be a registrable suffix of the origin.",
+      "examples": ["example.com", "auth.example.com"]
+    },
+    "rpName": {
+      "type": "string",
+      "description": "Human-readable Relying Party name displayed during registration/authentication.",
+      "examples": ["Example Store", "Example Payment Services"]
+    },
+    "registrationUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Endpoint to initiate WebAuthn credential registration. Returns registration options."
+    },
+    "authenticationUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Endpoint to initiate WebAuthn authentication. Returns authentication options."
+    },
+    "verifyRegistrationUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Endpoint to verify and store a new WebAuthn credential after registration."
+    },
+    "verifyAuthenticationUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Endpoint to verify WebAuthn authentication assertion."
+    },
+    "attestation": {
+      "type": "string",
+      "enum": ["none", "indirect", "direct", "enterprise"],
+      "default": "none",
+      "description": "Attestation conveyance preference. 'none' is recommended for most use cases."
+    },
+    "authenticatorAttachment": {
+      "type": "string",
+      "enum": ["platform", "cross-platform", "any"],
+      "default": "any",
+      "description": "Preferred authenticator type: 'platform' (Touch ID, Windows Hello), 'cross-platform' (USB keys), or 'any'."
+    },
+    "userVerification": {
+      "type": "string",
+      "enum": ["required", "preferred", "discouraged"],
+      "default": "preferred",
+      "description": "User verification requirement (PIN, biometric, etc.)."
+    },
+    "residentKey": {
+      "type": "string",
+      "enum": ["required", "preferred", "discouraged"],
+      "default": "preferred",
+      "description": "Whether to create a resident key (passkey) that can be used for passwordless authentication."
+    },
+    "timeout": {
+      "type": "integer",
+      "minimum": 30000,
+      "maximum": 600000,
+      "default": 60000,
+      "description": "Timeout for registration/authentication ceremony in milliseconds (30s-10min)."
+    },
+    "supportedAlgorithms": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "examples": [-7, -257]
+      },
+      "default": [-7, -257],
+      "description": "COSE algorithm identifiers supported. -7 = ES256 (recommended), -257 = RS256."
+    },
+    "credentialManagementUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Optional endpoint for users to manage their registered WebAuthn credentials (list, rename, delete)."
+    },
+    "recoveryMethods": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["email", "sms", "recovery_code", "backup_authenticator"]
+      },
+      "description": "Available recovery methods if user loses access to their authenticator."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "WebAuthn extensions configuration",
+      "properties": {
+        "credProps": {
+          "type": "boolean",
+          "default": true,
+          "description": "Request credential properties extension to determine if credential is discoverable."
+        },
+        "largeBlob": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable large blob storage extension for storing additional data with credential."
+        },
+        "prf": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable pseudorandom function extension for deriving secrets."
+        }
+      }
+    }
+  },
+  "required": ["_version", "rpId", "rpName", "registrationUrl", "authenticationUrl", "verifyRegistrationUrl", "verifyAuthenticationUrl"],
+  "examples": [
+    {
+      "_version": "1.0",
+      "rpId": "example.com",
+      "rpName": "Example Store",
+      "registrationUrl": "https://api.example.com/auth/webauthn/register/begin",
+      "authenticationUrl": "https://api.example.com/auth/webauthn/authenticate/begin",
+      "verifyRegistrationUrl": "https://api.example.com/auth/webauthn/register/complete",
+      "verifyAuthenticationUrl": "https://api.example.com/auth/webauthn/authenticate/complete",
+      "attestation": "none",
+      "authenticatorAttachment": "platform",
+      "userVerification": "preferred",
+      "residentKey": "preferred",
+      "timeout": 60000,
+      "supportedAlgorithms": [-7, -257],
+      "credentialManagementUrl": "https://example.com/account/security/credentials",
+      "recoveryMethods": ["email", "recovery_code"],
+      "extensions": {
+        "credProps": true,
+        "largeBlob": false
+      }
+    },
+    {
+      "_version": "1.0",
+      "rpId": "payments.example.com",
+      "rpName": "Example Payment Processor",
+      "registrationUrl": "https://payments.example.com/webauthn/register",
+      "authenticationUrl": "https://payments.example.com/webauthn/authenticate",
+      "verifyRegistrationUrl": "https://payments.example.com/webauthn/verify-registration",
+      "verifyAuthenticationUrl": "https://payments.example.com/webauthn/verify-authentication",
+      "attestation": "direct",
+      "authenticatorAttachment": "any",
+      "userVerification": "required",
+      "residentKey": "required",
+      "timeout": 120000,
+      "supportedAlgorithms": [-7, -8, -257],
+      "recoveryMethods": ["backup_authenticator", "email"]
+    }
+  ]
+}

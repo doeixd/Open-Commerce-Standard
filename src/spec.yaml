@@ -97,6 +97,43 @@ tags:
     description: Endpoints for placing and managing orders, including real-time updates.
 
 paths:
+  /.well-known/ocs:
+    get:
+      tags: [Discovery]
+      summary: OCS Discovery Endpoint
+      description: |
+        RFC 8615-compliant discovery endpoint that provides the canonical location of OCS API resources.
+        This is the primary discovery mechanism for clients to locate the capabilities endpoint and other
+        core API resources. Servers SHOULD include CORS headers and cache directives on this endpoint.
+      responses:
+        '200':
+          description: OCS discovery metadata
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: "max-age=86400"
+              description: Recommended cache duration (24 hours)
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: "*"
+              description: CORS header for cross-origin discovery
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCSDiscoveryResponse'
+              example:
+                ocs:
+                  capabilities: "https://shop.example.com/ocs/capabilities"
+                  version: "1.0"
+                  context: "https://schemas.ocs.dev/context.jsonld"
+                  payment: "https://shop.example.com/ocs/payment"
+        '404':
+          description: Discovery endpoint not implemented
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /capabilities:
     get:
       tags: [Discovery]
@@ -627,6 +664,39 @@ paths:
 
 components:
   schemas:
+    # --- Discovery Schemas ---
+    OCSDiscoveryResponse:
+      type: object
+      description: |
+        RFC 8615-compliant discovery response providing the canonical locations of OCS API resources.
+        This is the authoritative source for API endpoint discovery.
+      properties:
+        ocs:
+          type: object
+          required:
+            - capabilities
+            - version
+          properties:
+            capabilities:
+              type: string
+              format: uri
+              description: "URI of the /capabilities endpoint"
+              example: "https://shop.example.com/ocs/capabilities"
+            version:
+              type: string
+              description: "Highest supported OCS core specification version"
+              example: "1.0"
+            context:
+              type: string
+              format: uri
+              description: "URI of the JSON-LD context document"
+              example: "https://schemas.ocs.dev/context.jsonld"
+            payment:
+              type: string
+              format: uri
+              description: "URI of the payment or x402 endpoint"
+              example: "https://shop.example.com/ocs/payment"
+
     # --- Capability Discovery Schemas ---
     CapabilitiesResponse:
       type: object
@@ -668,6 +738,13 @@ components:
         metadata:
           type: object
           description: "Optional metadata providing implementation-specific details for this capability, such as endpoint URLs or configuration options."
+        rel:
+          type: string
+          description: "Link relation type, mirrors HTTP Link rel and Hydra relation."
+        href:
+          type: string
+          format: uri-reference
+          description: "Target URI for this capability or linked resource."
 
     # --- Pagination Schemas ---
     PaginationMeta:
@@ -1032,15 +1109,14 @@ components:
              - confirmed   # The order is accepted and will be processed.
             actions:
               type: array
-           description: |
-             A list of actions the client can perform on this order in its current state.
-             The presence of an action indicates the user should be shown the corresponding UI control.
-           items:
-             type: object
-              properties:
-                 id: { type: "string", enum: ["cancel", "initiate_return", "add_rating", "pause_subscription", "resume_subscription", "cancel_subscription"] }
-                  href: { type: "string", format: "uri", description: "The API endpoint to call to perform this action." }
-             required: [id, href]
+              description: |
+                A list of actions the client can perform on this order in its current state.
+                The presence of an action indicates the user should be shown the corresponding UI control.
+
+                If the server advertises dev.ocs.hypermedia.schema_aware_actions@1.0 capability,
+                actions will include schema references for request/response validation and dynamic form generation.
+              items:
+                $ref: '#/components/schemas/Action'
          returns:
            type: array
            description: "A list of summaries for any returns associated with this order."
@@ -1147,6 +1223,20 @@ components:
         outputSchema: { type: object }
         maxTimeoutSeconds: { type: number }
         extra: { type: object }
+        interledger:
+          type: object
+          description: "Optional Interledger/Open Payments compatible metadata for multi-rail payment interoperability."
+          properties:
+            incoming_payment:
+              type: string
+              format: uri
+              description: "Open Payments incoming-payment endpoint URL."
+            asset_code:
+              type: string
+              description: "ISO 4217 currency code or token symbol (e.g., 'USD', 'EUR', 'USDC')."
+            asset_scale:
+              type: integer
+              description: "Number of decimal places for the asset (e.g., 2 for USD, 6 for USDC)."
       required: [scheme, network, maxAmountRequired, asset, payTo, resource, description, maxTimeoutSeconds]
 
     X402PaymentPayload:
@@ -1189,6 +1279,320 @@ components:
         network: { type: string }
         payer: { type: string }
       required: [success, transaction, network, payer]
+
+    # --- Hypermedia Schemas ---
+    Action:
+      type: object
+      description: |
+        Represents a hypermedia action that can be performed on a resource.
+        When dev.ocs.hypermedia.schema_aware_actions@1.0 is enabled, includes schema references
+        for request/response validation and dynamic client generation.
+      properties:
+        id:
+          type: string
+          description: "Unique identifier for this action type"
+          enum: ["cancel", "initiate_return", "add_rating", "pause_subscription", "resume_subscription", "cancel_subscription", "track", "retry_payment", "update_shipping", "add_tip"]
+        href:
+          type: string
+          format: uri
+          description: "The API endpoint to call to perform this action"
+        method:
+          type: string
+          enum: ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          default: "POST"
+          description: "HTTP method to use for this action"
+        rel:
+          type: string
+          description: "Link relation type, mirrors HTTP Link rel and Hydra relation"
+        title:
+          type: string
+          description: "Human-readable action name for UI display. Only present if schema-aware actions enabled."
+        description:
+          type: string
+          description: "Detailed explanation of what this action does. Only present if schema-aware actions enabled."
+        requestSchema:
+          $ref: '#/components/schemas/SchemaReference'
+        responseSchema:
+          $ref: '#/components/schemas/SchemaReference'
+        errorSchemas:
+          type: array
+          description: |
+            Possible error responses for this action. All errors follow the OCS Error structure
+            with code, message, userMessage, and nextActions fields.
+          items:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                description: "HTTP status code for this error"
+                example: 400
+              errorCodes:
+                type: array
+                description: "Specific OCS error codes that may be returned (from Error.code enum)"
+                items:
+                  type: string
+                example: ["cancellation_window_expired", "order_already_cancelled"]
+              description:
+                type: string
+                description: "Human-readable explanation of when this error occurs"
+                example: "Returned when the order cannot be cancelled because the cancellation window has expired or the order is already fulfilled"
+              schema:
+                description: "Schema for this error response. Typically references the standard OCS Error schema."
+                oneOf:
+                  - type: object
+                    properties:
+                      $ref:
+                        type: string
+                        const: "#/components/schemas/Error"
+                  - $ref: '#/components/schemas/SchemaReference'
+            required: [statusCode, errorCodes]
+        parameters:
+          type: array
+          description: "URL/query/header parameters for this action"
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: "Parameter name"
+              in:
+                type: string
+                enum: ["path", "query", "header"]
+                description: "Where this parameter is located"
+              required:
+                type: boolean
+                default: false
+                description: "Whether this parameter is required"
+              schema:
+                type: object
+                description: "JSON Schema for this parameter"
+            required: [name, in, schema]
+        examples:
+          type: object
+          description: "Example request and response payloads"
+          properties:
+            request:
+              type: object
+              description: "Example request body"
+            response:
+              type: object
+              description: "Example response body"
+      required: [id, href]
+      example:
+        id: "cancel"
+        href: "/orders/order_123/cancel"
+        method: "POST"
+        title: "Cancel Order"
+        description: "Cancel this order if it hasn't been fulfilled yet. Refunds will be processed within 5-7 business days."
+        requestSchema:
+          $ref: "https://schemas.ocs.dev/order/actions/cancel_request/v1.json"
+        responseSchema:
+          $ref: "https://schemas.ocs.dev/order/v1.json"
+        errorSchemas:
+          - statusCode: 400
+            errorCodes: ["cancellation_window_expired", "order_already_cancelled"]
+            description: "Order cannot be cancelled (window expired or already cancelled)"
+            schema:
+              $ref: "#/components/schemas/Error"
+          - statusCode: 404
+            errorCodes: ["not_found"]
+            description: "Order not found"
+            schema:
+              $ref: "#/components/schemas/Error"
+        examples:
+          request:
+            reason: "Changed my mind"
+          response:
+            id: "order_123"
+            status: "cancelled"
+            refundStatus: "processing"
+
+    SchemaReference:
+      type: object
+      description: |
+        Reference to a JSON Schema, either by URL or inline.
+        Inline schemas are preferred for small, simple schemas to reduce HTTP requests.
+      properties:
+        $ref:
+          type: string
+          format: uri
+          description: "URL to a JSON Schema document"
+        inline:
+          type: object
+          description: "Inline JSON Schema definition"
+      oneOf:
+        - required: [$ref]
+        - required: [inline]
+      example:
+        $ref: "https://schemas.ocs.dev/order/actions/cancel_request/v1.json"
+
+    # --- Web Payments & SPC Schemas ---
+    WebPaymentsMetadata:
+      type: object
+      description: |
+        Metadata for the dev.ocs.payment.web_payments@1.0 capability, enabling W3C Payment Request API integration.
+        This capability allows servers to advertise support for native browser payment UIs with saved payment methods.
+        See: https://www.w3.org/TR/payment-request/
+      properties:
+        _version:
+          type: string
+          const: "1.0"
+          description: "Schema version for this capability metadata."
+        supportedMethods:
+          type: array
+          items:
+            type: string
+            examples: ["basic-card", "https://apple.com/apple-pay", "https://google.com/pay"]
+          minItems: 1
+          description: "W3C payment method identifiers supported by this server."
+        merchantIdentifier:
+          type: string
+          description: "Merchant identifier required for payment methods like Apple Pay."
+        merchantName:
+          type: string
+          description: "Display name shown in the payment UI."
+        supportedNetworks:
+          type: array
+          items:
+            type: string
+            enum: [visa, mastercard, amex, discover, jcb, diners, maestro, unionpay]
+          description: "For basic-card: which card networks are accepted."
+        requireShippingAddress:
+          type: boolean
+          default: false
+          description: "Whether the Payment Request should collect shipping address."
+        requireBillingAddress:
+          type: boolean
+          default: false
+          description: "Whether billing address is required."
+      required: ["_version", "supportedMethods"]
+      example:
+        _version: "1.0"
+        supportedMethods: ["basic-card", "https://google.com/pay"]
+        merchantName: "Example Shop"
+        supportedNetworks: ["visa", "mastercard", "amex"]
+
+    SecurePaymentConfirmationMetadata:
+      type: object
+      description: |
+        Metadata for the dev.ocs.payment.spc@1.0 capability, enabling W3C Secure Payment Confirmation integration.
+        SPC provides biometric authentication for payments using WebAuthn, reducing fraud and improving UX.
+        See: https://www.w3.org/TR/secure-payment-confirmation/
+      properties:
+        _version:
+          type: string
+          const: "1.0"
+          description: "Schema version for this capability metadata."
+        supportedRps:
+          type: array
+          items:
+            type: string
+            format: hostname
+            examples: ["bank.example.com", "issuer.example.org"]
+          minItems: 1
+          description: "List of Relying Party domains coordinated for SPC authentication (typically banks/issuers)."
+        registrationUrl:
+          type: string
+          format: uri
+          description: "URL for RP credential registration, typically loaded in an iframe."
+        registrationFlow:
+          type: string
+          enum: [iframe, redirect, popup]
+          default: iframe
+          description: "How the registration flow should be presented to users."
+        timeout:
+          type: integer
+          minimum: 30000
+          maximum: 600000
+          default: 300000
+          description: "Timeout in milliseconds for SPC authentication prompts (30s-10min)."
+        requiresEnrollment:
+          type: boolean
+          default: true
+          description: "Whether users must enroll with the RP before using SPC."
+        fallbackMethods:
+          type: array
+          items:
+            type: string
+            enum: [otp, password, web_payments, manual_entry]
+          description: "Alternative authentication methods if SPC is unavailable."
+      required: ["_version", "supportedRps"]
+      example:
+        _version: "1.0"
+        supportedRps: ["bank.example.com"]
+        registrationUrl: "https://bank.example.com/register-spc"
+        timeout: 300000
+        fallbackMethods: ["otp", "web_payments"]
+
+    WebPaymentsExtras:
+      type: object
+      description: |
+        Additional data included in the x402 'extra' field when Web Payments capability is supported.
+        Provides information needed by the client to construct a PaymentRequest.
+      properties:
+        supportedMethods:
+          type: array
+          items:
+            type: object
+            properties:
+              supportedMethods:
+                type: string
+                description: "Payment method identifier"
+              data:
+                type: object
+                description: "Payment method specific data"
+          description: "Array of payment method objects for PaymentRequest constructor"
+        displayItems:
+          type: array
+          items:
+            type: object
+            properties:
+              label: { type: string }
+              amount: { type: object }
+          description: "Optional line items to display in the payment sheet"
+      example:
+        supportedMethods:
+          - supportedMethods: "basic-card"
+            data:
+              supportedNetworks: ["visa", "mastercard"]
+        displayItems:
+          - label: "Subtotal"
+            amount: { currency: "USD", value: "20.00" }
+
+    SPCExtras:
+      type: object
+      description: |
+        Additional data included in the x402 'extra' field when SPC capability is supported.
+        Provides challenge and credential information for SecurePaymentConfirmationRequest.
+      properties:
+        challenge:
+          type: string
+          format: byte
+          description: "Base64-encoded cryptographic challenge for this transaction"
+        credentialIds:
+          type: array
+          items:
+            type: string
+            format: byte
+          description: "Base64-encoded credential IDs available for this user"
+        rpId:
+          type: string
+          format: hostname
+          description: "Relying Party identifier"
+        instrument:
+          type: object
+          properties:
+            displayName: { type: string }
+            icon: { type: string, format: uri }
+          description: "Payment instrument details to display during authentication"
+      required: ["challenge", "credentialIds", "rpId", "instrument"]
+      example:
+        challenge: "dGhpc19pc19hX2NoYWxsZW5nZQ=="
+        credentialIds: ["Y3JlZGVudGlhbF9pZF8x"]
+        rpId: "bank.example.com"
+        instrument:
+          displayName: "Visa ****1234"
+          icon: "https://bank.example.com/card-icon.png"
 
     Error:
       type: object
@@ -1241,7 +1645,10 @@ components:
             - payment_failed
             # Cancellation & Returns
             - cancellation_window_expired
+            - order_already_cancelled
+            - order_not_cancellable
             - return_policy_violated
+            - return_window_expired
             # Rate Limiting
             - rate_limit_exceeded
         message:

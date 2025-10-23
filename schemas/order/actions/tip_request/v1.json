@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/order/actions/tip_request/v1.json",
+  "title": "Add Tip Request",
+  "description": "Request schema for adding a tip to a completed order",
+  "type": "object",
+  "properties": {
+    "amount": {
+      "type": "object",
+      "description": "Tip amount",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]{1,2})?$",
+          "description": "Tip amount in decimal format",
+          "examples": ["5.00", "10.50", "15.00"]
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217 currency code",
+          "examples": ["USD", "EUR", "GBP"]
+        }
+      },
+      "required": ["amount", "currency"]
+    },
+    "percentage": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Alternative: tip as percentage of order total",
+      "examples": [15, 18, 20, 25]
+    },
+    "recipient": {
+      "type": "string",
+      "enum": ["driver", "restaurant", "split"],
+      "description": "Who receives the tip"
+    },
+    "message": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Optional message to the recipient",
+      "examples": [
+        "Thank you!",
+        "Great service!",
+        "Food was amazing!"
+      ]
+    }
+  },
+  "oneOf": [
+    { "required": ["amount"] },
+    { "required": ["percentage"] }
+  ],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "amount": {
+        "amount": "5.00",
+        "currency": "USD"
+      },
+      "recipient": "driver",
+      "message": "Thank you!"
+    },
+    {
+      "percentage": 20,
+      "recipient": "split"
+    }
+  ]
+}

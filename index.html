@@ -293,6 +293,12 @@
             margin: 0;
         }
 
+        pre {
+            /* white-space: pre-wrap;
+            word-break: break-word; */
+            max-width: 100%;
+        }
+
         /* Custom scrollbar styling for code blocks */
         .code-block {
             scrollbar-width: thin;
@@ -695,6 +701,7 @@
                   <a href="#universal-client" class="nav-link">Universal Client Example</a>
                   <a href="#advanced-scenarios" class="nav-link">Advanced Commerce Scenarios</a>
                   <a href="#internationalization" class="nav-link">Internationalization</a>
+                  <a href="#standards-alignment" class="nav-link">Standards Alignment</a>
                   <a href="#capabilities" class="nav-link">Capabilities Reference</a>
              </div>
 
@@ -1468,6 +1475,12 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                         <div class="feature-icon">🛒</div>
                         <div class="feature-title">For Any Checkout Flow</div>
                         <div class="feature-description">One size doesn't fit all. OCS provides a robust, server-side cart for complex shopping journeys. For quick purchases, it also supports a stateless "Buy Now" flow. Your app can discover which models a server supports and dynamically provide the perfect UI for every product.</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔗</div>
+                        <div class="feature-title">Standards Alignment</div>
+                        <div class="feature-description">Built for the Web Ecosystem. OCS integrates seamlessly with Hydra for hypermedia semantics and Interledger/Open Payments for multi-rail payment interoperability—while maintaining its simple, developer-friendly JSON-first approach.</div>
                     </div>
                 </div>
             </section>
@@ -2540,6 +2553,173 @@ app.get('/catalogs/:id', (req, res) => {
                     <strong>Global-Ready by Design:</strong>
                     OCS internationalization enables truly global commerce. Any client can provide a fully localized experience in any supported language, with culturally correct formatting and proper UI layout for RTL languages.
                 </div>
+            </section>
+
+            <!-- Standards Alignment -->
+            <section id="standards-alignment">
+                <h2>Standards Alignment</h2>
+
+                <p>OCS is designed to integrate seamlessly with the broader web standards ecosystem while maintaining its core principles: <strong>HTTP-native</strong>, <strong>JSON-first</strong>, and <strong>developer-friendly</strong>. This section outlines how OCS aligns with adjacent standards for enhanced interoperability.</p>
+
+                <h3>🔗 Hypermedia Semantics (Hydra)</h3>
+
+                <p>OCS enhances its hypermedia capabilities by providing optional fields that map cleanly to Hydra's link and operation semantics, as well as standard HTTP Link headers.</p>
+
+                <h4>Optional <span class="inline-code">rel</span> and <span class="inline-code">href</span> Fields</h4>
+
+                <p>Actions and capabilities in OCS now support two optional metadata fields:</p>
+
+                <ul>
+                    <li><strong><span class="inline-code">rel</span></strong>: Link relation type that mirrors HTTP Link rel and Hydra relation (e.g., <span class="inline-code">self</span>, <span class="inline-code">cancel</span>, <span class="inline-code">create</span>)</li>
+                    <li><strong><span class="inline-code">href</span></strong>: Target URI for the action or linked resource</li>
+                </ul>
+
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "id": "cancel",
+  "href": "/orders/123/cancel",
+  "rel": "cancel",
+  "method": "POST"
+}</code></pre></div>
+                </div>
+
+                <h4>HTTP Link Headers</h4>
+
+                <p>Servers may optionally include equivalent HTTP Link headers for standard HTTP clients:</p>
+
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-http">Link: &lt;/orders/123/cancel&gt;; rel="cancel"</code></pre></div>
+                </div>
+
+                <h4>JSON-LD Context</h4>
+
+                <p>For Semantic Web compatibility, OCS provides an optional JSON-LD context at <span class="inline-code">schemas/context.jsonld</span>. Servers may include a top-level <span class="inline-code">@context</span> field in responses:</p>
+
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "@context": "https://schemas.ocs.dev/context.jsonld",
+  "capabilities": [
+    {
+      "id": "dev.ocs.cart@1.0",
+      "rel": "self",
+      "href": "/cart"
+    }
+  ]
+}</code></pre></div>
+                </div>
+
+                <p>JSON-only clients can safely ignore <span class="inline-code">@context</span>, while JSON-LD-aware clients can parse it semantically for integration with Hydra, RDF, and Linked Data tools.</p>
+
+                <h3>💸 Payment Interoperability (Interledger / Open Payments)</h3>
+
+                <p>OCS preserves its elegant HTTP 402 payment flow while enabling multi-rail interoperability through optional Interledger/Open Payments metadata.</p>
+
+                <h4>Enhanced Payment Requirements</h4>
+
+                <p>The <span class="inline-code">X402PaymentRequirements</span> schema now includes an optional <span class="inline-code">interledger</span> field:</p>
+
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "scheme": "fiat_intent",
+  "network": "stripe",
+  "maxAmountRequired": "2500",
+  "asset": "USD",
+  "interledger": {
+    "incoming_payment": "https://pay.example.com/incoming-payments/123",
+    "asset_code": "USD",
+    "asset_scale": 2
+  }
+}</code></pre></div>
+                </div>
+
+                <h4>Mapping to Open Payments</h4>
+
+                <p>OCS payment fields map cleanly to Interledger/Open Payments concepts:</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>OCS Field</th>
+                                <th>Open Payments Equivalent</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="inline-code">interledger.incoming_payment</span></td>
+                                <td><span class="inline-code">incoming-payment</span> or <span class="inline-code">quote</span> URL</td>
+                                <td>Open Payments endpoint</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">maxAmountRequired</span></td>
+                                <td><span class="inline-code">incoming-amount.value</span></td>
+                                <td>Transfer amount</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">interledger.asset_code</span></td>
+                                <td><span class="inline-code">incoming-amount.assetCode</span></td>
+                                <td>ISO 4217 or token symbol</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">network</span></td>
+                                <td>Connector / ledger ID</td>
+                                <td>e.g., <span class="inline-code">stripe</span>, <span class="inline-code">ilp</span>, <span class="inline-code">ethereum</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>Unified Payment Flow</h4>
+
+                <p>With these enhancements, a single OCS response can support multiple payment rails:</p>
+
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block"><pre><code class="language-json">{
+  "@context": "https://schemas.ocs.dev/context.jsonld",
+  "x402Version": 1,
+  "accepts": [
+    {
+      "scheme": "fiat_intent",
+      "network": "stripe",
+      "asset": "USD",
+      "maxAmountRequired": "2500",
+      "interledger": {
+        "incoming_payment": "https://pay.example.com/incoming-payments/123",
+        "asset_code": "USD",
+        "asset_scale": 2
+      }
+    },
+    {
+      "scheme": "exact",
+      "network": "base-sepolia",
+      "asset": "0x...",
+      "maxAmountRequired": "25000000"
+    }
+  ]
+}</code></pre></div>
+                </div>
+
+                <div class="info-box success">
+                    <strong>Multi-Rail Interoperability:</strong>
+                    This response is valid OCS, valid JSON-LD, and can settle via x402, Interledger/Open Payments, or traditional payment processors—all through the same elegant HTTP 402 flow.
+                </div>
+
+                <h3>📋 Implementation Status</h3>
+
+                <p>All standards alignment features are:</p>
+                <ul>
+                    <li><strong>Optional</strong>: No breaking changes to existing implementations</li>
+                    <li><strong>Backward Compatible</strong>: Existing clients continue to work without modification</li>
+                    <li><strong>Progressive Enhancement</strong>: Servers can adopt features incrementally</li>
+                </ul>
+
+                <p>For detailed implementation guidelines, see the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/docs/standards-alignment.md" target="_blank" style="color: var(--primary); text-decoration: underline;">Standards Alignment Roadmap</a> documentation.</p>
             </section>
 
             <!-- Capabilities Reference -->

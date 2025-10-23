@@ -1,0 +1,8 @@
+{
+  "ocs": {
+    "capabilities": "https://shop.example.com/ocs/capabilities",
+    "version": "1.0",
+    "context": "https://schemas.ocs.dev/context.jsonld",
+    "payment": "https://shop.example.com/ocs/payment"
+  }
+}

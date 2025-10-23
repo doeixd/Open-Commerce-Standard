@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCS Web Payments & SPC Example</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.6;
+    }
+    .section {
+      margin: 30px 0;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .section h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      background: #f0f0f0;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    .capability-check {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+    }
+    .capability-check span {
+      margin-left: 10px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .badge.supported {
+      background: #28a745;
+      color: white;
+    }
+    .badge.unsupported {
+      background: #dc3545;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔐 OCS Web Payments & Secure Payment Confirmation</h1>
+  <p>
+    This example demonstrates integration of W3C Payment Request API and Secure Payment Confirmation
+    with OCS's x402 payment protocol. Open the console to see detailed logs.
+  </p>
+
+  <!-- Browser Compatibility Check -->
+  <div class="section">
+    <h2>Browser Compatibility</h2>
+    <div id="compatibility-check">
+      <div class="capability-check">
+        <span class="badge" id="pr-badge">❓</span>
+        <span>Payment Request API</span>
+      </div>
+      <div class="capability-check">
+        <span class="badge" id="spc-badge">❓</span>
+        <span>Secure Payment Confirmation</span>
+      </div>
+      <div class="capability-check">
+        <span class="badge" id="webauthn-badge">❓</span>
+        <span>WebAuthn (required for SPC)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OCS Capability Discovery -->
+  <div class="section">
+    <h2>Step 1: OCS Capability Discovery</h2>
+    <button onclick="discoverCapabilities()">Discover Server Capabilities</button>
+    <div id="capabilities-status" class="status" style="display:none;"></div>
+    <pre id="capabilities-result" style="display:none;"></pre>
+  </div>
+
+  <!-- Web Payments Flow -->
+  <div class="section">
+    <h2>Step 2: Web Payments Flow</h2>
+    <p>Uses Payment Request API for streamlined checkout with saved payment methods.</p>
+    <button onclick="placeOrderWithWebPayments()" id="web-payments-btn" disabled>
+      Place Order with Web Payments
+    </button>
+    <div id="web-payments-status" class="status" style="display:none;"></div>
+    <pre id="web-payments-result" style="display:none;"></pre>
+  </div>
+
+  <!-- SPC Flow -->
+  <div class="section">
+    <h2>Step 3: Secure Payment Confirmation Flow</h2>
+    <p>Uses biometric authentication (Touch ID, Face ID, Windows Hello) for payment confirmation.</p>
+    <button onclick="registerSPCCredential()" id="spc-register-btn" disabled>
+      1. Register SPC Credential
+    </button>
+    <button onclick="placeOrderWithSPC()" id="spc-pay-btn" disabled>
+      2. Place Order with SPC
+    </button>
+    <div id="spc-status" class="status" style="display:none;"></div>
+    <pre id="spc-result" style="display:none;"></pre>
+  </div>
+
+  <!-- Implementation Notes -->
+  <div class="section">
+    <h2>📚 Implementation Notes</h2>
+    <h3>Web Payments Integration</h3>
+    <ol>
+      <li><strong>Server advertises capability:</strong> <code>dev.ocs.payment.web_payments@1.0</code></li>
+      <li><strong>On 402 Payment Required:</strong> Server includes <code>webPayments</code> data in <code>extra</code> field</li>
+      <li><strong>Client constructs PaymentRequest:</strong> Using supported methods from server</li>
+      <li><strong>User authenticates:</strong> Native browser UI shows saved payment methods</li>
+      <li><strong>Client retries order:</strong> Includes tokenized payment in <code>X-PAYMENT</code> header</li>
+    </ol>
+
+    <h3>SPC Integration</h3>
+    <ol>
+      <li><strong>Registration Phase:</strong> User enrolls biometric with bank/RP via iframe</li>
+      <li><strong>Storage:</strong> CredentialId saved locally (IndexedDB) for future use</li>
+      <li><strong>Payment Phase:</strong> Server sends challenge + credentialIds in 402 response</li>
+      <li><strong>Authentication:</strong> User confirms via biometric (phishing-resistant)</li>
+      <li><strong>Settlement:</strong> Server verifies WebAuthn assertion and processes payment</li>
+    </ol>
+
+    <h3>x402 Protocol Alignment</h3>
+    <pre>{
+  "x402Version": 1,
+  "error": "Payment required",
+  "accepts": [{
+    "scheme": "fiat_intent",
+    "network": "stripe",
+    "asset": "USD",
+    "maxAmountRequired": "2500",
+    "extra": {
+      "clientSecret": "pi_...",
+      "webPayments": {
+        "supportedMethods": ["basic-card", "https://google.com/pay"],
+        "displayItems": [...]
+      },
+      "spc": {
+        "challenge": "base64EncodedChallenge",
+        "credentialIds": ["base64CredentialId"],
+        "rpId": "bank.example.com",
+        "instrument": {
+          "displayName": "Visa ****1234",
+          "icon": "https://bank.example.com/icon.png"
+        }
+      }
+    }
+  }]
+}</pre>
+
+    <h3>Browser Support (as of Oct 2025)</h3>
+    <ul>
+      <li><strong>Payment Request API:</strong> Chrome ✅, Edge ✅, Safari ✅ (partial), Firefox ❌</li>
+      <li><strong>SPC:</strong> Chrome ✅ (macOS, Windows, Android), Safari ❌, Firefox ❌</li>
+      <li><strong>Production:</strong> Always provide fallback methods (manual entry, OTP)</li>
+    </ul>
+  </div>
+
+  <script>
+    // Configuration
+    const BASE_URL = 'http://localhost:3000';
+    let serverCapabilities = null;
+    let spcCredentialId = null;
+
+    // Check browser compatibility
+    function checkCompatibility() {
+      const hasPaymentRequest = 'PaymentRequest' in window;
+      const hasSPC = 'PaymentRequest' in window && window.PaymentRequest.prototype.hasOwnProperty('show');
+      const hasWebAuthn = 'credentials' in navigator && 'create' in navigator.credentials;
+
+      document.getElementById('pr-badge').className = `badge ${hasPaymentRequest ? 'supported' : 'unsupported'}`;
+      document.getElementById('pr-badge').textContent = hasPaymentRequest ? '✓' : '✗';
+
+      document.getElementById('spc-badge').className = `badge ${hasSPC ? 'supported' : 'unsupported'}`;
+      document.getElementById('spc-badge').textContent = hasSPC ? '✓' : '✗';
+
+      document.getElementById('webauthn-badge').className = `badge ${hasWebAuthn ? 'supported' : 'unsupported'}`;
+      document.getElementById('webauthn-badge').textContent = hasWebAuthn ? '✓' : '✗';
+
+      return { hasPaymentRequest, hasSPC, hasWebAuthn };
+    }
+
+    // Discover OCS capabilities
+    async function discoverCapabilities() {
+      const statusEl = document.getElementById('capabilities-status');
+      const resultEl = document.getElementById('capabilities-result');
+
+      statusEl.style.display = 'block';
+      statusEl.className = 'status info';
+      statusEl.textContent = 'Fetching capabilities from ' + BASE_URL + '/capabilities...';
+
+      try {
+        const response = await fetch(`${BASE_URL}/capabilities`);
+        const data = await response.json();
+        serverCapabilities = data;
+
+        console.log('Server capabilities:', data);
+
+        const hasWebPayments = data.capabilities.some(c => c.id === 'dev.ocs.payment.web_payments@1.0');
+        const hasSPC = data.capabilities.some(c => c.id === 'dev.ocs.payment.spc@1.0');
+
+        statusEl.className = 'status success';
+        statusEl.innerHTML = `
+          <strong>✓ Capabilities discovered</strong><br>
+          Web Payments: ${hasWebPayments ? '✓ Supported' : '✗ Not supported'}<br>
+          SPC: ${hasSPC ? '✓ Supported' : '✗ Not supported'}
+        `;
+
+        resultEl.style.display = 'block';
+        resultEl.textContent = JSON.stringify(data, null, 2);
+
+        // Enable buttons based on capabilities and browser support
+        const browserCompat = checkCompatibility();
+        document.getElementById('web-payments-btn').disabled = !(hasWebPayments && browserCompat.hasPaymentRequest);
+        document.getElementById('spc-register-btn').disabled = !(hasSPC && browserCompat.hasWebAuthn);
+
+      } catch (error) {
+        console.error('Capability discovery failed:', error);
+        statusEl.className = 'status error';
+        statusEl.textContent = '✗ Failed to fetch capabilities: ' + error.message;
+      }
+    }
+
+    // Place order using Web Payments
+    async function placeOrderWithWebPayments() {
+      const statusEl = document.getElementById('web-payments-status');
+      const resultEl = document.getElementById('web-payments-result');
+
+      statusEl.style.display = 'block';
+      statusEl.className = 'status info';
+      statusEl.textContent = 'Placing order...';
+
+      try {
+        // Step 1: Attempt to place order
+        const orderResponse = await fetch(`${BASE_URL}/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/ocs+json; version=1.0',
+            'Authorization': 'Bearer demo_token',
+            'Idempotency-Key': generateUUID()
+          },
+          body: JSON.stringify({
+            orderType: 'direct',
+            items: [{ catalogItemId: 'coffee_mug', quantity: 1 }],
+            deliveryAddress: { address: '123 Main St, Anytown, USA' }
+          })
+        });
+
+        // Step 2: Handle 402 Payment Required
+        if (orderResponse.status === 402) {
+          const x402Data = await orderResponse.json();
+          console.log('402 Payment Required:', x402Data);
+
+          const fiatAccept = x402Data.accepts.find(a => a.scheme === 'fiat_intent');
+          if (!fiatAccept || !fiatAccept.extra.webPayments) {
+            throw new Error('Server did not provide Web Payments data in x402 response');
+          }
+
+          statusEl.textContent = 'Showing payment UI...';
+
+          // Step 3: Construct PaymentRequest
+          const paymentMethods = fiatAccept.extra.webPayments.supportedMethods.map(method => ({
+            supportedMethods: method
+          }));
+
+          const paymentDetails = {
+            total: {
+              label: 'Total',
+              amount: {
+                currency: fiatAccept.asset,
+                value: (parseInt(fiatAccept.maxAmountRequired) / 100).toFixed(2)
+              }
+            },
+            displayItems: fiatAccept.extra.webPayments.displayItems || []
+          };
+
+          const request = new PaymentRequest(paymentMethods, paymentDetails);
+
+          // Step 4: Show payment UI
+          const paymentResponse = await request.show();
+          console.log('Payment response:', paymentResponse);
+
+          statusEl.textContent = 'Processing payment...';
+
+          // Step 5: Construct X-PAYMENT payload
+          const paymentPayload = {
+            x402Version: 1,
+            scheme: 'fiat_intent',
+            network: fiatAccept.network,
+            payload: {
+              methodName: paymentResponse.methodName,
+              details: paymentResponse.details
+            }
+          };
+
+          // Step 6: Retry order with payment
+          const retryResponse = await fetch(`${BASE_URL}/orders`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/ocs+json; version=1.0',
+              'Authorization': 'Bearer demo_token',
+              'Idempotency-Key': generateUUID(),
+              'X-PAYMENT': btoa(JSON.stringify(paymentPayload))
+            },
+            body: JSON.stringify({
+              orderType: 'direct',
+              items: [{ catalogItemId: 'coffee_mug', quantity: 1 }],
+              deliveryAddress: { address: '123 Main St, Anytown, USA' }
+            })
+          });
+
+          if (retryResponse.ok) {
+            const order = await retryResponse.json();
+            await paymentResponse.complete('success');
+
+            statusEl.className = 'status success';
+            statusEl.textContent = '✓ Order placed successfully with Web Payments!';
+            resultEl.style.display = 'block';
+            resultEl.textContent = JSON.stringify(order, null, 2);
+          } else {
+            await paymentResponse.complete('fail');
+            throw new Error('Order failed after payment');
+          }
+        } else if (orderResponse.ok) {
+          const order = await orderResponse.json();
+          statusEl.className = 'status success';
+          statusEl.textContent = '✓ Order placed (no payment required)';
+          resultEl.style.display = 'block';
+          resultEl.textContent = JSON.stringify(order, null, 2);
+        } else {
+          throw new Error(`Order request failed with status ${orderResponse.status}`);
+        }
+
+      } catch (error) {
+        console.error('Web Payments error:', error);
+        statusEl.className = 'status error';
+        statusEl.textContent = '✗ Error: ' + error.message;
+      }
+    }
+
+    // Register SPC credential
+    async function registerSPCCredential() {
+      const statusEl = document.getElementById('spc-status');
+      const resultEl = document.getElementById('spc-result');
+
+      statusEl.style.display = 'block';
+      statusEl.className = 'status info';
+      statusEl.textContent = 'Registering SPC credential with RP...';
+
+      try {
+        // In production, this would load an iframe from the RP's registrationUrl
+        // For demo, we'll simulate credential creation
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+
+        const publicKeyOptions = {
+          challenge: challenge,
+          rp: {
+            name: "Bank Example",
+            id: "bank.example.com"
+          },
+          user: {
+            id: new Uint8Array(16),
+            name: "user@example.com",
+            displayName: "Demo User"
+          },
+          pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+          timeout: 60000,
+          attestation: "none"
+        };
+
+        // Note: In a real implementation, this would be called from within
+        // the RP's registration iframe with their actual parameters
+        const credential = await navigator.credentials.create({
+          publicKey: publicKeyOptions
+        });
+
+        // Store credential ID for future use
+        spcCredentialId = arrayBufferToBase64(credential.rawId);
+        localStorage.setItem('spc_credential_id', spcCredentialId);
+
+        console.log('SPC credential registered:', credential);
+
+        statusEl.className = 'status success';
+        statusEl.innerHTML = `
+          <strong>✓ Credential registered successfully</strong><br>
+          Credential ID: ${spcCredentialId.substring(0, 20)}...<br>
+          You can now use biometric authentication for payments.
+        `;
+
+        resultEl.style.display = 'block';
+        resultEl.textContent = JSON.stringify({
+          id: spcCredentialId,
+          type: credential.type,
+          authenticatorAttachment: credential.authenticatorAttachment
+        }, null, 2);
+
+        document.getElementById('spc-pay-btn').disabled = false;
+
+      } catch (error) {
+        console.error('SPC registration error:', error);
+        statusEl.className = 'status error';
+        statusEl.textContent = '✗ Registration failed: ' + error.message;
+      }
+    }
+
+    // Place order using SPC
+    async function placeOrderWithSPC() {
+      const statusEl = document.getElementById('spc-status');
+      const resultEl = document.getElementById('spc-result');
+
+      statusEl.style.display = 'block';
+      statusEl.className = 'status info';
+      statusEl.textContent = 'Placing order with SPC...';
+
+      try {
+        // Retrieve stored credential
+        const credentialId = localStorage.getItem('spc_credential_id');
+        if (!credentialId) {
+          throw new Error('No SPC credential found. Register first.');
+        }
+
+        // Step 1: Attempt to place order
+        const orderResponse = await fetch(`${BASE_URL}/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/ocs+json; version=1.0',
+            'Authorization': 'Bearer demo_token',
+            'Idempotency-Key': generateUUID()
+          },
+          body: JSON.stringify({
+            orderType: 'direct',
+            items: [{ catalogItemId: 'coffee_mug', quantity: 1 }],
+            deliveryAddress: { address: '123 Main St, Anytown, USA' }
+          })
+        });
+
+        // Step 2: Handle 402 with SPC
+        if (orderResponse.status === 402) {
+          const x402Data = await orderResponse.json();
+          const fiatAccept = x402Data.accepts.find(a => a.scheme === 'fiat_intent');
+
+          if (!fiatAccept || !fiatAccept.extra.spc) {
+            throw new Error('Server did not provide SPC data in x402 response');
+          }
+
+          statusEl.textContent = 'Requesting biometric authentication...';
+
+          const spcData = fiatAccept.extra.spc;
+
+          // Step 3: Construct SecurePaymentConfirmationRequest
+          const paymentRequest = new PaymentRequest(
+            [{
+              supportedMethods: "secure-payment-confirmation",
+              data: {
+                action: "payment",
+                credentialIds: [base64ToArrayBuffer(credentialId)],
+                challenge: base64ToArrayBuffer(spcData.challenge),
+                instrument: spcData.instrument,
+                timeout: 300000,
+                payeeName: "Example Shop",
+                payeeOrigin: window.location.origin,
+                rpId: spcData.rpId
+              }
+            }],
+            {
+              total: {
+                label: 'Total',
+                amount: {
+                  currency: fiatAccept.asset,
+                  value: (parseInt(fiatAccept.maxAmountRequired) / 100).toFixed(2)
+                }
+              }
+            }
+          );
+
+          // Step 4: Show SPC prompt (biometric authentication)
+          const paymentResponse = await paymentRequest.show();
+          console.log('SPC response:', paymentResponse);
+
+          statusEl.textContent = 'Processing authenticated payment...';
+
+          // Step 5: Construct X-PAYMENT with assertion
+          const paymentPayload = {
+            x402Version: 1,
+            scheme: 'fiat_intent',
+            network: fiatAccept.network,
+            payload: {
+              assertion: {
+                id: paymentResponse.details.id,
+                rawId: arrayBufferToBase64(paymentResponse.details.rawId),
+                response: {
+                  authenticatorData: arrayBufferToBase64(paymentResponse.details.response.authenticatorData),
+                  clientDataJSON: arrayBufferToBase64(paymentResponse.details.response.clientDataJSON),
+                  signature: arrayBufferToBase64(paymentResponse.details.response.signature)
+                },
+                type: paymentResponse.details.type
+              }
+            }
+          };
+
+          // Step 6: Retry order with SPC assertion
+          const retryResponse = await fetch(`${BASE_URL}/orders`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/ocs+json; version=1.0',
+              'Authorization': 'Bearer demo_token',
+              'Idempotency-Key': generateUUID(),
+              'X-PAYMENT': btoa(JSON.stringify(paymentPayload))
+            },
+            body: JSON.stringify({
+              orderType: 'direct',
+              items: [{ catalogItemId: 'coffee_mug', quantity: 1 }],
+              deliveryAddress: { address: '123 Main St, Anytown, USA' }
+            })
+          });
+
+          if (retryResponse.ok) {
+            const order = await retryResponse.json();
+            await paymentResponse.complete('success');
+
+            statusEl.className = 'status success';
+            statusEl.textContent = '✓ Order placed successfully with SPC biometric authentication!';
+            resultEl.style.display = 'block';
+            resultEl.textContent = JSON.stringify(order, null, 2);
+          } else {
+            await paymentResponse.complete('fail');
+            throw new Error('Order failed after SPC authentication');
+          }
+        }
+
+      } catch (error) {
+        console.error('SPC payment error:', error);
+        statusEl.className = 'status error';
+        statusEl.textContent = '✗ Error: ' + error.message;
+      }
+    }
+
+    // Utility functions
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function arrayBufferToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    // Initialize
+    checkCompatibility();
+  </script>
+</body>
+</html>

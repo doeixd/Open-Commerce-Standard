@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/order/actions/return_request/v1.json",
+  "title": "Initiate Return Request",
+  "description": "Request schema for initiating a return for one or more items from an order",
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "description": "Items to return",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "cartItemId": {
+            "type": "string",
+            "description": "ID of the cart item to return (from order.items[].id)"
+          },
+          "variantId": {
+            "type": "string",
+            "description": "Variant ID if returning a specific variant"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of units to return"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "wrong_item",
+              "defective",
+              "damaged",
+              "wrong_size",
+              "wrong_color",
+              "not_as_described",
+              "changed_mind",
+              "quality_issue",
+              "other"
+            ],
+            "description": "Reason for return"
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Additional details about the return"
+          },
+          "images": {
+            "type": "array",
+            "description": "URLs of images showing the issue (for damaged/defective items)",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "maxItems": 5
+          }
+        },
+        "required": ["cartItemId", "quantity", "reason"]
+      }
+    },
+    "preferredResolution": {
+      "type": "string",
+      "enum": ["refund", "exchange", "store_credit"],
+      "default": "refund",
+      "description": "Customer's preferred resolution type"
+    },
+    "returnMethod": {
+      "type": "string",
+      "enum": ["ship", "in_store", "pickup"],
+      "description": "How the customer will return the items"
+    }
+  },
+  "required": ["items"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "items": [
+        {
+          "cartItemId": "item_456",
+          "quantity": 1,
+          "reason": "wrong_size",
+          "comment": "Ordered Large but need Medium"
+        }
+      ],
+      "preferredResolution": "exchange",
+      "returnMethod": "ship"
+    },
+    {
+      "items": [
+        {
+          "cartItemId": "item_789",
+          "quantity": 1,
+          "reason": "defective",
+          "comment": "Product arrived broken",
+          "images": [
+            "https://example.com/uploads/damage_photo1.jpg",
+            "https://example.com/uploads/damage_photo2.jpg"
+          ]
+        }
+      ],
+      "preferredResolution": "refund",
+      "returnMethod": "ship"
+    }
+  ]
+}

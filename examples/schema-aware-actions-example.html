@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCS Schema-Aware Actions Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.6;
+    }
+    .section {
+      margin: 30px 0;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    h2 { margin-top: 0; color: #333; }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      background: #f0f0f0;
+    }
+    .status.success { background: #d4edda; color: #155724; }
+    .status.error { background: #f8d7da; color: #721c24; }
+    .status.info { background: #d1ecf1; color: #0c5460; }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover { background: #0056b3; }
+    button:disabled { background: #6c757d; cursor: not-allowed; }
+    pre {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    .action-card {
+      border: 1px solid #007bff;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      background: #f8f9fa;
+    }
+    .action-title {
+      font-weight: bold;
+      font-size: 16px;
+      color: #007bff;
+      margin-bottom: 8px;
+    }
+    .action-description {
+      color: #666;
+      margin-bottom: 12px;
+    }
+    form {
+      margin-top: 15px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 500;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .field-hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+    .badge.supported { background: #28a745; color: white; }
+    .badge.unsupported { background: #dc3545; color: white; }
+    .error-list {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    .error-list li {
+      color: #856404;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔗 OCS Schema-Aware Actions Demo</h1>
+  <p>
+    This example demonstrates how schema-aware actions enable dynamic form generation,
+    client-side validation, and self-documenting APIs. The client discovers what actions
+    are available and dynamically builds UIs based on the schema information.
+  </p>
+
+  <!-- Step 1: Create Order -->
+  <div class="section">
+    <h2>Step 1: Create Order</h2>
+    <p>First, let's create an order to demonstrate schema-aware actions.</p>
+    <button onclick="createOrder()">Create Demo Order</button>
+    <div id="create-status" class="status" style="display:none;"></div>
+    <pre id="create-result" style="display:none;"></pre>
+  </div>
+
+  <!-- Step 2: Discover Actions -->
+  <div class="section">
+    <h2>Step 2: Discover Actions</h2>
+    <p>Once we have an order, we'll fetch it to see what actions are available based on its current status.</p>
+    <button onclick="fetchOrder()" id="fetch-btn" disabled>Fetch Order & Discover Actions</button>
+    <div id="discover-status" class="status" style="display:none;"></div>
+    <pre id="discover-result" style="display:none;"></pre>
+  </div>
+
+  <!-- Step 3: Dynamic Action Forms -->
+  <div class="section">
+    <h2>Step 3: Dynamic Action Forms</h2>
+    <p>Based on the discovered actions, we'll dynamically generate forms with validation.</p>
+    <div id="actions-container"></div>
+  </div>
+
+  <!-- Step 4: Benefits -->
+  <div class="section">
+    <h2>💡 Key Benefits Demonstrated</h2>
+    <ul>
+      <li><strong>Self-Documenting:</strong> Actions include title, description, and schema refs</li>
+      <li><strong>Dynamic Generation:</strong> Forms built automatically from schemas</li>
+      <li><strong>Client-Side Validation:</strong> Schemas define constraints (min/max, required, etc.)</li>
+      <li><strong>Error Handling:</strong> Actions describe possible errors with codes</li>
+      <li><strong>Type Safety:</strong> Can generate TypeScript types from schemas</li>
+      <li><strong>State-Dependent:</strong> Available actions change based on order status</li>
+    </ul>
+  </div>
+
+  <script>
+    const BASE_URL = 'http://localhost:3000';
+    let currentOrderId = null;
+    let currentOrder = null;
+
+    // Create demo order
+    async function createOrder() {
+      const statusEl = document.getElementById('create-status');
+      const resultEl = document.getElementById('create-result');
+
+      statusEl.style.display = 'block';
+      statusEl.className = 'status info';
+      statusEl.textContent = 'Creating order...';
+
+      try {
+        const response = await fetch(`${BASE_URL}/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/ocs+json; version=1.0',
+            'Authorization': 'Bearer demo_token',
+            'Idempotency-Key': generateUUID()
+          },
+          body: JSON.stringify({
+            orderType: 'direct',
+            items: [
+              { catalogItemId: 'coffee_mug', quantity: 1 }
+            ],
+            deliveryAddress: { address: '123 Main St, Anytown, USA' }
+          })
+        });
+
+        if (response.ok) {
+          const order = await response.json();
+          currentOrderId = order.id;
+          currentOrder = order;
+
+          statusEl.className = 'status success';
+          statusEl.textContent = '✓ Order created successfully!';
+          resultEl.style.display = 'block';
+          resultEl.textContent = JSON.stringify(order, null, 2);
+
+          document.getElementById('fetch-btn').disabled = false;
+
+          console.log('Order created:', order);
+          console.log('Actions available:', order.actions);
+        } else {
+          throw new Error(`Order creation failed: ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        statusEl.className = 'status error';
+        statusEl.textContent = '✗ Error: ' + error.message;
+      }
+    }
+
+    // Fetch order and discover actions
+    async function fetchOrder() {
+      if (!currentOrderId) {
+        alert('Please create an order first');
+        return;
+      }
+
+      const statusEl = document.getElementById('discover-status');
+      const resultEl = document.getElementById('discover-result');
+
+      statusEl.style.display = 'block';
+      statusEl.className = 'status info';
+      statusEl.textContent = 'Fetching order...';
+
+      try {
+        const response = await fetch(`${BASE_URL}/orders/${currentOrderId}`, {
+          headers: {
+            'Authorization': 'Bearer demo_token'
+          }
+        });
+
+        if (response.ok) {
+          const order = await response.json();
+          currentOrder = order;
+
+          statusEl.className = 'status success';
+          statusEl.innerHTML = `
+            <strong>✓ Order fetched successfully!</strong><br>
+            Status: ${order.status}<br>
+            Actions available: ${order.actions.length}
+          `;
+
+          resultEl.style.display = 'block';
+          resultEl.textContent = JSON.stringify(order, null, 2);
+
+          // Render actions dynamically
+          renderActions(order.actions);
+        } else {
+          throw new Error(`Failed to fetch order: ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        statusEl.className = 'status error';
+        statusEl.textContent = '✗ Error: ' + error.message;
+      }
+    }
+
+    // Dynamically render action forms
+    function renderActions(actions) {
+      const container = document.getElementById('actions-container');
+      container.innerHTML = '';
+
+      if (!actions || actions.length === 0) {
+        container.innerHTML = '<p>No actions available for this order status.</p>';
+        return;
+      }
+
+      actions.forEach(action => {
+        const card = document.createElement('div');
+        card.className = 'action-card';
+
+        const title = document.createElement('div');
+        title.className = 'action-title';
+        title.textContent = action.title || action.id;
+
+        const description = document.createElement('div');
+        description.className = 'action-description';
+        description.textContent = action.description || 'No description available';
+
+        const form = createFormFromAction(action);
+
+        card.appendChild(title);
+        card.appendChild(description);
+        card.appendChild(form);
+
+        container.appendChild(card);
+      });
+    }
+
+    // Create form from action schema
+    function createFormFromAction(action) {
+      const form = document.createElement('form');
+      form.id = `form-${action.id}`;
+
+      // Get schema (either inline or from $ref)
+      const schema = action.requestSchema?.inline;
+
+      if (schema) {
+        // Generate form fields from schema
+        for (const [field, config] of Object.entries(schema.properties || {})) {
+          const label = document.createElement('label');
+          label.textContent = field.charAt(0).toUpperCase() + field.slice(1).replace(/_/g, ' ');
+          if (schema.required?.includes(field)) {
+            label.textContent += ' *';
+          }
+
+          const input = createInputFromSchema(field, config);
+          input.name = field;
+
+          form.appendChild(label);
+          form.appendChild(input);
+
+          if (config.description) {
+            const hint = document.createElement('div');
+            hint.className = 'field-hint';
+            hint.textContent = config.description;
+            form.appendChild(hint);
+          }
+        }
+      } else {
+        const note = document.createElement('p');
+        note.textContent = 'Schema available at: ' + (action.requestSchema?.$ref || 'No schema provided');
+        note.style.fontSize = '12px';
+        note.style.color = '#666';
+        form.appendChild(note);
+      }
+
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'submit';
+      submitBtn.textContent = `Execute: ${action.title || action.id}`;
+
+      form.appendChild(submitBtn);
+
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        executeAction(action, new FormData(form));
+      };
+
+      return form;
+    }
+
+    // Create input element from schema
+    function createInputFromSchema(name, config) {
+      let input;
+
+      if (config.type === 'integer') {
+        input = document.createElement('input');
+        input.type = 'number';
+        if (config.minimum !== undefined) input.min = config.minimum;
+        if (config.maximum !== undefined) input.max = config.maximum;
+      } else if (config.maxLength > 100) {
+        input = document.createElement('textarea');
+        input.maxLength = config.maxLength;
+      } else if (config.enum) {
+        input = document.createElement('select');
+        config.enum.forEach(value => {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = value.replace(/_/g, ' ');
+          input.appendChild(option);
+        });
+      } else {
+        input = document.createElement('input');
+        input.type = 'text';
+        if (config.maxLength) input.maxLength = config.maxLength;
+      }
+
+      return input;
+    }
+
+    // Execute action
+    async function executeAction(action, formData) {
+      const data = Object.fromEntries(formData);
+
+      console.log(`Executing action: ${action.id}`, data);
+
+      // Client-side validation
+      const validation = validateAgainstSchema(data, action.requestSchema?.inline);
+      if (!validation.valid) {
+        alert('Validation failed:\n' + validation.errors.map(e => `- ${e.field}: ${e.message}`).join('\n'));
+        return;
+      }
+
+      try {
+        const response = await fetch(action.href, {
+          method: action.method || 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer demo_token'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          alert(`✓ Action "${action.title}" executed successfully!`);
+          console.log('Result:', result);
+
+          // Refresh order to see updated actions
+          fetchOrder();
+        } else {
+          const error = await response.json();
+          console.error('Action failed:', error);
+
+          let errorMessage = `✗ Action failed: ${error.message}`;
+          if (error.userMessage) {
+            errorMessage += `\n\nUser message: ${error.userMessage.localizationKey}`;
+          }
+
+          alert(errorMessage);
+        }
+      } catch (error) {
+        console.error('Error executing action:', error);
+        alert('✗ Error: ' + error.message);
+      }
+    }
+
+    // Simple validation function
+    function validateAgainstSchema(data, schema) {
+      if (!schema) return { valid: true };
+
+      const errors = [];
+
+      // Check required fields
+      if (schema.required) {
+        schema.required.forEach(field => {
+          if (!data[field] || data[field] === '') {
+            errors.push({ field, message: 'This field is required' });
+          }
+        });
+      }
+
+      // Check types and constraints
+      for (const [field, value] of Object.entries(data)) {
+        const config = schema.properties?.[field];
+        if (!config) continue;
+
+        if (config.type === 'integer') {
+          const num = parseInt(value);
+          if (isNaN(num)) {
+            errors.push({ field, message: 'Must be a number' });
+          } else {
+            if (config.minimum !== undefined && num < config.minimum) {
+              errors.push({ field, message: `Must be at least ${config.minimum}` });
+            }
+            if (config.maximum !== undefined && num > config.maximum) {
+              errors.push({ field, message: `Must be at most ${config.maximum}` });
+            }
+          }
+        }
+
+        if (config.maxLength && value.length > config.maxLength) {
+          errors.push({ field, message: `Must be ${config.maxLength} characters or less` });
+        }
+      }
+
+      return {
+        valid: errors.length === 0,
+        errors
+      };
+    }
+
+    // Utility function
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+  </script>
+</body>
+</html>

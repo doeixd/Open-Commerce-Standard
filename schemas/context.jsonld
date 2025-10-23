@@ -1,0 +1,41 @@
+{
+  "@context": {
+    "ocs": "https://schemas.ocs.dev/vocab#",
+    "hydra": "http://www.w3.org/ns/hydra/core#",
+    "schema": "http://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "rel": "hydra:Link",
+    "href": {
+      "@id": "hydra:Link",
+      "@type": "@id"
+    },
+    "actions": {
+      "@id": "hydra:operation",
+      "@container": "@set"
+    },
+    "capabilities": {
+      "@id": "ocs:Capability",
+      "@container": "@set"
+    },
+    "id": "@id",
+    "type": "@type",
+    "method": "hydra:method",
+    "price": "schema:price",
+    "name": "schema:name",
+    "description": "schema:description",
+    "ocs:EntryPoint": "ocs:EntryPoint",
+    "ocs:capabilities": {
+      "@id": "ocs:capabilities",
+      "@type": "@id"
+    },
+    "ocs:version": "ocs:version",
+    "ocs:context": {
+      "@id": "ocs:context",
+      "@type": "@id"
+    },
+    "ocs:payment": {
+      "@id": "ocs:payment",
+      "@type": "@id"
+    }
+  }
+}

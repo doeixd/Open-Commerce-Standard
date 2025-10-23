@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/payment/web_payments/v1.json",
+  "title": "Web Payments Capability",
+  "description": "Capability for W3C Payment Request API integration, enabling native browser payment UIs with saved payment methods and tokenization.",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version for this capability metadata."
+    },
+    "supportedMethods": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "examples": [
+          "basic-card",
+          "https://apple.com/apple-pay",
+          "https://google.com/pay"
+        ]
+      },
+      "minItems": 1,
+      "description": "W3C payment method identifiers supported by this server. See https://www.w3.org/TR/payment-method-id/"
+    },
+    "merchantIdentifier": {
+      "type": "string",
+      "description": "Optional merchant identifier required for certain payment methods like Apple Pay."
+    },
+    "merchantName": {
+      "type": "string",
+      "description": "Display name shown in the payment UI."
+    },
+    "supportedNetworks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["visa", "mastercard", "amex", "discover", "jcb", "diners", "maestro", "unionpay"]
+      },
+      "description": "For basic-card: which card networks are accepted."
+    },
+    "requireShippingAddress": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the Payment Request should collect shipping address."
+    },
+    "requireBillingAddress": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether billing address is required."
+    }
+  },
+  "required": ["_version", "supportedMethods"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "_version": "1.0",
+      "supportedMethods": ["basic-card"],
+      "merchantName": "Example Shop",
+      "supportedNetworks": ["visa", "mastercard", "amex"]
+    },
+    {
+      "_version": "1.0",
+      "supportedMethods": ["https://apple.com/apple-pay", "https://google.com/pay"],
+      "merchantIdentifier": "merchant.com.example",
+      "merchantName": "Example Store"
+    }
+  ]
+}

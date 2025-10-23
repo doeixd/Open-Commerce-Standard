@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCS Example Store</title>
+
+  <!-- OCS Discovery via HTML Meta Tags -->
+  <meta name="ocs:capabilities" content="https://shop.example.com/ocs/capabilities">
+  <meta name="ocs:version" content="1.0">
+  <meta name="ocs:context" content="https://schemas.ocs.dev/context.jsonld">
+
+  <!-- OCS Discovery via JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schemas.ocs.dev/context.jsonld",
+    "@type": "ocs:EntryPoint",
+    "ocs:capabilities": "https://shop.example.com/ocs/capabilities",
+    "ocs:version": "1.0",
+    "ocs:payment": "https://shop.example.com/ocs/payment"
+  }
+  </script>
+
+  <!-- Standard Schema.org markup for the store -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "Example OCS Store",
+    "description": "A demonstration store using the Open Commerce Standard",
+    "url": "https://shop.example.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://shop.example.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+</head>
+<body>
+  <h1>Welcome to Example OCS Store</h1>
+  <p>This page demonstrates OCS discovery mechanisms through HTML meta tags and JSON-LD.</p>
+
+  <!--
+    HTTP Response Headers (configured at server level):
+
+    OCS-Discovery: capabilities=https://shop.example.com/ocs/capabilities;version=1.0;context=https://schemas.ocs.dev/context.jsonld;payment=https://shop.example.com/ocs/payment
+    Link: <https://shop.example.com/.well-known/ocs>; rel="service-meta"
+    Cache-Control: public, max-age=3600
+  -->
+</body>
+</html>

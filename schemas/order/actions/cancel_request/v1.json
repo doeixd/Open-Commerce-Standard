@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/order/actions/cancel_request/v1.json",
+  "title": "Cancel Order Request",
+  "description": "Request schema for cancelling an order. The order must be in a cancellable state (typically 'confirmed' or 'pending') and within the cancellation window.",
+  "type": "object",
+  "properties": {
+    "reason": {
+      "type": "string",
+      "description": "Optional reason for cancelling the order",
+      "maxLength": 500,
+      "examples": [
+        "Changed my mind",
+        "Found a better price elsewhere",
+        "Ordered by mistake",
+        "No longer needed"
+      ]
+    },
+    "requestRefund": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to request a refund. If false, the payment may be held as store credit."
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "reason": "Changed my mind"
+    },
+    {
+      "reason": "Ordered by mistake",
+      "requestRefund": true
+    }
+  ]
+}
