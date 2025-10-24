@@ -13,6 +13,7 @@
  */
 
 const express = require('express');
+const crypto = require('crypto');
 const app = express();
 const PORT = 3000;
 
@@ -127,6 +128,10 @@ app.get('/capabilities', (req, res) => {
           inlineSchemas: true,
           includeExamples: true,
         },
+      },
+      {
+        id: 'dev.ocs.resource.versioning@1.0',
+        schemaUrl: 'https://schemas.ocs.dev/resource/versioning/v1.json',
       },
     ],
   });
@@ -431,8 +436,10 @@ app.post('/orders', requireAuth, (req, res) => {
   }
 
   // Create order
+  const chainId = `chain_${crypto.randomUUID()}`;
+  const orderId = `order_${crypto.randomUUID()}`;
   const order = {
-    id: `order_${Date.now()}`,
+    id: orderId,
     status: 'confirmed',
     items: orderItems,
     total: {
@@ -443,7 +450,17 @@ app.post('/orders', requireAuth, (req, res) => {
     pickupLocation: req.body.pickupLocation,
     createdAt: new Date().toISOString(),
     // Add schema-aware hypermedia actions
-    actions: buildOrderActions(order.id, order.status),
+    actions: buildOrderActions(orderId, 'confirmed'),
+    metadata: {
+      'dev.ocs.resource.versioning@1.0': {
+        _version: '1.0',
+        chainId: chainId,
+        version: 1,
+        revises: null,
+        isLatest: true,
+        revisionDetails: null
+      }
+    },
   };
 
   store.orders.push(order);
@@ -492,11 +509,11 @@ app.get('/orders', requireAuth, (req, res) => {
   });
 });
 
-// 11. Cancel Order (Hypermedia Action Example)
+// 11. Cancel Order (Immutable Versioning Example)
 app.post('/orders/:id/cancel', requireAuth, (req, res) => {
-  const order = store.orders.find(o => o.id === req.params.id);
+  const previousOrder = store.orders.find(o => o.id === req.params.id);
 
-  if (!order) {
+  if (!previousOrder) {
     return res.status(404)
       .header('Content-Type', 'application/problem+json')
       .json({
@@ -509,7 +526,19 @@ app.post('/orders/:id/cancel', requireAuth, (req, res) => {
       });
   }
 
-  if (order.status !== 'confirmed') {
+  const versioning = previousOrder.metadata['dev.ocs.resource.versioning@1.0'];
+  if (!versioning || !versioning.isLatest) {
+    const latest = store.orders.find(o => o.metadata['dev.ocs.resource.versioning@1.0']?.chainId === versioning.chainId && o.metadata['dev.ocs.resource.versioning@1.0']?.isLatest);
+    return res.status(409).json({
+      type: 'https://schemas.ocs.dev/errors/stale-version',
+      title: 'Stale Version',
+      status: 409,
+      detail: 'This order version has been superseded.',
+      latestVersionUrl: `http://localhost:${PORT}/orders/${latest.id}`
+    });
+  }
+
+  if (previousOrder.status !== 'confirmed') {
     return res.status(400)
       .header('Content-Type', 'application/problem+json')
       .json({
@@ -523,10 +552,42 @@ app.post('/orders/:id/cancel', requireAuth, (req, res) => {
       });
   }
 
-  order.status = 'cancelled';
-  order.actions = []; // Remove actions after cancellation
+  // --- Immutable Update Logic ---
+  // 1. Create a new version
+  const newOrderId = `order_${crypto.randomUUID()}`;
+  const newOrder = {
+    ...previousOrder,
+    id: newOrderId,
+    status: 'cancelled',
+    actions: [], // No actions on a cancelled order
+    metadata: {
+      ...previousOrder.metadata,
+      'dev.ocs.resource.versioning@1.0': {
+        ...versioning,
+        version: versioning.version + 1,
+        revises: previousOrder.id,
+        isLatest: true,
+        revisionDetails: {
+          actionId: 'cancel',
+          timestamp: new Date().toISOString(),
+          arguments: req.body,
+          actor: { type: 'user', id: 'demo_user' }
+        }
+      }
+    }
+  };
 
-  res.json(order);
+  // 2. Update the old version
+  previousOrder.status = 'superseded';
+  previousOrder.actions = [];
+  previousOrder.metadata['dev.ocs.resource.versioning@1.0'].isLatest = false;
+  previousOrder.metadata['dev.ocs.resource.versioning@1.0'].supersededBy = newOrderId;
+
+  // 3. Save the new version
+  store.orders.push(newOrder);
+
+  // 4. Respond with 201 Created
+  res.status(201).location(`/orders/${newOrderId}`).json(newOrder);
 });
 
 // --- Helper Functions ---

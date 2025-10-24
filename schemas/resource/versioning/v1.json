@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocs.dev/resource/versioning/v1.json",
+  "title": "Immutable Resource Versioning",
+  "description": "Metadata for a resource that supports immutable versioning (dev.ocs.resource.versioning@1.0). Mutations create a new version of the resource with a new ID, forming a linked chain of historical states.",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "chainId": {
+        "type": "string",
+        "description": "A stable, unique identifier for the entire version chain of a resource. This ID never changes across versions."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "A sequential, human-readable version number for the resource (e.g., 1, 2, 3)."
+    },
+    "revises": {
+      "type": ["string", "null"],
+      "description": "The unique ID of the resource version this one supersedes. `null` for the first version."
+    },
+    "isLatest": {
+      "type": "boolean",
+      "description": "True if this is the current, active version of the resource."
+    },
+    "supersededBy": {
+      "type": "string",
+      "description": "The unique ID of the resource version that has superseded this one. Only present if `isLatest` is false."
+    },
+    "revisionDetails": {
+      "type": ["object", "null"],
+      "description": "An audit record of the change that created this version.",
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "description": "The `id` of the hypermedia action that triggered this revision."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the revision occurred."
+        },
+        "arguments": {
+          "type": "object",
+          "description": "A copy of the request body or key arguments that caused the change."
+        },
+        "actor": {
+          "type": "object",
+          "description": "An identifier for the user or system that initiated the change.",
+          "properties": {
+            "type": { "type": "string", "enum": ["user", "agent", "system"] },
+            "id": { "type": "string" }
+          },
+          "required": ["type", "id"]
+        }
+      },
+      "required": ["actionId", "timestamp", "actor"]
+    }
+  },
+  "required": ["_version", "chainId", "version", "revises", "isLatest"]
+}

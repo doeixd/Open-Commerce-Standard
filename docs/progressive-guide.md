@@ -415,7 +415,22 @@ function buildOrder(order, user) {
 
 ---
 
-## Level 6: Advanced Features
+## Level 6: Ensure Data Integrity with Immutable Versioning
+
+**Goal:** Transition from a mutable API to a fully auditable, immutable system where every change creates a historical record.
+
+**Why:** For enterprise-grade systems, preventing data loss and maintaining a perfect audit trail is non-negotiable. This pattern eliminates complex state management bugs and provides complete traceability for every resource.
+
+**What to add:**
+1.  Advertise the `dev.ocs.resource.versioning@1.0` capability.
+2.  Refactor mutation endpoints (e.g., `cancel`, `change_address`) to create new resource versions instead of updating them in-place.
+3.  Implement the full transactional logic as described in the official guide.
+
+**Full details:** This is a significant architectural pattern. See the **[Immutable Resource Versioning Guide](./immutable-resource-versioning.md)** for the complete implementation details.
+
+---
+
+## Level 7: Advanced Features
 
 Once you've mastered Levels 0-5, explore these optional capabilities:
 

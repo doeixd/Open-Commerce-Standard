@@ -108,7 +108,7 @@ paths:
         This is the primary discovery mechanism for clients to locate the capabilities endpoint and other
         core API resources. Servers SHOULD include CORS headers and cache directives on this endpoint.
       responses:
-        '200':
+        "200":
           description: OCS discovery metadata
           headers:
             Cache-Control:
@@ -124,17 +124,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OCSDiscoveryResponse'
+                $ref: "#/components/schemas/OCSDiscoveryResponse"
               example:
                 ocs:
                   capabilities: "https://shop.example.com/ocs/capabilities"
                   version: "1.0"
                   context: "https://schemas.ocs.dev/context.jsonld"
                   payment: "https://shop.example.com/ocs/payment"
-        '404':
+        "404":
           description: Discovery endpoint not implemented
-        '500':
-          $ref: '#/components/responses/ServerError'
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /capabilities:
     get:
@@ -145,14 +145,14 @@ paths:
         Clients can use this information to understand which optional features are enabled,
         what metadata schemas to expect, and how to adapt their UI and behavior accordingly.
       responses:
-        '200':
+        "200":
           description: A list of supported capabilities.
           content:
-           application/ocs+json; version=1.0:
+            application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/CapabilitiesResponse'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/CapabilitiesResponse"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /stores:
     get:
@@ -160,17 +160,17 @@ paths:
       summary: List available stores
       description: Returns a paginated list of all stores/vendors available on this server.
       parameters:
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Cursor'
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
       responses:
-        '200':
+        "200":
           description: Paginated list of stores
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/StoresResponse'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/StoresResponse"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /catalogs:
     get:
@@ -178,21 +178,21 @@ paths:
       summary: List available catalogs
       description: Returns a paginated list of catalogs, optionally filtered by store.
       parameters:
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Cursor'
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
         - name: storeId
           in: query
           schema: { type: string, format: uuid }
           description: Filter catalogs by store ID
       responses:
-        '200':
+        "200":
           description: Paginated list of catalogs
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/CatalogsResponse'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/CatalogsResponse"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /catalogs/{catalogId}:
     get:
@@ -203,18 +203,18 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
-        - $ref: '#/components/parameters/AcceptOCSCapabilities'
+        - $ref: "#/components/parameters/AcceptOCSCapabilities"
       responses:
-        '200':
+        "200":
           description: The full catalog with all products
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/Catalog'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/Catalog"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /carts:
     post:
@@ -223,28 +223,28 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
           application/ocs+json; version=1.0:
             schema:
-              $ref: '#/components/schemas/CreateCartRequest'
+              $ref: "#/components/schemas/CreateCartRequest"
       responses:
-        '201':
+        "201":
           description: Cart created successfully
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/Cart'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/Cart"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /carts/{cartId}:
     get:
@@ -257,22 +257,22 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
-        - $ref: '#/components/parameters/AcceptOCSCapabilities'
+        - $ref: "#/components/parameters/AcceptOCSCapabilities"
       responses:
-        '200':
+        "200":
           description: The cart object
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/Cart'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
+                $ref: "#/components/schemas/Cart"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
           description: Cart not found
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               example:
                 type: "https://schemas.ocs.dev/errors/cart-not-found"
                 title: "Cart Not Found"
@@ -280,12 +280,12 @@ paths:
                 detail: "Cart does not exist or has been submitted"
                 instance: "https://api.example.com/carts/123"
                 timestamp: "2023-10-23T12:00:00Z"
-        '410':
+        "410":
           description: Cart expired
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               example:
                 type: "https://schemas.ocs.dev/errors/cart-expired"
                 title: "Cart Expired"
@@ -299,8 +299,8 @@ paths:
                     href: "/carts"
                     method: "POST"
                     title: "Create New Cart"
-        '500':
-          $ref: '#/components/responses/ServerError'
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /carts/{cartId}/items:
     post:
@@ -313,30 +313,30 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
           application/ocs+json; version=1.0:
             schema:
-              $ref: '#/components/schemas/CartItemRequest'
+              $ref: "#/components/schemas/CartItemRequest"
       responses:
-        '200':
+        "200":
           description: Item added, updated cart returned
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/Cart'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/Cart"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /carts/{cartId}/items/{itemId}:
     patch:
@@ -353,30 +353,30 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
           application/ocs+json; version=1.0:
             schema:
-              $ref: '#/components/schemas/UpdateCartItemRequest'
+              $ref: "#/components/schemas/UpdateCartItemRequest"
       responses:
-        '200':
+        "200":
           description: Item updated, updated cart returned
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/Cart'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/Cart"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
     delete:
       tags: [Cart Management]
@@ -392,22 +392,22 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: "#/components/parameters/IdempotencyKey"
       responses:
-        '200':
+        "200":
           description: Item removed, updated cart returned
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/Cart'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/Cart"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /orders/{orderId}/cancel:
     post:
@@ -417,31 +417,29 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        -
-           name: orderId
-           in: path
-           required: true
-           schema: { type: string }
-        -
-          $ref: '#/components/parameters/IdempotencyKey'
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         content:
         application/ocs+json; version=1.0:
           schema:
             type: object
             properties:
-                reason: { type: string }
+              reason: { type: string }
       responses:
-        '200':
+        "200":
           description: The cancellation was successful. The updated Order object is returned with status 'cancelled'.
           content:
             application/ocs+json; version=1.0:
-              schema: { $ref: '#/components/schemas/Order' }
-        '403':
-           description: The order is not in a state where it can be cancelled.
-           content:
-             application/ocs+json; version=1.0:
-               schema: { $ref: '#/components/schemas/Error' }
+              schema: { $ref: "#/components/schemas/Order" }
+        "403":
+          description: The order is not in a state where it can be cancelled.
+          content:
+            application/ocs+json; version=1.0:
+              schema: { $ref: "#/components/schemas/Error" }
 
   /orders:
     get:
@@ -451,25 +449,26 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Cursor'
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
         - name: status
           in: query
           schema:
             type: string
-            enum: [pending, confirmed, processing, in_transit, completed, cancelled]
+            enum:
+              [pending, confirmed, processing, in_transit, completed, cancelled]
           description: Filter orders by status
       responses:
-        '200':
+        "200":
           description: Paginated list of orders
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/OrdersResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/OrdersResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
     post:
       tags: [Ordering]
@@ -478,7 +477,7 @@ paths:
         - bearerAuth: []
       description: This endpoint initiates the order process. It may return a 402 if payment is required.
       parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: "#/components/parameters/IdempotencyKey"
         - name: X-PAYMENT
           in: header
           schema:
@@ -489,43 +488,41 @@ paths:
         content:
           application/ocs+json; version=1.0:
             schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
+              $ref: "#/components/schemas/CreateOrderRequest"
       responses:
-         '201':
-           description: |
-             The order(s) were successfully created. The response will contain a single Order object by default.
-             If the `dev.ocs.order.fulfillment_intent@1.0` capability was used and resulted in multiple fulfillment groups, this response will contain an array of the created Order objects.
-           headers:
-             X-PAYMENT-RESPONSE:
-               schema:
-                 type: string
-               description: Base64-encoded JSON `SettlementResponse` containing payment settlement details.
-           content:
-             application/ocs+json; version=1.0:
-               schema:
-                  oneOf:
-               -\n                      $ref: '#/components/schemas/Order'
-               - type: array
-                     items:
-                       $ref: '#/components/schemas/Order'
-          '400':
-          $ref: '#/components/responses/BadRequest'
-          '401':
-          $ref: '#/components/responses/Unauthorized'
-          '402':
+        "201":
+          description: |
+            The order(s) were successfully created. The response will contain a single Order object by default.
+            If the `dev.ocs.order.fulfillment_intent@1.0` capability was used and resulted in multiple fulfillment groups, this response will contain an array of the created Order objects.
+          headers:
+            X-PAYMENT-RESPONSE:
+              schema:
+                type: string
+              description: Base64-encoded JSON `SettlementResponse` containing payment settlement details.
+          application/ocs+json; version=1.0:
+            oneOf:
+              - $ref: "#/components/schemas/Order"
+              - type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+            "400":
+              $ref: "#/components/responses/BadRequest"
+            "401":
+              $ref: "#/components/responses/Unauthorized"
+            "402":
               description: Payment is required to proceed. The body contains payment requirements as per the x402 protocol.
               content:
-               application/ocs+json; version=1.0:
-               schema:
-                 $ref: '#/components/schemas/X402PaymentRequiredResponse'
-          '403':
-           $ref: '#/components/responses/Forbidden'
-           '404':
-           $ref: '#/components/responses/NotFound'
-           '409':
-           $ref: '#/components/responses/Conflict'
-           '500':
-             $ref: '#/components/responses/ServerError'
+                application/ocs+json; version=1.0:
+                schema:
+                  $ref: "#/components/schemas/X402PaymentRequiredResponse"
+            "403":
+              $ref: "#/components/responses/Forbidden"
+            "404":
+              $ref: "#/components/responses/NotFound"
+            "409":
+              $ref: "#/components/responses/Conflict"
+            "500":
+              $ref: "#/components/responses/ServerError"
 
   /orders/{orderId}:
     get:
@@ -539,39 +536,39 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/AcceptOCSCapabilities'
+        - $ref: "#/components/parameters/AcceptOCSCapabilities"
       responses:
-        '200':
+        "200":
           description: The order object.
           content:
             application/ocs+json; version=1.0:
               schema:
-                $ref: '#/components/schemas/Order'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/Order"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /orders/{orderId}/updates:
     get:
       tags: [Ordering]
       summary: Subscribe to real-time order updates (SSE)
       security:
-         - bearerAuth: []
-          description: |
+        - bearerAuth: []
+        - description: |
             Establishes a Server-Sent Events (SSE) connection to receive real-time updates for an order.
-         The client should handle a `text/event-stream` response.
+            The client should handle a `text/event-stream` response.
 
-         **Events:**
-         - `order.patch`: The `data` field will contain a JSON array of patch operations conforming to RFC 6902 (JSON Patch). This event is sent whenever the order object is updated.
-           - Patches to the core `/status` field represent changes to the order's programmatic state category.
-           - Patches to `/metadata/dev.ocs.order.detailed_status@1.0` represent changes to the rich, human-readable status meant for display.
-           - The server will bundle related status changes into a single message to ensure atomic updates.
-         - `close`: Indicates the order has reached a terminal state (`completed`, `cancelled`). The server will close the connection after sending this event.
+            **Events:**
+            - `order.patch`: The `data` field will contain a JSON array of patch operations conforming to RFC 6902 (JSON Patch). This event is sent whenever the order object is updated.
+              - Patches to the core `/status` field represent changes to the order's programmatic state category.
+              - Patches to `/metadata/dev.ocs.order.detailed_status@1.0` represent changes to the rich, human-readable status meant for display.
+              - The server will bundle related status changes into a single message to ensure atomic updates.
+            - `close`: Indicates the order has reached a terminal state (`completed`, `cancelled`). The server will close the connection after sending this event.
       parameters:
         - name: orderId
           in: path
@@ -579,20 +576,20 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: An active SSE stream. The connection will remain open until the order is in a terminal state.
           content:
             text/event-stream:
               schema:
                 type: string
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-          '500':
-            $ref: '#/components/responses/ServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+          "500":
+            $ref: "#/components/responses/ServerError"
 
   /orders/{orderId}/ratings:
     post:
@@ -606,31 +603,31 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
           application/ocs+json; version=1.0:
             schema:
-              $ref: '#/components/schemas/RatingRequest'
+              $ref: "#/components/schemas/RatingRequest"
       responses:
-        '201':
+        "201":
           description: The ratings were successfully submitted.
           content:
             application/ocs+json; version=1.0:
-              schema: { $ref: '#/components/schemas/Order' }
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
+              schema: { $ref: "#/components/schemas/Order" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /carts/{cartId}/promotions:
     post:
@@ -644,31 +641,31 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
           application/ocs+json; version=1.0:
             schema:
-              $ref: '#/components/schemas/PromotionRequest'
+              $ref: "#/components/schemas/PromotionRequest"
       responses:
-        '200':
+        "200":
           description: The promotion was successfully applied. The updated Cart object is returned.
           content:
             application/ocs+json; version=1.0:
-              schema: { $ref: '#/components/schemas/Cart' }
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
+              schema: { $ref: "#/components/schemas/Cart" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
 components:
   schemas:
@@ -712,7 +709,7 @@ components:
         capabilities:
           type: array
           items:
-            $ref: '#/components/schemas/Capability'
+            $ref: "#/components/schemas/Capability"
     Capability:
       type: object
       properties:
@@ -782,9 +779,9 @@ components:
         stores:
           type: array
           items:
-            $ref: '#/components/schemas/Store'
+            $ref: "#/components/schemas/Store"
         pagination:
-          $ref: '#/components/schemas/PaginationMeta'
+          $ref: "#/components/schemas/PaginationMeta"
       required: [stores, pagination]
 
     CatalogsResponse:
@@ -794,9 +791,9 @@ components:
         catalogs:
           type: array
           items:
-            $ref: '#/components/schemas/CatalogSummary'
+            $ref: "#/components/schemas/CatalogSummary"
         pagination:
-          $ref: '#/components/schemas/PaginationMeta'
+          $ref: "#/components/schemas/PaginationMeta"
       required: [catalogs, pagination]
 
     OrdersResponse:
@@ -806,17 +803,27 @@ components:
         orders:
           type: array
           items:
-            $ref: '#/components/schemas/Order'
+            $ref: "#/components/schemas/Order"
         pagination:
-          $ref: '#/components/schemas/PaginationMeta'
+          $ref: "#/components/schemas/PaginationMeta"
       required: [orders, pagination]
 
     # --- OCS Core Schemas ---
     Money:
       type: object
       properties:
-        amount: { type: string, description: "Monetary amount as a string.", example: "12.99" }
-        currency: { type: string, description: "ISO 4217 currency code.", example: "USD" }
+        amount:
+          {
+            type: string,
+            description: "Monetary amount as a string.",
+            example: "12.99",
+          }
+        currency:
+          {
+            type: string,
+            description: "ISO 4217 currency code.",
+            example: "USD",
+          }
       required: [amount, currency]
 
     Location:
@@ -832,7 +839,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        location: { $ref: '#/components/schemas/Location' }
+        location: { $ref: "#/components/schemas/Location" }
         catalogIds: { type: array, items: { type: string } }
         metadata:
           type: object
@@ -850,24 +857,29 @@ components:
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        version: { type: string, description: "Version identifier for the catalog." }
+        version:
+          { type: string, description: "Version identifier for the catalog." }
       required: [id, name, version]
 
     Catalog:
       allOf:
-        - $ref: '#/components/schemas/CatalogSummary'
+        - $ref: "#/components/schemas/CatalogSummary"
         - type: object
           properties:
-            items: { type: array, items: { $ref: '#/components/schemas/CatalogItem' } }
+            items:
+              {
+                type: array,
+                items: { $ref: "#/components/schemas/CatalogItem" },
+              }
             metadata:
               type: object
       description: |
-                Namespaced key-value pairs. The structure of this object may be defined
-                by schemas discoverable at the `/capabilities` endpoint. Each capability
-                uses its base ID as a key, with a "_version" field inside.
-                Examples:
-                - "dev.ocs.promotions.discoverable": { "_version": "1.0", ... }
-          required: [items]
+        Namespaced key-value pairs. The structure of this object may be defined
+        by schemas discoverable at the `/capabilities` endpoint. Each capability
+        uses its base ID as a key, with a "_version" field inside.
+        Examples:
+        - "dev.ocs.promotions.discoverable": { "_version": "1.0", ... }
+      required: [items]
 
     CatalogItem:
       type: object
@@ -875,7 +887,7 @@ components:
         id: { type: string }
         name: { type: string }
         description: { type: string }
-        price: { $ref: '#/components/schemas/Money' }
+        price: { $ref: "#/components/schemas/Money" }
         available: { type: boolean, default: true }
         fulfillmentType:
           type: string
@@ -911,7 +923,7 @@ components:
                 type: boolean
                 description: "Whether this component is required for the order"
             required: [type, description, required]
-       required: [id, name, price, available, fulfillmentType]
+      required: [id, name, price, available, fulfillmentType]
 
     CreateCartRequest:
       type: object
@@ -935,7 +947,11 @@ components:
                 items:
                   type: string
           description: "Key-value map of selected customizations, where the key is the group ID and value is the selected option ID(s)."
-          example: {"group_size": "size_large", "group_toppings": ["topping_pepperoni", "topping_onions"]}
+          example:
+            {
+              "group_size": "size_large",
+              "group_toppings": ["topping_pepperoni", "topping_onions"],
+            }
       required: [itemId, quantity]
 
     UpdateCartItemRequest:
@@ -958,10 +974,10 @@ components:
       type: object
       properties:
         id: { type: string, format: uuid }
-        items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
-        subtotal: { $ref: '#/components/schemas/Money' }
-        tax: { $ref: '#/components/schemas/Money' }
-        total: { $ref: '#/components/schemas/Money' }
+        items: { type: array, items: { $ref: "#/components/schemas/CartItem" } }
+        subtotal: { $ref: "#/components/schemas/Money" }
+        tax: { $ref: "#/components/schemas/Money" }
+        total: { $ref: "#/components/schemas/Money" }
         stores:
           type: array
           description: "List of stores represented in this cart. Only present if the server supports multi-store carts (dev.ocs.cart.multi_store@1.0 capability)."
@@ -970,28 +986,58 @@ components:
             properties:
               storeId: { type: string, format: uuid }
               storeName: { type: string }
-              itemCount: { type: integer, description: "Number of items from this store in the cart" }
-              subtotal: { $ref: '#/components/schemas/Money', description: "Subtotal for items from this store" }
+              itemCount:
+                {
+                  type: integer,
+                  description: "Number of items from this store in the cart",
+                }
+              subtotal:
+                {
+                  $ref: "#/components/schemas/Money",
+                  description: "Subtotal for items from this store",
+                }
             required: [storeId, itemCount, subtotal]
         guestInfo:
           type: object
           description: "Temporary customer information for guest checkouts. Only present if the server supports dev.ocs.cart.guest@1.0 capability."
           properties:
-            email: { type: string, format: email, description: "Guest's email address." }
-            deliveryAddress: { $ref: '#/components/schemas/Location', description: "Delivery address for the guest." }
-            billingAddress: { $ref: '#/components/schemas/Location', description: "Billing address for the guest." }
+            email:
+              {
+                type: string,
+                format: email,
+                description: "Guest's email address.",
+              }
+            deliveryAddress:
+              {
+                $ref: "#/components/schemas/Location",
+                description: "Delivery address for the guest.",
+              }
+            billingAddress:
+              {
+                $ref: "#/components/schemas/Location",
+                description: "Billing address for the guest.",
+              }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
       required: [id, items, subtotal, tax, total, createdAt, updatedAt]
 
     CartItem:
       allOf:
-        - $ref: '#/components/schemas/CartItemRequest'
+        - $ref: "#/components/schemas/CartItemRequest"
         - type: object
           properties:
-            cartItemId: { type: string, format: uuid, description: "Unique identifier for this item instance in the cart." }
-            price: { $ref: '#/components/schemas/Money' }
-            metadata: { type: object, description: "Namespaced key-value pairs. Each capability uses its base ID as a key, with a '_version' field inside." }
+            cartItemId:
+              {
+                type: string,
+                format: uuid,
+                description: "Unique identifier for this item instance in the cart.",
+              }
+            price: { $ref: "#/components/schemas/Money" }
+            metadata:
+              {
+                type: object,
+                description: "Namespaced key-value pairs. Each capability uses its base ID as a key, with a '_version' field inside.",
+              }
           required: [cartItemId, price]
 
     CreateOrderFromCartRequest:
@@ -1004,10 +1050,10 @@ components:
           description: "Discriminator field indicating this is a cart-based order."
         cartId: { type: string, format: uuid }
         deliveryAddress:
-          $ref: '#/components/schemas/Location'
+          $ref: "#/components/schemas/Location"
           description: "A delivery address is required if, and only if, the referenced cart contains at least one item with a fulfillmentType of 'physical' or 'hybrid' (where any component is physical)."
         billingAddress:
-          $ref: '#/components/schemas/Location'
+          $ref: "#/components/schemas/Location"
           description: "An optional billing address for payment processing. Required if the payment method demands it (discoverable via x402 metadata)."
         consentGiven:
           type: boolean
@@ -1027,80 +1073,97 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/CartItemRequest'
+            $ref: "#/components/schemas/CartItemRequest"
           description: "The list of items to order."
         deliveryAddress:
-          $ref: '#/components/schemas/Location'
+          $ref: "#/components/schemas/Location"
           description: "A delivery address is required if any item has a fulfillmentType of 'physical' or 'hybrid' (where any component is physical)."
         billingAddress:
-          $ref: '#/components/schemas/Location'
+          $ref: "#/components/schemas/Location"
           description: "An optional billing address for payment processing. Required if the payment method demands it (discoverable via x402 metadata)."
         consentGiven:
           type: boolean
           description: "Indicates if the user has given consent for data collection/storage, as per dev.ocs.store.policies@1.0 dataPolicy."
         notes: { type: string }
-        promotionCode: { type: string, description: "Optional promotion code to apply to the order." }
+        promotionCode:
+          {
+            type: string,
+            description: "Optional promotion code to apply to the order.",
+          }
         metadata: { type: object }
       required: [orderType, items]
 
     CreateOrderRequest:
-          oneOf:
-            from_cart: '#/components/schemas/CreateOrderFromCartRequest'
-            direct: '#/components/schemas/CreateDirectOrderRequest'
-
-     PromotionRequest:
-       type: object
-       description: A request to apply or validate a promotion on a cart.
-       properties:
-         type:
-           type: string
-           enum: [promo_code, gift_card, loyalty_points]
-           description: "The type of promotion being applied."
-          value:
-            description: "The value for the promotion (e.g., the code 'SUMMER10')."
-          required: [type, value]
-
-     RatingRequest:
-       type: object
-       description: A request to submit ratings for a completed order.
-       properties:
-         food:
-           type: integer
-           minimum: 1
-           maximum: 5
-           description: "Rating for the food quality (1-5 stars)."
-         delivery:
-           type: integer
-           minimum: 1
-           maximum: 5
-           description: "Rating for the delivery service (1-5 stars)."
-         restaurant:
-           type: integer
-           minimum: 1
-           maximum: 5
-           description: "Overall rating for the restaurant (1-5 stars)."
-         comment:
-           type: string
-           description: "Optional text comment from the customer."
-
-     ValidationIssue:
-       type: object
-       description: "Details a failed validation rule on a specific field."
-       properties:
-         type: { type: string, enum: ["validation"] }
-         field: { type: string, description: "A JSON Pointer to the invalid field in the request body." }
-         value: { description: "The invalid value that was provided by the client." }
-          reason: { type: string, description: "A description of the validation rule that failed (e.g., 'String must be a valid UUID')." }
-          required: [type, field, reason]
-
-     BusinessLogicIssue:
-       type: object
-       description: "Details a failed business rule involving one or more resources."
-       properties:
-         type: { type: string, enum: ["business_logic"] }
-         resourceId: { type: string, description: "The ID of the resource that caused the issue (e.g., an out-of-stock itemId)." }
-         reason: { type: string, description: "A description of the business rule that was violated (e.g., 'The requested item has 0 stock remaining')." }
-       required: [type, resourceId, reason]
+      oneOf:
+        from_cart: "#/components/schemas/CreateOrderFromCartRequest"
+        direct: "#/components/schemas/CreateDirectOrderRequest"
+    PromotionRequest:
+      type: object
+      description: A request to apply or validate a promotion on a cart.
+      properties:
+        type:
+          type: string
+          enum: [promo_code, gift_card, loyalty_points]
+          description: "The type of promotion being applied."
+        value:
+          description: "The value for the promotion (e.g., the code 'SUMMER10')."
+        required: [type, value]
+    RatingRequest:
+      type: object
+      description: A request to submit ratings for a completed order.
+      properties:
+        food:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: "Rating for the food quality (1-5 stars)."
+        delivery:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: "Rating for the delivery service (1-5 stars)."
+        restaurant:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: "Overall rating for the restaurant (1-5 stars)."
+        comment:
+          type: string
+          description: "Optional text comment from the customer."
+    ValidationIssue:
+      type: object
+      description: "Details a failed validation rule on a specific field."
+      properties:
+        type: { type: string, enum: ["validation"] }
+        field:
+          {
+            type: string,
+            description: "A JSON Pointer to the invalid field in the request body.",
+          }
+        value:
+          { description: "The invalid value that was provided by the client." }
+        reason:
+          {
+            type: string,
+            description: "A description of the validation rule that failed (e.g., 'String must be a valid UUID').",
+          }
+        required: [type, field, reason]
+    BusinessLogicIssue:
+      type: object
+      description: "Details a failed business rule involving one or more resources."
+      properties:
+        type: { type: string, enum: ["business_logic"] }
+        resourceId:
+          {
+            type: string,
+            description: "The ID of the resource that caused the issue (e.g., an out-of-stock itemId).",
+          }
+        reason:
+          {
+            type: string,
+            description: "A description of the business rule that was violated (e.g., 'The requested item has 0 stock remaining').",
+          }
+      required: [type, resourceId, reason]
 
     Order:
       type: object
@@ -1113,26 +1176,26 @@ components:
             This is intended for client-side logic (e.g., state machines), NOT for direct display to the user.
             For rich, human-readable status, clients should check for the 'dev.ocs.order.detailed_status@1.0' capability.
           enum:
-            - pending     # Order created, but not yet confirmed by the system (e.g., awaiting inventory check).
-             - confirmed   # The order is accepted and will be processed.
-            actions:
-              type: array
-              description: |
-                A list of actions the client can perform on this order in its current state.
-                The presence of an action indicates the user should be shown the corresponding UI control.
+            - pending # Order created, but not yet confirmed by the system (e.g., awaiting inventory check).
+            - confirmed # The order is accepted and will be processed.
+          actions:
+            type: array
+            description: |
+              A list of actions the client can perform on this order in its current state.
+              The presence of an action indicates the user should be shown the corresponding UI control.
 
-                If the server advertises dev.ocs.hypermedia.schema_aware_actions@1.0 capability,
-                actions will include schema references for request/response validation and dynamic form generation.
-              items:
-                $ref: '#/components/schemas/Action'
-         returns:
-           type: array
-           description: "A list of summaries for any returns associated with this order."
-           items:
-             $ref: '#/components/schemas/ReturnSummary'
-        items: { type: array, items: { $ref: '#/components/schemas/CartItem' } }
-        total: { $ref: '#/components/schemas/Money' }
-        deliveryAddress: { $ref: '#/components/schemas/Location' }
+              If the server advertises dev.ocs.hypermedia.schema_aware_actions@1.0 capability,
+              actions will include schema references for request/response validation and dynamic form generation.
+            items:
+              $ref: "#/components/schemas/Action"
+          returns:
+            type: array
+            description: "A list of summaries for any returns associated with this order."
+            items:
+              $ref: "#/components/schemas/ReturnSummary"
+        items: { type: array, items: { $ref: "#/components/schemas/CartItem" } }
+        total: { $ref: "#/components/schemas/Money" }
+        deliveryAddress: { $ref: "#/components/schemas/Location" }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
         metadata:
@@ -1161,42 +1224,98 @@ components:
           items:
             type: object
             properties:
-              cartItemId: { type: string, description: "The ID of the item from the original order." }
+              cartItemId:
+                {
+                  type: string,
+                  description: "The ID of the item from the original order.",
+                }
               quantity: { type: integer, minimum: 1 }
             required: [cartItemId, quantity]
-         reason: { type: string, description: "The user-provided reason for the return." }
-         required: [items, reason]
+          reason:
+            {
+              type: string,
+              description: "The user-provided reason for the return.",
+            }
+          required: [items, reason]
 
-     ReturnSummary:
-       type: object
-       description: "A summary of a return, intended for embedding in the Order object."
-       properties:
-         id: { type: string, format: "uuid", description: "The unique ID of the return." }
-         status: { type: string, enum: ["requested", "approved", "rejected", "in_transit", "received", "processed", "completed"] }
-          href: { type: string, format: "uri", description: "The URL to fetch the full Return object." }
-          required: [id, status, href]
-
-     Return:
-       type: object
-       description: "The full Return object, representing the complete state of a return workflow."
-       properties:
-         id: { type: string, format: "uuid" }
-         orderHref: { type: string, format: "uri", description: "A link back to the original Order." }
-         status: { type: string, enum: ["requested", "approved", "rejected", "in_transit", "received", "processed", "completed"] }
-         items:
-           type: array
-           items:
-             type: object
-             properties:
-               cartItemId: { type: string, description: "The ID of the item from the original order." }
-               quantity: { type: integer }
-         reason: { type: string }
-         returnLabelUrl: { type: string, format: "uri", description: "A URL to a printable shipping label." }
-         createdAt: { type: string, format: "date-time" }
-          updatedAt: { type: string, format: "date-time" }
-          required: [id, orderHref, status, items, createdAt, updatedAt]
-
-     JsonPatchOperation:
+    ReturnSummary:
+      type: object
+      description: "A summary of a return, intended for embedding in the Order object."
+      properties:
+        id:
+          {
+            type: string,
+            format: "uuid",
+            description: "The unique ID of the return.",
+          }
+        status:
+          {
+            type: string,
+            enum:
+              [
+                "requested",
+                "approved",
+                "rejected",
+                "in_transit",
+                "received",
+                "processed",
+                "completed",
+              ],
+          }
+        href:
+          {
+            type: string,
+            format: "uri",
+            description: "The URL to fetch the full Return object.",
+          }
+        required: [id, status, href]
+    Return:
+      type: object
+      description: "The full Return object, representing the complete state of a return workflow."
+      properties:
+        id: { type: string, format: "uuid" }
+        orderHref:
+          {
+            type: string,
+            format: "uri",
+            description: "A link back to the original Order.",
+          }
+        status:
+          {
+            type: string,
+            enum:
+              [
+                "requested",
+                "approved",
+                "rejected",
+                "in_transit",
+                "received",
+                "processed",
+                "completed",
+              ],
+          }
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              cartItemId:
+                {
+                  type: string,
+                  description: "The ID of the item from the original order.",
+                }
+              quantity: { type: integer }
+        reason: { type: string }
+        returnLabelUrl:
+          {
+            type: string,
+            format: "uri",
+            description: "A URL to a printable shipping label.",
+          }
+        createdAt: { type: string, format: "date-time" }
+        updatedAt: { type: string, format: "date-time" }
+        required: [id, orderHref, status, items, createdAt, updatedAt]
+    JsonPatchOperation:
       type: object
       description: "A single JSON Patch operation, as defined by RFC 6902."
       required: [op, path]
@@ -1204,16 +1323,29 @@ components:
         op: { type: string, enum: [add, remove, replace, move, copy, test] }
         path: { type: string, description: "A JSON Pointer path." }
         value: { description: "The value for the operation." }
-        from: { type: string, description: "A JSON Pointer path. Used in 'move' and 'copy' ops." }
+        from:
+          {
+            type: string,
+            description: "A JSON Pointer path. Used in 'move' and 'copy' ops.",
+          }
 
     # --- X402 Protocol Schemas ---
     X402PaymentRequiredResponse:
       type: object
       description: "The response body for a 402 Payment Required status. See x402 spec section 5.1."
       properties:
-        x402Version: { type: number, description: "Protocol version identifier." }
-        error: { type: string, description: "Human-readable error message explaining why payment is required." }
-        accepts: { type: array, items: { $ref: '#/components/schemas/X402PaymentRequirements' } }
+        x402Version:
+          { type: number, description: "Protocol version identifier." }
+        error:
+          {
+            type: string,
+            description: "Human-readable error message explaining why payment is required.",
+          }
+        accepts:
+          {
+            type: array,
+            items: { $ref: "#/components/schemas/X402PaymentRequirements" },
+          }
       required: [x402Version, error, accepts]
 
     X402PaymentRequirements:
@@ -1245,7 +1377,17 @@ components:
             asset_scale:
               type: integer
               description: "Number of decimal places for the asset (e.g., 2 for USD, 6 for USDC)."
-      required: [scheme, network, maxAmountRequired, asset, payTo, resource, description, maxTimeoutSeconds]
+      required:
+        [
+          scheme,
+          network,
+          maxAmountRequired,
+          asset,
+          payTo,
+          resource,
+          description,
+          maxTimeoutSeconds,
+        ]
 
     X402PaymentPayload:
       type: object
@@ -1254,7 +1396,8 @@ components:
         x402Version: { type: number, example: 1 }
         scheme: { type: string, example: "exact" }
         network: { type: string, example: "base-sepolia" }
-        payload: { oneOf: [ { $ref: '#/components/schemas/X402ExactSchemePayload' } ] }
+        payload:
+          { oneOf: [{ $ref: "#/components/schemas/X402ExactSchemePayload" }] }
       required: [x402Version, scheme, network, payload]
 
     X402ExactSchemePayload:
@@ -1262,7 +1405,7 @@ components:
       description: "The payload for the 'exact' payment scheme. See x402 spec section 5.2.2."
       properties:
         signature: { type: string }
-        authorization: { $ref: '#/components/schemas/X402Authorization' }
+        authorization: { $ref: "#/components/schemas/X402Authorization" }
       required: [signature, authorization]
 
     X402Authorization:
@@ -1299,7 +1442,19 @@ components:
         id:
           type: string
           description: "Unique identifier for this action type"
-          enum: ["cancel", "initiate_return", "add_rating", "pause_subscription", "resume_subscription", "cancel_subscription", "track", "retry_payment", "update_shipping", "add_tip"]
+          enum:
+            [
+              "cancel",
+              "initiate_return",
+              "add_rating",
+              "pause_subscription",
+              "resume_subscription",
+              "cancel_subscription",
+              "track",
+              "retry_payment",
+              "update_shipping",
+              "add_tip",
+            ]
         href:
           type: string
           format: uri
@@ -1319,9 +1474,9 @@ components:
           type: string
           description: "Detailed explanation of what this action does. Only present if schema-aware actions enabled."
         requestSchema:
-          $ref: '#/components/schemas/SchemaReference'
+          $ref: "#/components/schemas/SchemaReference"
         responseSchema:
-          $ref: '#/components/schemas/SchemaReference'
+          $ref: "#/components/schemas/SchemaReference"
         errorSchemas:
           type: array
           description: |
@@ -1339,7 +1494,8 @@ components:
                 description: "Specific OCS error codes that may be returned (from Error.code enum)"
                 items:
                   type: string
-                example: ["cancellation_window_expired", "order_already_cancelled"]
+                example:
+                  ["cancellation_window_expired", "order_already_cancelled"]
               description:
                 type: string
                 description: "Human-readable explanation of when this error occurs"
@@ -1352,7 +1508,7 @@ components:
                       $ref:
                         type: string
                         const: "#/components/schemas/Error"
-                  - $ref: '#/components/schemas/SchemaReference'
+                  - $ref: "#/components/schemas/SchemaReference"
             required: [statusCode, errorCodes]
         parameters:
           type: array
@@ -1398,7 +1554,8 @@ components:
           $ref: "https://schemas.ocs.dev/order/v1.json"
         errorSchemas:
           - statusCode: 400
-            errorCodes: ["cancellation_window_expired", "order_already_cancelled"]
+            errorCodes:
+              ["cancellation_window_expired", "order_already_cancelled"]
             description: "Order cannot be cancelled (window expired or already cancelled)"
             schema:
               $ref: "#/components/schemas/Error"
@@ -1450,7 +1607,12 @@ components:
           type: array
           items:
             type: string
-            examples: ["basic-card", "https://apple.com/apple-pay", "https://google.com/pay"]
+            examples:
+              [
+                "basic-card",
+                "https://apple.com/apple-pay",
+                "https://google.com/pay",
+              ]
           minItems: 1
           description: "W3C payment method identifiers supported by this server."
         merchantIdentifier:
@@ -1463,7 +1625,8 @@ components:
           type: array
           items:
             type: string
-            enum: [visa, mastercard, amex, discover, jcb, diners, maestro, unionpay]
+            enum:
+              [visa, mastercard, amex, discover, jcb, diners, maestro, unionpay]
           description: "For basic-card: which card networks are accepted."
         requireShippingAddress:
           type: boolean
@@ -1973,148 +2136,152 @@ components:
       description: "Too many requests have been made. Please slow down and retry after the specified time."
       category: "rate_limiting"
       retryable: true
-      retryStrategy: "Wait for the duration specified in the Retry-After header before retrying"
+      retryStrategy: "Wait for the duration specified in the Retry-After header before retrying."
       possibleCauses:
-        - "Making too many requests in a short period"
-        - "Exceeded per-minute or per-hour rate limits"
-        - "Burst limit exceeded"
+        - "Making too many requests in a short period."
+        - "Exceeded per-minute or per-hour rate limits."
+        - "Burst limit exceeded."
       headers:
         Retry-After:
           schema: { type: integer }
-          description: "Number of seconds to wait before retrying"
+          description: "Number of seconds to wait before retrying."
         X-RateLimit-Limit:
           schema: { type: integer }
-          description: "Maximum requests allowed in the current window"
+          description: "Maximum requests allowed in the current window."
         X-RateLimit-Remaining:
           schema: { type: integer }
-          description: "Requests remaining in the current window (will be 0)"
+          description: "Requests remaining in the current window (will be 0)."
         X-RateLimit-Reset:
           schema: { type: integer }
-           description: "Unix timestamp when the rate limit resets"
-        relatedCapabilities: ["dev.ocs.server.rate_limits"]
-          metadataKeys:
-         - "Check dev.ocs.server.rate_limits capability for rate limit policies"
+          description: "Unix timestamp when the rate limit resets."
+      relatedCapabilities:
+        - "dev.ocs.server.rate_limits"
+      metadataKeys:
+        - "Check dev.ocs.server.rate_limits capability for rate limit policies."
 
-     order_items_unavailable:
-       httpStatus: 409
-       title: "Order Items Unavailable"
-       description: "One or more items in the cart/order are no longer available for purchase."
-       category: "business_logic"
-       retryable: true
-       retryStrategy: "Remove unavailable items and retry"
-       possibleCauses:
-         - "Items went out of stock after being added to cart"
-         - "Items were discontinued"
-         - "Inventory levels changed"
-       suggestedActions:
-         - action: "review_cart"
-           method: "GET"
-           endpoint: "/carts/{cartId}"
-           description: "Review cart contents and remove unavailable items"
-         - action: "update_quantities"
-           method: "PATCH"
-           endpoint: "/carts/{cartId}/items/{itemId}"
-            description: "Reduce quantities of partially available items"
-         relatedCapabilities: ["dev.ocs.cart"]
-           details:
-          type: array
-          description: "List of unavailable items with specific reasons"
-          items:
-            type: object
-            properties:
-              itemId:
-                type: string
-                description: "ID of the unavailable item"
-              reason:
-                type: string
-                description: "Human-readable reason why the item is unavailable"
-              availableQuantity:
-                type: integer
-                 description: "How many units are actually available (0 if completely unavailable)"
-               required: [itemId, reason]
+    order_items_unavailable:
+      httpStatus: 409
+      title: "Order Items Unavailable"
+      description: "One or more items in the cart/order are no longer available for purchase."
+      category: "business_logic"
+      retryable: true
+      retryStrategy: "Remove unavailable items and retry."
+      possibleCauses:
+        - "Items went out of stock after being added to cart."
+        - "Items were discontinued."
+        - "Inventory levels changed."
+      suggestedActions:
+        - action: "review_cart"
+          method: "GET"
+          endpoint: "/carts/{cartId}"
+          description: "Review cart contents and remove unavailable items."
+        - action: "update_quantities"
+          method: "PATCH"
+          endpoint: "/carts/{cartId}/items/{itemId}"
+          description: "Reduce quantities of partially available items."
+      relatedCapabilities:
+        - "dev.ocs.cart"
+      details:
+        type: array
+        description: "List of unavailable items with specific reasons."
+        items:
+          type: object
+          properties:
+            itemId:
+              type: string
+              description: "ID of the unavailable item."
+            reason:
+              type: string
+              description: "Human-readable reason why the item is unavailable."
+            availableQuantity:
+              type: integer
+              description: "How many units are actually available (0 if completely unavailable)."
+          required:
+            - itemId
+            - reason
 
-     insufficient_stock:
-       httpStatus: 409
-       title: "Insufficient Stock"
-       description: "The requested quantity exceeds available inventory."
-       category: "business_logic"
-       retryable: true
-       retryStrategy: "Reduce quantity or try again later"
-       possibleCauses:
-         - "Requested quantity is higher than current stock level"
-         - "Stock was reduced by another customer's order"
-       suggestedActions:
-         - action: "reduce_quantity"
-           method: "PATCH"
-           endpoint: "/carts/{cartId}/items/{itemId}"
-           description: "Reduce the quantity to match available stock"
-         - action: "check_availability"
-           method: "GET"
-           endpoint: "/catalogs/{catalogId}/items/{itemId}"
-           description: "Check current stock levels"
+      insufficient_stock:
+        httpStatus: 409
+        title: "Insufficient Stock"
+        description: "The requested quantity exceeds available inventory."
+        category: "business_logic"
+        retryable: true
+        retryStrategy: "Reduce quantity or try again later"
+        possibleCauses:
+          - "Requested quantity is higher than current stock level"
+          - "Stock was reduced by another customer's order"
+        suggestedActions:
+          - action: "reduce_quantity"
+            method: "PATCH"
+            endpoint: "/carts/{cartId}/items/{itemId}"
+            description: "Reduce the quantity to match available stock"
+          - action: "check_availability"
+            method: "GET"
+            endpoint: "/catalogs/{catalogId}/items/{itemId}"
+            description: "Check current stock levels"
 
-     invalid_quantity:
-       httpStatus: 400
-       title: "Invalid Quantity"
-       description: "The requested quantity is invalid (negative, zero, or exceeds maximum allowed)."
-       category: "validation"
-       retryable: true
-       retryStrategy: "Provide a valid quantity"
-       possibleCauses:
-         - "Quantity is negative or zero"
-         - "Quantity exceeds per-customer limits"
-         - "Quantity exceeds per-order limits"
+      invalid_quantity:
+        httpStatus: 400
+        title: "Invalid Quantity"
+        description: "The requested quantity is invalid (negative, zero, or exceeds maximum allowed)."
+        category: "validation"
+        retryable: true
+        retryStrategy: "Provide a valid quantity"
+        possibleCauses:
+          - "Quantity is negative or zero"
+          - "Quantity exceeds per-customer limits"
+          - "Quantity exceeds per-order limits"
 
-     geographic_restriction:
-       httpStatus: 403
-       title: "Geographic Restriction"
-       description: "This item is not available for delivery/shipping to the specified location."
-       category: "business_logic"
-       retryable: false
-       possibleCauses:
-         - "Item shipping restrictions"
-         - "Legal/regulatory restrictions"
-         - "Vendor geographic limitations"
+      geographic_restriction:
+        httpStatus: 403
+        title: "Geographic Restriction"
+        description: "This item is not available for delivery/shipping to the specified location."
+        category: "business_logic"
+        retryable: false
+        possibleCauses:
+          - "Item shipping restrictions"
+          - "Legal/regulatory restrictions"
+          - "Vendor geographic limitations"
 
-     minimum_order_value:
-       httpStatus: 400
-       title: "Minimum Order Value Not Met"
-       description: "The order total does not meet the minimum required value."
-       category: "business_logic"
-       retryable: true
-       retryStrategy: "Add more items to meet minimum order value"
-       possibleCauses:
-         - "Order subtotal is below minimum threshold"
-         - "After discounts, order value is too low"
-       suggestedActions:
-         - action: "add_more_items"
-           method: "POST"
-           endpoint: "/carts/{cartId}/items"
-           description: "Add additional items to increase order value"
+      minimum_order_value:
+        httpStatus: 400
+        title: "Minimum Order Value Not Met"
+        description: "The order total does not meet the minimum required value."
+        category: "business_logic"
+        retryable: true
+        retryStrategy: "Add more items to meet minimum order value"
+        possibleCauses:
+          - "Order subtotal is below minimum threshold"
+          - "After discounts, order value is too low"
+        suggestedActions:
+          - action: "add_more_items"
+            method: "POST"
+            endpoint: "/carts/{cartId}/items"
+            description: "Add additional items to increase order value"
 
-     service_unavailable:
-       httpStatus: 503
-       title: "Service Temporarily Unavailable"
-       description: "The service is temporarily unavailable due to maintenance or high load."
-       category: "server_error"
-       retryable: true
-       retryStrategy: "Wait and retry with exponential backoff"
-       headers:
-         Retry-After:
-           schema: { type: integer }
-           description: "Suggested wait time in seconds"
+      service_unavailable:
+        httpStatus: 503
+        title: "Service Temporarily Unavailable"
+        description: "The service is temporarily unavailable due to maintenance or high load."
+        category: "server_error"
+        retryable: true
+        retryStrategy: "Wait and retry with exponential backoff"
+        headers:
+          Retry-After:
+            schema: { type: integer }
+            description: "Suggested wait time in seconds"
 
-     payment_method_unsupported:
-       httpStatus: 400
-       title: "Payment Method Not Supported"
-       description: "The selected payment method is not supported for this order."
-       category: "payment"
-       retryable: true
-       retryStrategy: "Choose a different payment method"
-       possibleCauses:
-         - "Payment method not accepted by merchant"
-         - "Payment method not available in customer's region"
-         - "Payment method requires additional verification"
+      payment_method_unsupported:
+        httpStatus: 400
+        title: "Payment Method Not Supported"
+        description: "The selected payment method is not supported for this order."
+        category: "payment"
+        retryable: true
+        retryStrategy: "Choose a different payment method"
+        possibleCauses:
+          - "Payment method not accepted by merchant"
+          - "Payment method not available in customer's region"
+          - "Payment method requires additional verification"
 
   securitySchemes:
     bearerAuth:
@@ -2215,29 +2382,29 @@ components:
       description: The request was malformed or invalid.
       content:
         application/ocs+json; version=1.0:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
     Unauthorized:
       description: Authentication credentials are required and are missing or invalid.
       content:
         application/problem+json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
     Forbidden:
       description: The client is not authorized to perform this action.
       content:
         application/problem+json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
     NotFound:
       description: The requested resource could not be found.
       content:
         application/problem+json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
     Conflict:
       description: A conflict occurred, such as a reused idempotency key with a different request body.
       content:
         application/problem+json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }
     ServerError:
       description: An unexpected server error occurred.
       content:
         application/problem+json:
-          schema: { $ref: '#/components/schemas/Error' }
+          schema: { $ref: "#/components/schemas/Error" }

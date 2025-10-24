@@ -848,7 +848,53 @@ curl -X POST http://localhost:3000/orders \
 
 ---
 
-## Quick Links
+## Resource Mutation (with Versioning)
+
+When a server supports `dev.ocs.resource.versioning@1.0`, mutations create new resources. **Clients must update their state with the new ID.**
+
+```javascript
+// 1. Get the latest version of an order
+const orderV1 = await ocsRequest('/orders/order_abc1');
+
+// 2. Find the mutation action
+const cancelAction = orderV1.actions.find(a => a.id === 'cancel');
+if (!cancelAction) {
+  throw new Error('Cancel action not available');
+}
+
+// 3. Perform the action
+const response = await fetch(cancelAction.href, { method: 'POST', ... });
+
+// 4. CRITICAL: Handle the 201 Created response
+if (response.status === 201) {
+  const orderV2 = await response.json();
+  const newLocation = response.headers.get('Location');
+
+  console.log('Old ID:', orderV1.id); // "order_abc1"
+  console.log('New ID:', orderV2.id); // "order_def2"
+
+  // Update all local state from old ID to new ID
+  updateApplicationState(orderV1.id, orderV2);
+}
+```
+
+### Handling Stale Updates
+
+```javascript
+// If you try to mutate a stale version, you'll get a 409 Conflict
+try {
+  await performMutation(staleOrderV1);
+} catch (error) {
+  if (error.status === 409) {
+    // Recover by fetching the latest version
+    const latestOrder = await ocsRequest(error.latestVersionUrl);
+    // Now retry the mutation on 'latestOrder'
+  }
+}
+```
+
+---
+
 
 - [Getting Started Lite](./getting-started-lite.md) - Beginner guide
 - [Progressive Guide](./progressive-guide.md) - Step-by-step features

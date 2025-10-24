@@ -20,7 +20,7 @@ The Open Commerce Standard (OCS) is an open, extensible API specification for di
 
 ## Overview & Common Questions
 
-**What is OCS?**  
+**What is OCS?**
 An open, minimal, and extensible standard for digital commerce. It defines a universal HTTP API for the entire transaction lifecycle: product discovery, cart management, ordering, and real-time updates—supporting physical goods, digital services, and in-store pickup.
 
 **Why OCS?**
@@ -29,13 +29,13 @@ Traditional e-commerce APIs are fragmented and vendor-specific. OCS provides a c
 **How does OCS work?**
 Clients begin by discovering server capabilities (`GET /capabilities`), then browse catalogs, manage carts, and place orders. Real-time updates stream via Server-Sent Events. Complexity is delegated to structured `metadata` linked to JSON Schemas, allowing clients to adapt dynamically without hardcoding features.
 
-**Why X402 for payments?**  
+**Why X402 for payments?**
 OCS integrates the [x402 Protocol](https://github.com/coinbase/x402) for web3-native payments, enabling instant, low-fee blockchain transactions with stablecoins like USDC. Unlike credit cards (high fees, slow settlement, chargebacks), X402 supports micropayments, AI agents, and programmable commerce.
 
-**How does authentication work?**  
+**How does authentication work?**
 OCS uses Bearer token authentication (`Authorization: Bearer <token>`). Token formats (e.g., JWT, API keys) are implementation-specific and may be discoverable via capabilities. Discovery endpoints are public; others require auth.
 
-**Who is OCS for?**  
+**Who is OCS for?**
 API providers monetizing digital commerce, client developers building universal shopping apps, and AI agents requiring autonomous transactions.
 
 The full OpenAPI 3.0 specification is available in [`spec.yaml`](./src/spec.yaml).
@@ -86,6 +86,7 @@ Implement 3 endpoints:
 - 📈 **Progressive:** [Progressive Guide](./docs/progressive-guide.md) - Add features step-by-step
 - 🗺️ **Not sure?** [Learning Path Guide](./docs/learning-path.md) - Choose your path based on experience
 - 📁 **Examples:** [Code Examples](./examples/README.md) - Runnable client and server code
+- 🔄 **Versioning:** [Immutable Resource Versioning Guide](./docs/immutable-resource-versioning.md) - Official guide for immutable versioning of resources
 - 🔧 **Reference:** Continue reading below for complete documentation
 
 <br />
@@ -116,6 +117,7 @@ Implement 3 endpoints:
 *   **Web3-Native Payments:** Includes a complete, protocol-compliant implementation for handling payments via the [x402 Protocol](https://github.com/coinbase/x402).
 *   **Global-Ready by Design:** Full internationalization support is built into the standard. Servers can advertise supported languages and regional formats, allowing clients to provide a fully localized experience, including right-to-left (RTL) language support and culturally correct currency formatting.
 *   **Formal Security Model:** Recommends and formalizes a `Bearer` token authentication scheme for all protected resources.
+*   **Immutable, Auditable History:** An optional, advanced capability (`dev.ocs.resource.versioning@1.0`) for treating all resource mutations as the creation of a new, immutable version. This provides a full, unchangeable audit trail for critical resources like orders, inspired by financial ledger systems.
 
 <br />
 
@@ -683,6 +685,7 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | **`dev.ocs.order.subscription@1.0`** | Order | Defines recurring subscription orders with frequency, billing cycles, and cancellation policies. | [order/subscription/v1.json](./schemas/order/subscription/v1.json) |
 | **`dev.ocs.order.preorder@1.0`** | Product (`CatalogItem`) | Defines preorder information for items not yet available, including release dates and payment timing. | [order/preorder/v1.json](./schemas/order/preorder/v1.json) |
 | **`dev.ocs.service.scheduling@1.0`** | Product (`CatalogItem`) | Defines scheduling information for service-based items like appointments, including time slots and booking constraints. | [service/scheduling/v1.json](./schemas/service/scheduling/v1.json) |
+| **`dev.ocs.resource.versioning@1.0`** | All Resources | Enables immutable versioning for resources, creating a full audit trail of changes where each mutation creates a new resource version. See [Immutable Resource Versioning Guide](./docs/immutable-resource-versioning.md). | [resource/versioning/v1.json](./schemas/resource/versioning/v1.json)[Immutable Resource Versioning Guide](./docs/immutable-resource-versioning.md) |
 | **`dev.ocs.hypermedia.schema_aware_actions@1.0`** | Actions | Extends hypermedia actions to include request/response schema references, enabling dynamic client generation, form building, and truly self-documenting APIs. See [Schema-Aware Actions Guide](./docs/schema-aware-actions.md). | [hypermedia/schema_aware_actions/v1.json](./schemas/hypermedia/schema_aware_actions/v1.json) |
 
 <br />

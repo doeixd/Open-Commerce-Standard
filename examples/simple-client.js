@@ -280,6 +280,65 @@ function subscribeToOrderUpdates(orderId) {
   return eventSource;
 }
 
+// --- Example: Immutable Resource Revisions ---
+
+async function revisionExample() {
+  console.log('\n🔄 Demonstrating immutable resource revision...\n');
+  try {
+    // 1. Create an initial order
+    console.log('Creating initial order...');
+    const orderV1 = await ocsRequest('/orders', {
+      method: 'POST',
+      body: JSON.stringify({
+        items: [{ catalogItemId: 'coffee_mug', quantity: 1 }],
+        deliveryAddress: { address: '123 Main St' }
+      }),
+    });
+    console.log(`✅ Order V1 created with ID: ${orderV1.id}`);
+
+    // 2. Find the 'cancel' action on V1
+    const cancelAction = orderV1.actions.find(a => a.id === 'cancel');
+    if (!cancelAction) {
+      throw new Error('Could not find "cancel" action on Order V1.');
+    }
+    console.log(`Found 'cancel' action: POST ${cancelAction.href}`);
+
+    // 3. Execute the action, expecting a new version
+    console.log('\nExecuting cancel action...');
+    const response = await fetch(`${BASE_URL}${cancelAction.href}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/ocs+json; version=1.0',
+        'Accept': 'application/ocs+json; version=1.0',
+        'Authorization': `Bearer ${AUTH_TOKEN}`
+      },
+      body: JSON.stringify({ reason: 'Client test' })
+    });
+
+    if (response.status !== 201) {
+      throw new Error(`Expected status 201, but got ${response.status}`);
+    }
+
+    // 4. Handle the 201 Created response - THIS IS THE GOLDEN RULE
+    const orderV2 = await response.json();
+    console.log('✅ Received 201 Created. A new version was made.');
+    console.log(`   Order V2 ID: ${orderV2.id}`);
+    console.log(`   V2 revises V1: ${orderV2.metadata['dev.ocs.resource.versioning@1.0'].revises === orderV1.id}`);
+    console.log(`   V2 status: ${orderV2.status}`);
+
+    // 5. Verify the old version is now superseded
+    console.log('\nVerifying old version status...');
+    const oldOrderResponse = await ocsRequest(`/orders/${orderV1.id}`);
+    console.log(`✅ Order V1 is now 'superseded': ${oldOrderResponse.status === 'superseded'}`);
+    console.log(`   V1 isLatest is false: ${oldOrderResponse.metadata['dev.ocs.resource.versioning@1.0'].isLatest === false}`);
+    console.log(`   V1 superseded by V2: ${oldOrderResponse.metadata['dev.ocs.resource.versioning@1.0'].supersededBy === orderV2.id}`);
+
+    console.log('\n✨ Revision demo complete!');
+  } catch (error) {
+    console.error('❌ Revision Example Error:', error.message);
+  }
+}
+
 // --- Example: Client-Only (Stateless) Cart Simulation ---
 
 // For client-only carts, errors are handled locally without server persistence
@@ -350,6 +409,7 @@ if (typeof module !== 'undefined' && module.exports) {
     checkOrderStatus,
     cartBasedFlow,
     variantExample,
+    revisionExample,
     subscribeToOrderUpdates,
     simulateClientOnlyCart,
   };
@@ -361,6 +421,7 @@ if (typeof module !== 'undefined' && module.exports) {
 // main();
 // cartBasedFlow();
 // variantExample();
+// revisionExample();
 
 // Example: Subscribe to order updates
 // const eventSource = subscribeToOrderUpdates('order_123');
