@@ -147,7 +147,7 @@ Write-Host "Phase 3: Verification" -ForegroundColor Green
 Write-Host "--------------------" -ForegroundColor Green
 
 # Search for any remaining OCS references (excluding certain patterns)
-Write-Host "Searching for remaining 'OCS' references..." -ForegroundColor Yellow
+Write-Host "Searching for remaining OCS references..." -ForegroundColor Yellow
 
 $remainingOCS = Get-ChildItem -Recurse -File -Include $filePatterns |
     Where-Object { $_.FullName -notmatch '\\node_modules\\|\\\.git\\|\\dist\\' } |
@@ -156,7 +156,7 @@ $remainingOCS = Get-ChildItem -Recurse -File -Include $filePatterns |
 
 if ($remainingOCS) {
     Write-Host ""
-    Write-Host "⚠ Found potential remaining OCS references:" -ForegroundColor Yellow
+    Write-Host "Found potential remaining OCS references:" -ForegroundColor Yellow
     $remainingOCS | ForEach-Object {
         $relativePath = $_.Path.Replace((Get-Location).Path + "\", "")
         Write-Host "  $relativePath`:$($_.LineNumber) - $($_.Line.Trim())" -ForegroundColor Gray
@@ -179,5 +179,5 @@ Write-Host "  1. Review changes: git diff" -ForegroundColor White
 Write-Host "  2. Update repository URL if needed" -ForegroundColor White
 Write-Host "  3. Update any external documentation" -ForegroundColor White
 Write-Host "  4. Test the application" -ForegroundColor White
-Write-Host "  5. Commit: git add . && git commit -m 'Rename from OCS to OCP'" -ForegroundColor White
+Write-Host "  5. Commit: git add . && git commit -m `"Rename from OCS to OCP`"" -ForegroundColor White
 Write-Host ""
