@@ -6,7 +6,9 @@
 
 | Spec Version | Status | License |
 | :--- | :--- | :--- |
-| **1.0.0** | **Active & Ready for Implementation** | **MIT** |
+| **1.0.0-rc.1** | **🚧 Pre-Release Candidate - Awaiting Implementation** | **MIT** |
+
+> **Note:** This is a living pre-release specification subject to minor changes based on implementation feedback and real-world usage. The specification is stable enough for experimental implementations but may undergo adjustments before the final 1.0 release.
 
 ## Introduction
 

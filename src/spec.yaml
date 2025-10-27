@@ -1,8 +1,14 @@
 openapi: 3.0.3
 info:
   title: Open Commerce Protocol (OCP)
-  version: 1.0.0
+  version: 1.0.0-rc.1
   description: |
+    **🚧 PRE-RELEASE CANDIDATE 1.0 - Subject to Change**
+
+    This is a living pre-release specification awaiting implementation and feedback. The specification may undergo minor changes based on real-world implementation experience.
+
+    ---
+
     An open, minimal, and extensible standard for all forms of digital commerce.
 
     **Core Philosophy:**

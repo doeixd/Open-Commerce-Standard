@@ -1,6 +1,6 @@
 {
   "name": "Open-Commerce-Protocol",
-  "version": "1.0.0",
+  "version": "1.0.0-rc.1",
   "files": [
     "dist",
     "src"
@@ -29,7 +29,7 @@
     "test": "vitest --run"
   },
   "private": false,
-  "description": "Open Commerce Protocol (OCP) - HTTP-native API for digital commerce",
+  "description": "Open Commerce Protocol (OCP) - HTTP-native API for digital commerce [Pre-Release Candidate - Subject to Change]",
   "repository": {
     "url": "",
     "type": "git"
