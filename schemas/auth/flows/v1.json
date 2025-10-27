@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/auth/flows/v1.json",
+  "$id": "https://schemas.OCP.dev/auth/flows/v1.json",
   "type": "object",
-  "description": "Schema for discovering authentication-related endpoints, token formats, and supported authentication methods (dev.ocs.auth.flows@1.0).",
+  "description": "Schema for discovering authentication-related endpoints, token formats, and supported authentication methods (dev.ocp.auth.flows@1.0).",
   "properties": {
     "signInUrl": {
       "type": "string",

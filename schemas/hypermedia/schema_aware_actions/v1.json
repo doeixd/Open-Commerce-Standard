@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/hypermedia/schema_aware_actions/v1.json",
+  "$id": "https://schemas.OCP.dev/hypermedia/schema_aware_actions/v1.json",
   "title": "Schema-Aware Actions",
-  "description": "Extends OCS hypermedia actions to include request/response schema references, enabling dynamic client generation, form building, and true self-documenting APIs.",
+  "description": "Extends OCP hypermedia actions to include request/response schema references, enabling dynamic client generation, form building, and true self-documenting APIs.",
   "type": "object",
   "properties": {
     "_version": {

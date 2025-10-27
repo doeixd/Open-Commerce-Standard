@@ -1,6 +1,6 @@
 That is a fantastic and deeply insightful question. It cuts to the core of API design philosophy: push vs. pull, and synchronous vs. asynchronous communication.
 
-The short answer is: **No, `actions` do not replace the need for webhooks.** They solve different problems. OCS would greatly benefit from formalizing webhooks in the main spec for server-to-server integrations.
+The short answer is: **No, `actions` do not replace the need for webhooks.** They solve different problems. OCP would greatly benefit from formalizing webhooks in the main spec for server-to-server integrations.
 
 Let's break down why.
 
@@ -14,9 +14,9 @@ This is the most important difference:
 
 *   **Webhooks:** This is a **server-push** mechanism. The server detects that an event has occurred (e.g., an order has been shipped) and **initiates** a new, unsolicited `POST` request to a URL that a third-party system has pre-registered. The receiving system is passive until the event is pushed to it. It's asynchronous.
 
-### A Comparative Table of OCS Communication Patterns
+### A Comparative Table of OCP Communication Patterns
 
-The OCS spec, as written, already has two powerful communication patterns. Webhooks would be the third, completing the trifecta needed for a comprehensive commerce ecosystem.
+The OCP spec, as written, already has two powerful communication patterns. Webhooks would be the third, completing the trifecta needed for a comprehensive commerce ecosystem.
 
 | Feature | `actions` (Hypermedia) | `GET /updates` (SSE) | **Webhooks (Proposed)** |
 | :--- | :--- | :--- | :--- |
@@ -28,9 +28,9 @@ The OCS spec, as written, already has two powerful communication patterns. Webho
 
 As you can see, they serve three distinct and complementary purposes. You cannot use `actions` to tell a separate inventory management system that a new order has been placed. That system isn't actively polling your API; it needs to be told.
 
-### Why Are Webhooks Necessary for the OCS "Main Spec"?
+### Why Are Webhooks Necessary for the OCP "Main Spec"?
 
-Without a formalized webhook system, every OCS implementation would have to invent its own proprietary way of handling server-to-server notifications. This would break the promise of a universal standard for a critical part of the commerce lifecycle: **post-order automation**.
+Without a formalized webhook system, every OCP implementation would have to invent its own proprietary way of handling server-to-server notifications. This would break the promise of a universal standard for a critical part of the commerce lifecycle: **post-order automation**.
 
 Use cases that are *impossible* without webhooks (or inefficient polling):
 *   **Inventory Management:** A central system needs to be notified instantly when an order is placed to decrement stock.
@@ -38,11 +38,11 @@ Use cases that are *impossible* without webhooks (or inefficient polling):
 *   **Accounting:** An accounting system needs to be notified to create an invoice.
 *   **Agentic Checkout (like OpenAI's):** The agent's backend needs to be notified when the order status changes to `shipped` or `refunded` long after the initial checkout conversation is over.
 
-### How to Formalize Webhooks in OCS (A Proposal)
+### How to Formalize Webhooks in OCP (A Proposal)
 
-To integrate webhooks properly, OCS should add two components, following its own design principles:
+To integrate webhooks properly, OCP should add two components, following its own design principles:
 
-#### 1. A New Capability: `dev.ocs.server.webhooks@1.0`
+#### 1. A New Capability: `dev.ocp.server.webhooks@1.0`
 
 A server advertises its support for webhooks via the `/capabilities` endpoint. The metadata would describe the supported events and security mechanisms.
 
@@ -82,21 +82,21 @@ A server advertises its support for webhooks via the `/capabilities` endpoint. T
 
 A set of discoverable endpoints for creating and managing subscriptions, following standard REST patterns.
 
-*   `POST /webhook_subscriptions`
+*   `POST /webhooks`
     *   **Request Body:** `{ "url": "https://api.thirdparty.com/webhook", "events": ["order.created", "order.shipped"] }`
     *   **Response Body:** `{ "id": "sub_123", "url": "...", "events": [...], "secret": "whsec_..." }`
     *   The `secret` is used by the subscriber to verify the HMAC signature on incoming webhooks.
 
-*   `GET /webhook_subscriptions`
+*   `GET /webhooks`
     *   Lists all active subscriptions for the authenticated user/system.
 
-*   `DELETE /webhook_subscriptions/{id}`
+*   `DELETE /webhooks/{id}`
     *   Removes a subscription.
 
-This approach makes the entire webhook system discoverable, manageable, and secure, fitting perfectly within the OCS philosophy.
+This approach makes the entire webhook system discoverable, manageable, and secure, fitting perfectly within the OCP philosophy.
 
 ### Conclusion
 
 You are correct to question the relationship between `actions` and webhooks. While `actions` are a powerful tool for building interactive, state-driven clients, **they are not a substitute for webhooks.**
 
-Webhooks are the industry-standard solution for asynchronous, server-to-server event notification. Formalizing them within the OCS spec is not just a good idea; it is **essential** for enabling the rich, automated, and interconnected commerce ecosystem that OCS aims to create.
+Webhooks are the industry-standard solution for asynchronous, server-to-server event notification. Formalizing them within the OCP spec is not just a good idea; it is **essential** for enabling the rich, automated, and interconnected commerce ecosystem that OCP aims to create.

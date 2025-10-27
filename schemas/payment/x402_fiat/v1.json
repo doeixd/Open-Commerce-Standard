@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "array",
-  "description": "Schema for the dev.ocs.payment.x402_fiat@1.0 capability. Defines a list of supported fiat providers and their required client-side configuration.",
+  "description": "Schema for the dev.ocp.payment.x402_fiat@1.0 capability. Defines a list of supported fiat providers and their required client-side configuration.",
   "items": {
     "type": "object",
     "properties": {

@@ -1,7 +1,7 @@
 # Fiat Payments with Stripe, Apple Pay, and SPC
 
 **Status:** Community Guide
-**Applies To:** OCS v1.0.0
+**Applies To:** OCP v1.0.0
 **Goal:** Implement modern fiat payment flows using a stateful, hypermedia-driven approach, without using the stateless x402 protocol.
 
 ---
@@ -19,7 +19,7 @@
 
 ## 1. Core Philosophy: The Stateful, Hypermedia-Driven Flow
 
-While the Open Commerce Standard (OCS) specifies a powerful, stateless payment protocol using the `402 Payment Required` status code, some implementations may prefer a more traditional, stateful approach. This guide outlines how to achieve this using OCS's core hypermedia principles.
+While the Open Commerce Protocol (OCP) specifies a powerful, stateless payment protocol using the `402 Payment Required` status code, some implementations may prefer a more traditional, stateful approach. This guide outlines how to achieve this using OCP's core hypermedia principles.
 
 Instead of a stateless request/retry loop, this pattern uses a stateful `Order` resource. The flow is as follows:
 
@@ -29,7 +29,7 @@ Instead of a stateless request/retry loop, this pattern uses a stateful `Order` 
 4.  **Confirm Payment:** The client sends the resulting payment token or assertion to a dedicated confirmation endpoint provided by the server.
 5.  **Finalize Order:** The server verifies the payment, captures the funds, and transitions the order's status to `confirmed`.
 
-This pattern relies on the `Order` resource to hold state, and on the `actions` array to guide the client, making it fully compliant with OCS's HATEOAS design.
+This pattern relies on the `Order` resource to hold state, and on the `actions` array to guide the client, making it fully compliant with OCP's HATEOAS design.
 
 ---
 
@@ -209,7 +209,7 @@ First, create the order to get its `pending_payment` state and available actions
 async function createOrder() {
   const response = await fetch('/orders', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/ocs+json; version=1.0' },
+    headers: { 'Content-Type': 'application/ocp+json; version=1.0' },
     body: JSON.stringify({ items: [...] })
   });
   const pendingOrder = await response.json();
@@ -366,14 +366,14 @@ This stateful, hypermedia-driven pattern is a robust and widely understood alter
 
 
 
-# Comparative Analysis: OCS Fiat Payment Patterns
+# Comparative Analysis: OCP Fiat Payment Patterns
 
-The Open Commerce Standard (OCS) is flexible enough to support multiple payment integration patterns. This document compares two primary approaches for handling fiat payments like Stripe, Apple Pay, and SPC:
+The Open Commerce Protocol (OCP) is flexible enough to support multiple payment integration patterns. This document compares two primary approaches for handling fiat payments like Stripe, Apple Pay, and SPC:
 
 1.  **Stateless x402 Pattern:** The official, recommended approach using the `402 Payment Required` HTTP status code for a stateless, universal flow.
 2.  **Stateful Hypermedia Pattern:** A more traditional, alternative approach that uses a `pending_payment` order state and hypermedia `actions` to guide the client.
 
-Both patterns are valid within the OCS framework, but they offer different architectural trade-offs.
+Both patterns are valid within the OCP framework, but they offer different architectural trade-offs.
 
 ---
 
@@ -454,7 +454,7 @@ Let's trace a simple Stripe payment through both patterns.
 ## 4. Which Pattern Should You Use?
 
 **Choose the Stateless x402 Pattern if:**
-*   You are building a **universal client** designed to work with any OCS server.
+*   You are building a **universal client** designed to work with any OCP server.
 *   You prioritize **architectural elegance, atomicity, and simplicity** on the server.
 *   Your developers are comfortable learning a slightly unconventional but powerful HTTP pattern.
 *   You are building for the future, including potential for **AI agents or other automated systems** that benefit from a simple, stateless protocol.
@@ -468,6 +468,6 @@ Let's trace a simple Stripe payment through both patterns.
 
 ### Final Recommendation
 
-For new, greenfield projects aiming to fully embrace the power and philosophy of the Open Commerce Standard, the **Stateless x402 Pattern is the recommended approach.** It best embodies the goals of universality, resilience, and server-driven logic.
+For new, greenfield projects aiming to fully embrace the power and philosophy of the Open Commerce Protocol, the **Stateless x402 Pattern is the recommended approach.** It best embodies the goals of universality, resilience, and server-driven logic.
 
 The **Stateful Hypermedia Pattern** remains an excellent, fully compliant, and practical alternative for teams who prioritize implementation familiarity and have business needs that align with a stateful order model.

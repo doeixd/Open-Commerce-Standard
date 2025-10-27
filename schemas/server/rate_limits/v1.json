@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for the dev.ocs.server.rate_limits@1.0 capability. Its presence indicates the server implements rate limiting and provides discoverable rate limit policies.",
+  "description": "Schema for the dev.ocp.server.rate_limits@1.0 capability. Its presence indicates the server implements rate limiting and provides discoverable rate limit policies.",
   "properties": {
     "authenticated": {
       "type": "object",

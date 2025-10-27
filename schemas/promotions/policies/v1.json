@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/promotions/policies/v1.json",
+  "$id": "https://schemas.OCP.dev/promotions/policies/v1.json",
   "type": "object",
-  "description": "Defines server-wide promotion policies and stacking rules (dev.ocs.promotions.policies@1.0).",
+  "description": "Defines server-wide promotion policies and stacking rules (dev.ocp.promotions.policies@1.0).",
   "properties": {
     "stackingAllowed": {
       "type": "boolean",

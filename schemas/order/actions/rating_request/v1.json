@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/order/actions/rating_request/v1.json",
+  "$id": "https://schemas.OCP.dev/order/actions/rating_request/v1.json",
   "title": "Add Rating Request",
   "description": "Request schema for adding a rating to a completed order",
   "type": "object",

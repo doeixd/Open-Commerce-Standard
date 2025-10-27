@@ -1,18 +1,18 @@
-# Open Commerce Standard — Standards Alignment Roadmap
+# Open Commerce Protocol — Standards Alignment Roadmap
 
 **Version:** Draft 1.0
 **Last Updated:** October 2025
 
-This document outlines the roadmap and implementation guidelines for aligning the **Open Commerce Standard (OCS)** with adjacent web standards — specifically **Hydra** (for hypermedia semantics) and **Interledger/Open Payments** (for payment interoperability).
+This document outlines the roadmap and implementation guidelines for aligning the **Open Commerce Protocol (OCP)** with adjacent web standards — specifically **Hydra** (for hypermedia semantics) and **Interledger/Open Payments** (for payment interoperability).
 
-The goal is to enhance interoperability while preserving OCS's core design principles: **HTTP-native**, **JSON-first**, and **developer-friendly**.
+The goal is to enhance interoperability while preserving OCP's core design principles: **HTTP-native**, **JSON-first**, and **developer-friendly**.
 
 ---
 
 ## 🎯 Goals
 
 1. Improve interoperability with the broader web ecosystem.
-2. Maintain OCS's minimalism and clarity.
+2. Maintain OCP's minimalism and clarity.
 3. Enable optional bridges to Semantic Web and multi-rail payment protocols.
 
 ---
@@ -20,7 +20,7 @@ The goal is to enhance interoperability while preserving OCS's core design princ
 ## 🧩 1. Capability Metadata (`rel` and `href`)
 
 ### Purpose
-Add lightweight link metadata that allows OCS resources to map cleanly to:
+Add lightweight link metadata that allows OCP resources to map cleanly to:
 - Standard HTTP `Link` headers
 - Hydra's `hydra:Link` and `hydra:Operation` semantics
 
@@ -59,7 +59,7 @@ Extend the **action** and **capability** schemas with two optional fields:
 
 * `rel` defines the **semantic role** of the link (e.g., `self`, `cancel`, `checkout`).
 * `href` defines the **target** of the link.
-* These fields are optional and purely descriptive — they do not alter OCS behavior.
+* These fields are optional and purely descriptive — they do not alter OCP behavior.
 
 #### d. Optional HTTP Link Headers
 
@@ -69,7 +69,7 @@ Servers **may** include equivalent link headers for standard clients:
 Link: </orders/123/cancel>; rel="cancel"
 ```
 
-This makes OCS resources semantically interoperable with Hydra clients and HTTP-aware tooling.
+This makes OCP resources semantically interoperable with Hydra clients and HTTP-aware tooling.
 
 ---
 
@@ -83,12 +83,12 @@ Preserve the simple, elegant HTTP 402 flow while defining a clear mapping to **I
 
 #### a. Continue Using `x402`
 
-OCS's existing HTTP 402 flow remains canonical:
+OCP's existing HTTP 402 flow remains canonical:
 
 ```http
 POST /checkout
 402 Payment Required
-Content-Type: application/ocs+json
+Content-Type: application/ocp+json
 Link: <https://pay.example.com/intent/123>; rel="payment"
 ```
 
@@ -107,7 +107,7 @@ Response body:
 
 #### b. Mapping Table
 
-| OCS Field  | Interledger / Open Payments Equivalent | Notes                                |
+| OCP Field  | Interledger / Open Payments Equivalent | Notes                                |
 | ---------- | -------------------------------------- | ------------------------------------ |
 | `intent`   | `incoming-payment` or `quote` URL      | Equivalent to Open Payments endpoint |
 | `amount`   | `incoming-amount.value`                | Transfer amount                      |
@@ -154,7 +154,7 @@ Enable Semantic Web and Hydra compatibility through an optional JSON-LD context,
 Host a context at:
 
 ```
-https://schemas.ocs.dev/context.jsonld
+https://schemas.OCP.dev/context.jsonld
 ```
 
 Example contents:
@@ -162,11 +162,11 @@ Example contents:
 ```json
 {
   "@context": {
-    "ocs": "https://schemas.ocs.dev/vocab#",
+    "OCP": "https://schemas.OCP.dev/vocab#",
     "hydra": "http://www.w3.org/ns/hydra/core#",
     "rel": "hydra:Link",
     "actions": "hydra:Operation",
-    "capabilities": "ocs:Capability"
+    "capabilities": "OCP:Capability"
   }
 }
 ```
@@ -177,10 +177,10 @@ Servers **may** include a top-level `@context` field in any response:
 
 ```json
 {
-  "@context": "https://schemas.ocs.dev/context.jsonld",
+  "@context": "https://schemas.OCP.dev/context.jsonld",
   "capabilities": [
     {
-      "id": "dev.ocs.cart@1.0",
+      "id": "dev.ocp.cart@1.0",
       "title": "Cart API",
       "rel": "self",
       "href": "/cart"
@@ -192,7 +192,7 @@ Servers **may** include a top-level `@context` field in any response:
 * JSON-only clients can safely ignore `@context`.
 * JSON-LD-aware clients can parse it semantically.
 
-This allows OCS to integrate with **Hydra, RDF, and Linked Data** tools if needed.
+This allows OCP to integrate with **Hydra, RDF, and Linked Data** tools if needed.
 
 ---
 
@@ -210,10 +210,10 @@ This allows OCS to integrate with **Hydra, RDF, and Linked Data** tools if neede
 
 ```json
 {
-  "@context": "https://schemas.ocs.dev/context.jsonld",
+  "@context": "https://schemas.OCP.dev/context.jsonld",
   "capabilities": [
     {
-      "id": "dev.ocs.cart@1.0",
+      "id": "dev.ocp.cart@1.0",
       "title": "Cart",
       "rel": "self",
       "href": "/cart",
@@ -242,7 +242,7 @@ This allows OCS to integrate with **Hydra, RDF, and Linked Data** tools if neede
 
 This JSON response:
 
-* Is valid OCS.
+* Is valid OCP.
 * Is valid JSON-LD.
 * Can settle via `x402` or Interledger/Open Payments.
 
@@ -259,4 +259,4 @@ This JSON response:
 
 ---
 
-**OCS remains simple and developer-first — but now sits within the broader family of web standards, ready for Semantic Web and open payment ecosystems.**
+**OCP remains simple and developer-first — but now sits within the broader family of web standards, ready for Semantic Web and open payment ecosystems.**

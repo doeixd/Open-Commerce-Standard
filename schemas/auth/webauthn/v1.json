@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/auth/webauthn/v1.json",
+  "$id": "https://schemas.OCP.dev/auth/webauthn/v1.json",
   "title": "WebAuthn Authentication Configuration",
-  "description": "Configuration for WebAuthn authentication (FIDO2/passkeys), which provides phishing-resistant biometric and hardware key authentication. This capability extends dev.ocs.auth.flows@1.0 when 'webauthn' is included in the methods array.",
+  "description": "Configuration for WebAuthn authentication (FIDO2/passkeys), which provides phishing-resistant biometric and hardware key authentication. This capability extends dev.ocp.auth.flows@1.0 when 'webauthn' is included in the methods array.",
   "type": "object",
   "properties": {
     "_version": {

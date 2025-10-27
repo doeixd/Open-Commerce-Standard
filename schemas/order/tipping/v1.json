@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for order tipping (dev.ocs.order.tipping_and_ratings@1.0)",
+  "description": "Schema for order tipping (dev.ocp.order.tipping_and_ratings@1.0)",
   "properties": {
     "tip": {
       "$ref": "#/$defs/Money",

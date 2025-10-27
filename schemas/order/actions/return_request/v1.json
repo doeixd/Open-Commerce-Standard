@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/order/actions/return_request/v1.json",
+  "$id": "https://schemas.OCP.dev/order/actions/return_request/v1.json",
   "title": "Initiate Return Request",
   "description": "Request schema for initiating a return for one or more items from an order",
   "type": "object",

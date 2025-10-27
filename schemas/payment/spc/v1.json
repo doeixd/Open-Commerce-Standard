@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/payment/spc/v1.json",
+  "$id": "https://schemas.OCP.dev/payment/spc/v1.json",
   "title": "Secure Payment Confirmation (SPC) Capability",
   "description": "Capability for W3C Secure Payment Confirmation, enabling biometric authentication during payments via WebAuthn. See https://www.w3.org/TR/secure-payment-confirmation/",
   "type": "object",

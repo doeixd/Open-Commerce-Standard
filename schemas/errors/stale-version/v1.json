@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/errors/stale-version/v1.json",
+  "$id": "https://schemas.OCP.dev/errors/stale-version/v1.json",
   "title": "Stale Version Error",
   "description": "RFC 9457 Problem Details for a 409 Conflict error when a client attempts to modify a resource version that has already been superseded.",
   "type": "object",
@@ -8,7 +8,7 @@
     "type": {
       "type": "string",
       "format": "uri",
-      "const": "https://schemas.ocs.dev/errors/stale-version"
+      "const": "https://schemas.OCP.dev/errors/stale-version"
     },
     "title": {
       "type": "string",

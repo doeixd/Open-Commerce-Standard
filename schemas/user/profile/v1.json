@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for user profile capability (dev.ocs.user.profile@1.0), providing user-specific data like saved addresses and preferences.",
+  "description": "Schema for user profile capability (dev.ocp.user.profile@1.0), providing user-specific data like saved addresses and preferences.",
   "definitions": {
     "Location": {
       "type": "object",
@@ -60,7 +60,7 @@
       "properties": {
         "language": {
           "type": "string",
-          "description": "Preferred language code (e.g., 'en-US'), aligns with dev.ocs.i18n@1.0."
+          "description": "Preferred language code (e.g., 'en-US'), aligns with dev.ocp.i18n@1.0."
         },
         "notifications": {
           "type": "boolean",

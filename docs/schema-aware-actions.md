@@ -1,6 +1,6 @@
-# Schema-Aware Actions in OCS
+# Schema-Aware Actions in OCP
 
-**Capability ID:** `dev.ocs.hypermedia.schema_aware_actions@1.0`
+**Capability ID:** `dev.ocp.hypermedia.schema_aware_actions@1.0`
 **Status:** Proposed Enhancement
 **Date:** October 23, 2025
 
@@ -8,7 +8,7 @@
 
 ## Problem Statement
 
-Currently, OCS actions provide hypermedia links but **don't advertise schemas**:
+Currently, OCP actions provide hypermedia links but **don't advertise schemas**:
 
 ```json
 {
@@ -47,10 +47,10 @@ Extend actions to include schema references:
       "href": "/orders/order_123/cancel",
       "method": "POST",
       "requestSchema": {
-        "$ref": "https://schemas.ocs.dev/order/actions/cancel_request/v1.json"
+        "$ref": "https://schemas.OCP.dev/order/actions/cancel_request/v1.json"
       },
       "responseSchema": {
-        "$ref": "https://schemas.ocs.dev/order/v1.json"
+        "$ref": "https://schemas.OCP.dev/order/v1.json"
       },
       "title": "Cancel Order",
       "description": "Cancel this order if it hasn't been fulfilled yet"
@@ -136,11 +136,11 @@ Action:
       "description": "Cancel this order. Refunds will be processed within 5-7 business days.",
 
       "requestSchema": {
-        "$ref": "https://schemas.ocs.dev/order/actions/cancel_request/v1.json"
+        "$ref": "https://schemas.OCP.dev/order/actions/cancel_request/v1.json"
       },
 
       "responseSchema": {
-        "$ref": "https://schemas.ocs.dev/order/v1.json"
+        "$ref": "https://schemas.OCP.dev/order/v1.json"
       },
 
       "errorSchemas": [
@@ -207,7 +207,7 @@ Action:
       },
 
       "responseSchema": {
-        "$ref": "https://schemas.ocs.dev/order/v1.json"
+        "$ref": "https://schemas.OCP.dev/order/v1.json"
       },
 
       "examples": {
@@ -246,11 +246,11 @@ Action:
       ],
 
       "requestSchema": {
-        "$ref": "https://schemas.ocs.dev/order/actions/return_request/v1.json"
+        "$ref": "https://schemas.OCP.dev/order/actions/return_request/v1.json"
       },
 
       "responseSchema": {
-        "$ref": "https://schemas.ocs.dev/order/return/v1.json"
+        "$ref": "https://schemas.OCP.dev/order/return/v1.json"
       },
 
       "examples": {
@@ -394,8 +394,8 @@ function generateOpenAPIFromActions(order) {
 {
   "capabilities": [
     {
-      "id": "dev.ocs.hypermedia.schema_aware_actions@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/hypermedia/schema_aware_actions/v1.json",
+      "id": "dev.ocp.hypermedia.schema_aware_actions@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/hypermedia/schema_aware_actions/v1.json",
       "metadata": {
         "_version": "1.0",
         "enabled": true,
@@ -460,8 +460,8 @@ const order = {
       href: `/orders/order_123/cancel`,
       title: 'Cancel Order',
       description: 'Cancel this order',
-      requestSchemaUrl: 'https://schemas.ocs.dev/order/actions/cancel_request/v1.json',
-      responseSchemaUrl: 'https://schemas.ocs.dev/order/v1.json',
+      requestSchemaUrl: 'https://schemas.OCP.dev/order/actions/cancel_request/v1.json',
+      responseSchemaUrl: 'https://schemas.OCP.dev/order/v1.json',
       examples: {
         request: { reason: 'Changed my mind' }
       }
@@ -480,7 +480,7 @@ const order = {
 async function supportsSchemaAwareActions() {
   const caps = await fetch('/capabilities').then(r => r.json());
   return caps.capabilities.some(
-    c => c.id === 'dev.ocs.hypermedia.schema_aware_actions@1.0'
+    c => c.id === 'dev.ocp.hypermedia.schema_aware_actions@1.0'
   );
 }
 ```
@@ -540,7 +540,7 @@ class ActionHandler {
 ```json
 {
   "capabilities": [
-    { "id": "dev.ocs.hypermedia.schema_aware_actions@1.0" }
+    { "id": "dev.ocp.hypermedia.schema_aware_actions@1.0" }
   ]
 }
 ```
@@ -567,7 +567,7 @@ class ActionHandler {
 ### vs. JSON:API
 - ✅ **Advantage**: Uses JSON Schema (more widespread)
 - ✅ **Advantage**: Simpler structure
-- ✅ **Advantage**: Compatible with OCS patterns
+- ✅ **Advantage**: Compatible with OCP patterns
 
 ### vs. HAL / Siren
 - ✅ **Advantage**: Explicit schemas (not just links)
@@ -582,7 +582,7 @@ For schema-aware actions to work well, establish a schema registry:
 
 ### Registry Structure
 ```
-https://schemas.ocs.dev/
+https://schemas.OCP.dev/
 ├── order/
 │   ├── v1.json (Order schema)
 │   └── actions/
@@ -650,7 +650,7 @@ https://schemas.ocs.dev/
 
 ## Summary
 
-**Schema-aware actions transform OCS from:**
+**Schema-aware actions transform OCP from:**
 - ❌ "Here's a link, good luck figuring out what to send"
 
 **To:**
@@ -670,4 +670,4 @@ https://schemas.ocs.dev/
 
 **Status:** Ready for community feedback and RFC
 **Next Steps:** Gather implementer input, create reference implementation
-**Target:** OCS v1.1 or v2.0
+**Target:** OCP v1.1 or v2.0

@@ -1,6 +1,6 @@
-# Progressive Guide to OCS Features
+# Progressive Guide to OCP Features
 
-This guide walks you through building an OCS API from simple to advanced, adding one feature at a time. Each level builds on the previous one.
+This guide walks you through building an OCP API from simple to advanced, adding one feature at a time. Each level builds on the previous one.
 
 **Prerequisites:** Complete the [Getting Started Lite](./getting-started-lite.md) guide first.
 
@@ -57,7 +57,7 @@ GET /capabilities
 {
   "capabilities": [
     {
-      "id": "dev.ocs.cart@1.0",
+      "id": "dev.ocp.cart@1.0",
       "metadata": {
         "lifetimeSeconds": 3600,
         "maxItems": 50
@@ -127,8 +127,8 @@ const order = await createOrder({ cartId: cart.id });
 
 ```json
 {
-  "id": "dev.ocs.product.variants@1.0",
-  "schemaUrl": "https://schemas.ocs.dev/product/variants/v1.json"
+  "id": "dev.ocp.product.variants@1.0",
+  "schemaUrl": "https://schemas.OCP.dev/product/variants/v1.json"
 }
 ```
 
@@ -137,12 +137,12 @@ const order = await createOrder({ cartId: cart.id });
 ```json
 {
   "id": "tshirt",
-  "name": "OCS Logo T-Shirt",
+  "name": "OCP Logo T-Shirt",
   "price": { "amount": "20.00", "currency": "USD" },
   "fulfillmentType": "physical",
   "available": true,
   "metadata": {
-    "dev.ocs.product.variants@1.0": {
+    "dev.ocp.product.variants@1.0": {
       "_version": "1.0",
       "options": ["Size", "Color"],
       "variants": [
@@ -169,11 +169,11 @@ const order = await createOrder({ cartId: cart.id });
 ```javascript
 // Check if server supports variants
 const hasVariants = capabilities.capabilities
-  .some(c => c.id === 'dev.ocs.product.variants@1.0');
+  .some(c => c.id === 'dev.ocp.product.variants@1.0');
 
-if (hasVariants && product.metadata['dev.ocs.product.variants@1.0']) {
+if (hasVariants && product.metadata['dev.ocp.product.variants@1.0']) {
   // Show size/color picker UI
-  const variants = product.metadata['dev.ocs.product.variants@1.0'];
+  const variants = product.metadata['dev.ocp.product.variants@1.0'];
   renderVariantPicker(variants.options, variants.variants);
 }
 
@@ -246,7 +246,7 @@ Add human-readable status via metadata:
 event: order.patch
 data: [
   {"op": "replace", "path": "/status", "value": "in_transit"},
-  {"op": "add", "path": "/metadata/dev.ocs.order.detailed_status", "value": {
+  {"op": "add", "path": "/metadata/dev.ocp.order.detailed_status", "value": {
     "_version": "1.0",
     "title": "Out for Delivery",
     "description": "Your order is on its way!",
@@ -266,21 +266,21 @@ data: [
 **Why:** Enables browser extensions, federated commerce, SEO, AI agents.
 
 **What to add:**
-1. `/.well-known/ocs` endpoint
+1. `/.well-known/ocp` endpoint
 2. Optional: HTML meta tags, JSON-LD, HTTP headers
 
 ### 1. Implement Well-Known Endpoint
 
 ```json
-GET /.well-known/ocs
+GET /.well-known/ocp
 Cache-Control: max-age=86400
 Access-Control-Allow-Origin: *
 
 {
-  "ocs": {
+  "OCP": {
     "capabilities": "https://shop.example.com/api/v1/capabilities",
     "version": "1.0",
-    "context": "https://schemas.ocs.dev/context.jsonld"
+    "context": "https://schemas.OCP.dev/context.jsonld"
   }
 }
 ```
@@ -294,11 +294,11 @@ const caps = await fetch('https://shop.example.com/api/v1/capabilities');
 // New way: Discovered
 async function discoverOCS(domain) {
   // Try well-known endpoint
-  const discovery = await fetch(`https://${domain}/.well-known/ocs`)
+  const discovery = await fetch(`https://${domain}/.well-known/ocp`)
     .then(r => r.json());
 
   // Use discovered endpoint
-  const caps = await fetch(discovery.ocs.capabilities)
+  const caps = await fetch(discovery.OCP.capabilities)
     .then(r => r.json());
 
   return caps;
@@ -313,19 +313,19 @@ If you serve HTML pages:
 
 ```html
 <head>
-  <meta name="ocs:capabilities" content="https://shop.example.com/api/v1/capabilities">
+  <meta name="OCP:capabilities" content="https://shop.example.com/api/v1/capabilities">
 
   <script type="application/ld+json">
   {
-    "@context": "https://schemas.ocs.dev/context.jsonld",
-    "@type": "ocs:EntryPoint",
-    "ocs:capabilities": "https://shop.example.com/api/v1/capabilities"
+    "@context": "https://schemas.OCP.dev/context.jsonld",
+    "@type": "OCP:EntryPoint",
+    "OCP:capabilities": "https://shop.example.com/api/v1/capabilities"
   }
   </script>
 </head>
 ```
 
-**Full details:** See [OCS Discovery Specification](./ocs-discovery.md)
+**Full details:** See [OCP Discovery Specification](./OCP-discovery.md)
 
 **When to move on:** You need dynamic, context-aware APIs.
 
@@ -422,7 +422,7 @@ function buildOrder(order, user) {
 **Why:** For enterprise-grade systems, preventing data loss and maintaining a perfect audit trail is non-negotiable. This pattern eliminates complex state management bugs and provides complete traceability for every resource.
 
 **What to add:**
-1.  Advertise the `dev.ocs.resource.versioning@1.0` capability.
+1.  Advertise the `dev.ocp.resource.versioning@1.0` capability.
 2.  Refactor mutation endpoints (e.g., `cancel`, `change_address`) to create new resource versions instead of updating them in-place.
 3.  Implement the full transactional logic as described in the official guide.
 
@@ -442,24 +442,24 @@ Once you've mastered Levels 0-5, explore these optional capabilities:
 ### Promotions & Discounts
 - **Use case:** Coupons, seasonal sales, bundle pricing
 - **Capabilities:**
-  - `dev.ocs.promotions.discoverable@1.0`
-  - `dev.ocs.promotions.policies@1.0`
-  - `dev.ocs.order.applied_promotions@1.0`
+  - `dev.ocp.promotions.discoverable@1.0`
+  - `dev.ocp.promotions.policies@1.0`
+  - `dev.ocp.order.applied_promotions@1.0`
 
 ### Returns & Refunds
 - **Use case:** E-commerce return workflows
 - **Capabilities:**
-  - `dev.ocs.order.returns@1.0`
-  - `dev.ocs.order.refunds@1.0`
+  - `dev.ocp.order.returns@1.0`
+  - `dev.ocp.order.refunds@1.0`
 
 ### Internationalization
 - **Use case:** Multi-language, multi-currency stores
-- **Capability:** `dev.ocs.i18n@1.0`
+- **Capability:** `dev.ocp.i18n@1.0`
 - **Features:** Locale negotiation, currency formatting, RTL support
 
 ### Subscriptions
 - **Use case:** Recurring orders (meal kits, software licenses)
-- **Capability:** `dev.ocs.order.subscription@1.0`
+- **Capability:** `dev.ocp.order.subscription@1.0`
 
 ---
 
@@ -480,10 +480,10 @@ Once you've mastered Levels 0-5, explore these optional capabilities:
 | Level | Capabilities to Add |
 |-------|---------------------|
 | **0** | None (bare minimum) |
-| **1** | `dev.ocs.cart@1.0` |
-| **2** | `dev.ocs.product.variants@1.0` |
+| **1** | `dev.ocp.cart@1.0` |
+| **2** | `dev.ocp.product.variants@1.0` |
 | **3** | No new capability (use SSE endpoint) |
-| **4** | `dev.ocs.discovery@1.0` |
+| **4** | `dev.ocp.discovery@1.0` |
 | **5** | No new capability (add `actions` to responses) |
 | **6** | Custom based on needs |
 
@@ -545,14 +545,14 @@ After each level, verify your API works:
 
 ### Level 1 Checklist
 - [ ] All Level 0 items pass
-- [ ] Capabilities advertises `dev.ocs.cart@1.0`
+- [ ] Capabilities advertises `dev.ocp.cart@1.0`
 - [ ] Can create cart with `POST /carts`
 - [ ] Can add items with `POST /carts/{id}/items`
 - [ ] Can create order from cart with `POST /orders { cartId }`
 
 ### Level 2 Checklist
 - [ ] All Level 1 items pass
-- [ ] Capabilities advertises `dev.ocs.product.variants@1.0`
+- [ ] Capabilities advertises `dev.ocp.product.variants@1.0`
 - [ ] Products with variants include metadata
 - [ ] Can add specific variant to cart using `variantId`
 
@@ -564,9 +564,9 @@ After each level, verify your API works:
 
 ### Level 4 Checklist
 - [ ] All Level 3 items pass
-- [ ] `GET /.well-known/ocs` returns discovery metadata
+- [ ] `GET /.well-known/ocp` returns discovery metadata
 - [ ] Discovery response includes `capabilities` URL
-- [ ] CORS headers present on `.well-known/ocs`
+- [ ] CORS headers present on `.well-known/ocp`
 
 ### Level 5 Checklist
 - [ ] All Level 4 items pass
@@ -583,9 +583,9 @@ After each level, verify your API works:
 1. **[Getting Started Lite](./getting-started-lite.md)** - Review the basics
 2. **[Full README](../README.md)** - Complete feature documentation
 3. **[OpenAPI Spec](../src/spec.yaml)** - Detailed endpoint schemas
-4. **[GitHub Issues](https://github.com/anthropics/open-commerce-standard/issues)** - Ask questions
+4. **[GitHub Issues](https://github.com/anthropics/Open-Commerce-Protocol/issues)** - Ask questions
 
 **Next:** Ready for advanced topics? See:
-- [OCS Discovery Specification](./ocs-discovery.md)
+- [OCP Discovery Specification](./OCP-discovery.md)
 - [Capability Versioning Guide](./capability-versioning.md)
 - Standards alignment documentation

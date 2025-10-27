@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for discovering the product search endpoint (dev.ocs.product.search@1.0).",
+  "description": "Schema for discovering the product search endpoint (dev.ocp.product.search@1.0).",
   "properties": {
     "urlTemplate": {
       "type": "string",

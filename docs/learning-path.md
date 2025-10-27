@@ -1,4 +1,4 @@
-# OCS Learning Path
+# OCP Learning Path
 
 **Choose your path based on your experience level and goals.**
 
@@ -6,7 +6,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                     👋 COMPLETE BEGINNER                        │
 │                                                                 │
-│  "I'm new to OCS and want to understand the basics"            │
+│  "I'm new to OCP and want to understand the basics"            │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
             📚 Start: Getting Started Lite Guide
@@ -43,7 +43,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                    🏗️  PRODUCTION BUILDER                       │
 │                                                                 │
-│  "I need to build a production-ready OCS implementation"       │
+│  "I need to build a production-ready OCP implementation"       │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
             📋 Review: Main README
@@ -52,8 +52,8 @@
             🔧 Study: OpenAPI Specification
            (src/spec.yaml)
                               ↓
-            🌐 Implement: OCS Discovery
-           (docs/ocs-discovery.md)
+            🌐 Implement: OCP Discovery
+           (docs/OCP-discovery.md)
                               ↓
             📦 Add: Capability schemas
            (schemas/* directory)
@@ -75,7 +75,7 @@
             • Metadata extensibility
                               ↓
          📚 Read specialized docs:
-            • docs/ocs-discovery.md
+            • docs/OCP-discovery.md
             • docs/capability-versioning.md
             • docs/standards-alignment.md
                               ↓
@@ -107,7 +107,7 @@ Are you building a server or client?
    ├─ Simple shopping app (one store)
    │  → Getting Started Lite → simple-client.js
    │
-   ├─ Universal client (supports any OCS server)
+   ├─ Universal client (supports any OCP server)
    │  → Progressive Guide → Discovery Spec → Capability negotiation
    │
    └─ AI agent / Automated system
@@ -122,8 +122,8 @@ Are you building a server or client?
 
 | Document | Purpose | Time |
 |----------|---------|------|
-| [Getting Started Lite](./getting-started-lite.md) | Learn OCS basics without jargon | 15 min |
-| [5-Minute Quickstart](../README.md#5-minute-quickstart) | See OCS in action immediately | 5 min |
+| [Getting Started Lite](./getting-started-lite.md) | Learn OCP basics without jargon | 15 min |
+| [5-Minute Quickstart](../README.md#5-minute-quickstart) | See OCP in action immediately | 5 min |
 | [simple-client.js](../examples/simple-client.js) | Working client code examples | 10 min |
 | [simple-server.js](../examples/simple-server.js) | Minimal server implementation | 15 min |
 
@@ -142,14 +142,14 @@ Are you building a server or client?
 |----------|---------|----------|
 | [Main README](../README.md) | Complete feature overview | All levels |
 | [spec.yaml](../src/spec.yaml) | OpenAPI 3.0 specification | Implementers |
-| [OCS Discovery](./ocs-discovery.md) | Discovery mechanisms (4 channels) | Production builders |
+| [OCP Discovery](./OCP-discovery.md) | Discovery mechanisms (4 channels) | Production builders |
 | [Capability Versioning](./capability-versioning.md) | Version negotiation rules | API maintainers |
 
 ### 🎯 Specialized Topics
 
 | Document | Topic | When to Read |
 |----------|-------|--------------|
-| [OCS Discovery](./ocs-discovery.md) | Auto-discovery, well-known URIs, JSON-LD | Building federated systems |
+| [OCP Discovery](./OCP-discovery.md) | Auto-discovery, well-known URIs, JSON-LD | Building federated systems |
 | [Capability Versioning](./capability-versioning.md) | Semantic versioning, deprecation | Maintaining APIs long-term |
 | [Standards Alignment](./standards-alignment.md) | HTTP semantics, RFC compliance | Architecture review |
 | [Schema Catalog](../schemas/README.md) | All capability JSON schemas | Implementing capabilities |
@@ -228,7 +228,7 @@ Are you building a server or client?
 **Your path:**
 1. Getting Started Lite (understand basics)
 2. Progressive Guide Level 0-1 (menu + orders)
-3. Add `dev.ocs.product.customization@1.0` (for milk/size options)
+3. Add `dev.ocp.product.customization@1.0` (for milk/size options)
 4. Add Level 3 (real-time "your order is ready" notifications)
 
 **Skip:** Discovery, hypermedia, payments (handle locally)
@@ -245,8 +245,8 @@ Are you building a server or client?
 **Your path:**
 1. Getting Started Lite
 2. Progressive Guide Levels 0-2 (products + variants)
-3. Add `dev.ocs.product.physical_properties@1.0` (for shipping)
-4. Add `dev.ocs.order.shipment_tracking@1.0`
+3. Add `dev.ocp.product.physical_properties@1.0` (for shipping)
+4. Add `dev.ocp.order.shipment_tracking@1.0`
 
 **Skip:** Discovery (initially), hypermedia (nice-to-have)
 
@@ -262,7 +262,7 @@ Are you building a server or client?
 **Your path:**
 1. Getting Started Lite (quick overview)
 2. Progressive Guide Levels 0-5 (full stack)
-3. Implement OCS Discovery (for seller onboarding)
+3. Implement OCP Discovery (for seller onboarding)
 4. Study hypermedia patterns (for API evolution)
 
 **Don't skip:** Discovery, hypermedia, versioning
@@ -272,13 +272,13 @@ Are you building a server or client?
 ### Use Case: AI Shopping Agent
 
 **Your needs:**
-- Auto-discover any OCS API
+- Auto-discover any OCP API
 - Parse structured data
 - Autonomous transactions
 
 **Your path:**
 1. Getting Started Lite (understand data model)
-2. OCS Discovery Spec (auto-discovery)
+2. OCP Discovery Spec (auto-discovery)
 3. Full README (all capabilities)
 4. Hypermedia patterns (follow actions)
 5. x402 Protocol (autonomous payments)
@@ -294,7 +294,7 @@ Are you building a server or client?
 | **Prototype a simple API** | Lite Guide + Level 0 | 2-3 hours |
 | **Production basic store** | Lite Guide + Levels 0-2 | 1 day |
 | **Full-featured e-commerce** | Lite Guide + Levels 0-4 | 2-3 days |
-| **Universal OCS client** | All docs + examples | 1 week |
+| **Universal OCP client** | All docs + examples | 1 week |
 | **Enterprise marketplace** | Full mastery + custom capabilities | 2-4 weeks |
 
 ---
@@ -305,7 +305,7 @@ Are you building a server or client?
 
 1. Check [Getting Started Lite](./getting-started-lite.md) FAQ
 2. Review code examples in `/examples`
-3. Search [GitHub Issues](https://github.com/anthropics/open-commerce-standard/issues)
+3. Search [GitHub Issues](https://github.com/anthropics/Open-Commerce-Protocol/issues)
 4. Open a new issue with your question
 
 **Want to contribute?**

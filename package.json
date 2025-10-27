@@ -1,5 +1,5 @@
 {
-  "name": "Open-Commerce-Standard",
+  "name": "Open-Commerce-Protocol",
   "version": "1.0.0",
   "files": [
     "dist",
@@ -29,7 +29,7 @@
     "test": "vitest --run"
   },
   "private": false,
-  "description": "Open Commerce Standard (OCS) - HTTP-native API for digital commerce",
+  "description": "Open Commerce Protocol (OCP) - HTTP-native API for digital commerce",
   "repository": {
     "url": "",
     "type": "git"

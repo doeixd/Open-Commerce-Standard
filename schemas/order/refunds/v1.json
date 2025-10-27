@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "array",
-  "description": "Schema for providing a record of refunds (dev.ocs.order.refunds@1.0).",
+  "description": "Schema for providing a record of refunds (dev.ocp.order.refunds@1.0).",
   "items": {
     "type": "object",
     "properties": {
       "id": { "type": "string", "format": "uuid", "description": "Unique ID for the refund transaction." },
-      "amount": { "$ref": "https://raw.githubusercontent.com/doeixd/Open-Commerce-Standard/main/src/spec.yaml#/components/schemas/Money" },
+      "amount": { "$ref": "https://raw.githubusercontent.com/doeixd/Open-Commerce-Protocol/main/src/spec.yaml#/components/schemas/Money" },
       "reason": { "type": "string", "description": "Reason for the refund (e.g., 'Return #ret_123', 'Cancellation')." },
       "status": { "type": "string", "enum": ["pending", "succeeded", "failed"] },
       "processedAt": { "type": "string", "format": "date-time" }

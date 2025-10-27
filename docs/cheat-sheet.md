@@ -1,11 +1,11 @@
-# OCS Cheat Sheet
+# OCP Cheat Sheet
 
-Quick reference for common OCS patterns and endpoints.
+Quick reference for common OCP patterns and endpoints.
 
 ## Core Endpoints (Minimum Viable)
 
 ```javascript
-GET  /.well-known/ocs       // Discovery (optional but recommended)
+GET  /.well-known/ocp       // Discovery (optional but recommended)
 GET  /capabilities          // List supported features (required)
 GET  /catalogs/{id}         // Get products (required)
 POST /orders                // Place order (required)
@@ -14,8 +14,8 @@ POST /orders                // Place order (required)
 ## Common Headers
 
 ```http
-Content-Type: application/ocs+json; version=1.0
-Accept: application/ocs+json; version=1.0
+Content-Type: application/ocp+json; version=1.0
+Accept: application/ocp+json; version=1.0
 Authorization: Bearer {token}
 Idempotency-Key: {unique-key}  // For POST/PATCH/DELETE
 ```
@@ -98,13 +98,13 @@ POST /orders
 ## Discovery Response
 
 ```json
-GET /.well-known/ocs
+GET /.well-known/ocp
 
 {
-  "ocs": {
+  "OCP": {
     "capabilities": "https://api.example.com/capabilities",
     "version": "1.0",
-    "context": "https://schemas.ocs.dev/context.jsonld"
+    "context": "https://schemas.OCP.dev/context.jsonld"
   }
 }
 ```
@@ -117,8 +117,8 @@ GET /capabilities
 {
   "capabilities": [
     {
-      "id": "dev.ocs.cart@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/cart/v1.json",
+      "id": "dev.ocp.cart@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/cart/v1.json",
       "metadata": {
         "lifetimeSeconds": 3600,
         "maxItems": 50
@@ -132,12 +132,12 @@ GET /capabilities
 
 | Capability ID | Purpose |
 |---------------|---------|
-| `dev.ocs.cart@1.0` | Shopping cart support |
-| `dev.ocs.order.direct@1.0` | Direct orders (no cart) |
-| `dev.ocs.product.variants@1.0` | Size/color options |
-| `dev.ocs.order.shipment_tracking@1.0` | Track deliveries |
-| `dev.ocs.discovery@1.0` | Discovery mechanisms |
-| `dev.ocs.i18n@1.0` | Internationalization |
+| `dev.ocp.cart@1.0` | Shopping cart support |
+| `dev.ocp.order.direct@1.0` | Direct orders (no cart) |
+| `dev.ocp.product.variants@1.0` | Size/color options |
+| `dev.ocp.order.shipment_tracking@1.0` | Track deliveries |
+| `dev.ocp.discovery@1.0` | Discovery mechanisms |
+| `dev.ocp.i18n@1.0` | Internationalization |
 
 ## Product with Variants
 
@@ -149,7 +149,7 @@ GET /capabilities
   "fulfillmentType": "physical",
   "available": true,
   "metadata": {
-    "dev.ocs.product.variants@1.0": {
+    "dev.ocp.product.variants@1.0": {
       "_version": "1.0",
       "options": ["Size", "Color"],
       "variants": [
@@ -214,7 +214,7 @@ if (cancelAction) {
 
 ### Schema-Aware Actions
 
-When `dev.ocs.hypermedia.schema_aware_actions@1.0` is enabled:
+When `dev.ocp.hypermedia.schema_aware_actions@1.0` is enabled:
 
 ```json
 // Server includes schemas and metadata
@@ -229,10 +229,10 @@ When `dev.ocs.hypermedia.schema_aware_actions@1.0` is enabled:
       "title": "Cancel Order",
       "description": "Cancel this order. Refunds processed in 5-7 days.",
       "requestSchema": {
-        "$ref": "https://schemas.ocs.dev/order/actions/cancel_request/v1.json"
+        "$ref": "https://schemas.OCP.dev/order/actions/cancel_request/v1.json"
       },
       "responseSchema": {
-        "$ref": "https://schemas.ocs.dev/order/v1.json"
+        "$ref": "https://schemas.OCP.dev/order/v1.json"
       },
       "errorSchemas": [
         {
@@ -396,7 +396,7 @@ eventSource.addEventListener('order.patch', (event) => {
 
 ```json
 {
-  "type": "https://schemas.ocs.dev/errors/cart-expired",
+  "type": "https://schemas.OCP.dev/errors/cart-expired",
   "title": "Cart Expired",
   "status": 410,
   "detail": "Cart expired after 3600 seconds",
@@ -473,8 +473,8 @@ const nextUrl = `/catalogs?limit=20&cursor=${data.pagination.nextCursor}`;
 
 When multiple discovery sources exist, use this order:
 
-1. **`.well-known/ocs`** (highest authority)
-2. **`OCS-Discovery` HTTP header**
+1. **`.well-known/ocp`** (highest authority)
+2. **`OCP-Discovery` HTTP header**
 3. **JSON-LD block** in HTML
 4. **HTML `<meta>` tags** (lowest authority)
 
@@ -486,7 +486,7 @@ const caps = await fetch('/capabilities').then(r => r.json());
 
 // 2. Check for specific feature
 const hasVariants = caps.capabilities
-  .some(c => c.id === 'dev.ocs.product.variants@1.0');
+  .some(c => c.id === 'dev.ocp.product.variants@1.0');
 
 // 3. Adapt UI
 if (hasVariants) {
@@ -503,7 +503,7 @@ Always use full capability ID as metadata key:
 ```json
 {
   "metadata": {
-    "dev.ocs.product.variants@1.0": { ... },
+    "dev.ocp.product.variants@1.0": { ... },
     // NOT "variants": { ... }  ← Wrong!
   }
 }
@@ -672,8 +672,8 @@ const paymentPayload = btoa(JSON.stringify({
 {
   "capabilities": [
     {
-      "id": "dev.ocs.payment.web_payments@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/payment/web_payments/v1.json",
+      "id": "dev.ocp.payment.web_payments@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/payment/web_payments/v1.json",
       "metadata": {
         "_version": "1.0",
         "supportedMethods": ["basic-card", "https://google.com/pay"],
@@ -682,8 +682,8 @@ const paymentPayload = btoa(JSON.stringify({
       }
     },
     {
-      "id": "dev.ocs.payment.spc@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/payment/spc/v1.json",
+      "id": "dev.ocp.payment.spc@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/payment/spc/v1.json",
       "metadata": {
         "_version": "1.0",
         "supportedRps": ["bank.example.com"],
@@ -692,8 +692,8 @@ const paymentPayload = btoa(JSON.stringify({
       }
     },
     {
-      "id": "dev.ocs.auth.webauthn@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/auth/webauthn/v1.json",
+      "id": "dev.ocp.auth.webauthn@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/auth/webauthn/v1.json",
       "metadata": {
         "_version": "1.0",
         "rpId": "shop.example.com",
@@ -779,7 +779,7 @@ Minimum viable server:
 
 Recommended additions:
 
-- [ ] `GET /.well-known/ocs` for discovery
+- [ ] `GET /.well-known/ocp` for discovery
 - [ ] `POST /carts` for cart support
 - [ ] Bearer token authentication
 - [ ] Idempotency key handling
@@ -799,7 +799,7 @@ Recommended additions:
 
 ```bash
 # 1. Test discovery
-curl http://localhost:3000/.well-known/ocs
+curl http://localhost:3000/.well-known/ocp
 
 # 2. Test capabilities
 curl http://localhost:3000/capabilities
@@ -809,7 +809,7 @@ curl http://localhost:3000/catalogs/main
 
 # 4. Test order (with auth)
 curl -X POST http://localhost:3000/orders \
-  -H "Content-Type: application/ocs+json; version=1.0" \
+  -H "Content-Type: application/ocp+json; version=1.0" \
   -H "Authorization: Bearer test_token" \
   -d '{
     "items": [{"catalogItemId": "prod_1", "quantity": 1}],
@@ -831,7 +831,7 @@ curl -X POST http://localhost:3000/orders \
 ## Performance Tips
 
 - Cache `/capabilities` response (changes rarely)
-- Cache `.well-known/ocs` (24 hours recommended)
+- Cache `.well-known/ocp` (24 hours recommended)
 - Use cursor pagination for large catalogs
 - Implement SSE for real-time updates (not polling)
 - Include `ETag` headers for conditional requests
@@ -850,11 +850,11 @@ curl -X POST http://localhost:3000/orders \
 
 ## Resource Mutation (with Versioning)
 
-When a server supports `dev.ocs.resource.versioning@1.0`, mutations create new resources. **Clients must update their state with the new ID.**
+When a server supports `dev.ocp.resource.versioning@1.0`, mutations create new resources. **Clients must update their state with the new ID.**
 
 ```javascript
 // 1. Get the latest version of an order
-const orderV1 = await ocsRequest('/orders/order_abc1');
+const orderV1 = await ocpRequest('/orders/order_abc1');
 
 // 2. Find the mutation action
 const cancelAction = orderV1.actions.find(a => a.id === 'cancel');
@@ -887,7 +887,7 @@ try {
 } catch (error) {
   if (error.status === 409) {
     // Recover by fetching the latest version
-    const latestOrder = await ocsRequest(error.latestVersionUrl);
+    const latestOrder = await ocpRequest(error.latestVersionUrl);
     // Now retry the mutation on 'latestOrder'
   }
 }

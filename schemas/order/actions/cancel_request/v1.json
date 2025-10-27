@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/order/actions/cancel_request/v1.json",
+  "$id": "https://schemas.OCP.dev/order/actions/cancel_request/v1.json",
   "title": "Cancel Order Request",
   "description": "Request schema for cancelling an order. The order must be in a cancellable state (typically 'confirmed' or 'pending') and within the cancellation window.",
   "type": "object",

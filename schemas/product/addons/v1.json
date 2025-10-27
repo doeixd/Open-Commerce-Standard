@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "array",
-  "description": "Schema for product add-ons capability (dev.ocs.product.addons@1.0). Defines a list of optional, secondary items that can be attached to a primary product.",
+  "description": "Schema for product add-ons capability (dev.ocp.product.addons@1.0). Defines a list of optional, secondary items that can be attached to a primary product.",
   "items": {
     "type": "object",
     "properties": {

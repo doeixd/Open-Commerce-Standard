@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for providing rich, human-readable, and domain-specific status updates (dev.ocs.order.detailed_status@1.0).",
+  "description": "Schema for providing rich, human-readable, and domain-specific status updates (dev.ocp.order.detailed_status@1.0).",
   "properties": {
     "title": {
       "type": "string",

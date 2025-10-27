@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for store info capability (dev.ocs.store.info@1.0), providing general store information including location, hours, website, and contact details, referencing schema.org LocalBusiness properties.",
+  "description": "Schema for store info capability (dev.ocp.store.info@1.0), providing general store information including location, hours, website, and contact details, referencing schema.org LocalBusiness properties.",
   "properties": {
     "name": {
       "type": "string",

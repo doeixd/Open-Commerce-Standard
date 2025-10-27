@@ -1,4 +1,4 @@
-# Implementation Guide: Integrating Web Payments and Secure Payment Confirmation into OCS
+# Implementation Guide: Integrating Web Payments and Secure Payment Confirmation into OCP
 
 **Date:** October 23, 2025
 **Version:** 1.0
@@ -7,7 +7,7 @@
 **References:**
 - [W3C Payment Request API](https://www.w3.org/TR/payment-request/) (Candidate Recommendation)
 - [W3C Secure Payment Confirmation](https://www.w3.org/TR/secure-payment-confirmation/) (Candidate Recommendation Draft)
-- [OCS Specification v1.0.0](../src/spec.yaml)
+- [OCP Specification v1.0.0](../src/spec.yaml)
 - [x402 Payment Protocol](../README.md#x402-payment-protocol)
 
 ---
@@ -34,18 +34,18 @@
 
 **Secure Payment Confirmation (SPC)**: Built on WebAuthn, SPC enables strong, biometric-based authentication (e.g., Touch ID, Windows Hello) during payments. It involves device registration with a Relying Party (RP, e.g., a bank) and transaction confirmation. SPC reduces fraud and friction, with trials showing 8% better conversion rates and 3x faster checkouts.
 
-### 1.2 Benefits for OCS
+### 1.2 Benefits for OCP
 
 - **Improved UX**: Native UIs reduce form-filling and cart abandonment
 - **Enhanced Security**: SPC provides phishing-resistant authentication; Web Payments tokenizes sensitive data
 - **Compliance**: Supports regulations like PSD2/SCA in Europe
-- **Extensibility**: Fits OCS's capability discovery model, allowing adaptive clients
+- **Extensibility**: Fits OCP's capability discovery model, allowing adaptive clients
 - **Conversion Boost**: Stripe's 2025 SPC trials reported significant improvements in completion rates
 - **Limitations**: Browser-centric; fallback required for non-browsers (e.g., manual forms or OTPs)
 
 ### 1.3 How They Integrate with x402
 
-Both standards complement OCS's x402 Protocol:
+Both standards complement OCP's x402 Protocol:
 
 - **x402** unifies payments in a stateless HTTP retry loop: `POST /orders` → `402 Payment Required` → client authorizes → retry with `X-PAYMENT`
 - **Web Payments and SPC** handle client-side authorization for `fiat_intent` scheme, feeding into `X-PAYMENT` without altering server logic
@@ -54,11 +54,11 @@ Both standards complement OCS's x402 Protocol:
 ### 1.4 Prerequisites
 
 **Server:**
-- OCS server implementing x402 with `fiat_intent` support
+- OCP server implementing x402 with `fiat_intent` support
 - Integration with payment provider (e.g., Stripe, PayPal)
 - Ability to verify WebAuthn assertions (for SPC)
 - RP coordination for SPC credential registration/verification
-- **Recommended:** `dev.ocs.auth.flows@1.0` with WebAuthn support for unified authentication
+- **Recommended:** `dev.ocp.auth.flows@1.0` with WebAuthn support for unified authentication
 
 **Client:**
 - Browser supporting the APIs:
@@ -71,19 +71,19 @@ Both standards complement OCS's x402 Protocol:
 - W3C test suites for compliance
 - Origin Trials if using experimental features
 
-### 1.5 Relationship to OCS Authentication
+### 1.5 Relationship to OCP Authentication
 
 **WebAuthn Integration:**
 
-OCS has a general authentication capability (`dev.ocs.auth.flows@1.0`) that includes WebAuthn as a supported authentication method. The relationship between general WebAuthn auth and SPC for payments is:
+OCP has a general authentication capability (`dev.ocp.auth.flows@1.0`) that includes WebAuthn as a supported authentication method. The relationship between general WebAuthn auth and SPC for payments is:
 
-1. **General Auth (dev.ocs.auth.flows@1.0 + dev.ocs.auth.webauthn@1.0):**
+1. **General Auth (dev.ocp.auth.flows@1.0 + dev.ocp.auth.webauthn@1.0):**
    - Used for user login/authentication
    - Creates passkeys for accessing account
    - Credentials managed by the merchant/store
    - RP ID is the merchant's domain
 
-2. **SPC (dev.ocs.payment.spc@1.0):**
+2. **SPC (dev.ocp.payment.spc@1.0):**
    - Used specifically for payment authorization
    - Creates credentials for payment confirmation
    - Credentials managed by bank/issuer (RP)
@@ -101,13 +101,13 @@ Servers implementing both should coordinate the flows:
 ```javascript
 // General auth - user logs in
 if (authCapability && authCapability.methods.includes('webauthn')) {
-  // Use dev.ocs.auth.webauthn@1.0 for login
+  // Use dev.ocp.auth.webauthn@1.0 for login
   // rpId: "shop.example.com"
 }
 
 // Payment auth - user authorizes payment
 if (spcCapability) {
-  // Use dev.ocs.payment.spc@1.0 for payment
+  // Use dev.ocp.payment.spc@1.0 for payment
   // rpId: "bank.example.com" (from user's issuer)
 }
 ```
@@ -121,11 +121,11 @@ This separation ensures:
 
 ## 2. Capability Definitions
 
-OCS uses dynamic capabilities (`GET /capabilities`) for discoverability. Two new optional capabilities are defined for these standards, following OCS versioning rules (minor for additions, major for breaks, 12-month deprecation notice).
+OCP uses dynamic capabilities (`GET /capabilities`) for discoverability. Two new optional capabilities are defined for these standards, following OCP versioning rules (minor for additions, major for breaks, 12-month deprecation notice).
 
 ### 2.1 Web Payments Capability
 
-**Capability ID:** `dev.ocs.payment.web_payments@1.0`
+**Capability ID:** `dev.ocp.payment.web_payments@1.0`
 
 **Schema Location:** `schemas/payment/web_payments/v1.json`
 
@@ -134,7 +134,7 @@ OCS uses dynamic capabilities (`GET /capabilities`) for discoverability. Two new
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/payment/web_payments/v1.json",
+  "$id": "https://schemas.OCP.dev/payment/web_payments/v1.json",
   "title": "Web Payments Capability",
   "type": "object",
   "properties": {
@@ -182,8 +182,8 @@ OCS uses dynamic capabilities (`GET /capabilities`) for discoverability. Two new
 {
   "capabilities": [
     {
-      "id": "dev.ocs.payment.web_payments@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/payment/web_payments/v1.json",
+      "id": "dev.ocp.payment.web_payments@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/payment/web_payments/v1.json",
       "metadata": {
         "_version": "1.0",
         "supportedMethods": ["basic-card", "https://google.com/pay"],
@@ -197,7 +197,7 @@ OCS uses dynamic capabilities (`GET /capabilities`) for discoverability. Two new
 
 ### 2.2 Secure Payment Confirmation Capability
 
-**Capability ID:** `dev.ocs.payment.spc@1.0`
+**Capability ID:** `dev.ocp.payment.spc@1.0`
 
 **Schema Location:** `schemas/payment/spc/v1.json`
 
@@ -206,7 +206,7 @@ OCS uses dynamic capabilities (`GET /capabilities`) for discoverability. Two new
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/payment/spc/v1.json",
+  "$id": "https://schemas.OCP.dev/payment/spc/v1.json",
   "title": "Secure Payment Confirmation (SPC) Capability",
   "type": "object",
   "properties": {
@@ -258,8 +258,8 @@ OCS uses dynamic capabilities (`GET /capabilities`) for discoverability. Two new
 {
   "capabilities": [
     {
-      "id": "dev.ocs.payment.spc@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/payment/spc/v1.json",
+      "id": "dev.ocp.payment.spc@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/payment/spc/v1.json",
       "metadata": {
         "_version": "1.0",
         "supportedRps": ["bank.example.com"],
@@ -286,8 +286,8 @@ app.get('/capabilities', (req, res) => {
     capabilities: [
       // ... other capabilities
       {
-        id: 'dev.ocs.payment.web_payments@1.0',
-        schemaUrl: 'https://schemas.ocs.dev/payment/web_payments/v1.json',
+        id: 'dev.ocp.payment.web_payments@1.0',
+        schemaUrl: 'https://schemas.OCP.dev/payment/web_payments/v1.json',
         metadata: {
           _version: '1.0',
           supportedMethods: ['basic-card', 'https://google.com/pay'],
@@ -296,8 +296,8 @@ app.get('/capabilities', (req, res) => {
         }
       },
       {
-        id: 'dev.ocs.payment.spc@1.0',
-        schemaUrl: 'https://schemas.ocs.dev/payment/spc/v1.json',
+        id: 'dev.ocp.payment.spc@1.0',
+        schemaUrl: 'https://schemas.OCP.dev/payment/spc/v1.json',
         metadata: {
           _version: '1.0',
           supportedRps: ['bank.example.com'],
@@ -473,11 +473,11 @@ app.get('/spc-register', (req, res) => {
 
 ### 3.5 Error Handling
 
-Use OCS structured errors with `nextActions` for recovery:
+Use OCP structured errors with `nextActions` for recovery:
 
 ```json
 {
-  "type": "https://schemas.ocs.dev/errors/payment-auth-failed",
+  "type": "https://schemas.OCP.dev/errors/payment-auth-failed",
   "title": "Payment Authentication Failed",
   "status": 402,
   "detail": "SPC authentication failed",
@@ -515,12 +515,12 @@ const data = await response.json();
 
 // Check for Web Payments support
 const hasWebPayments = data.capabilities.some(
-  c => c.id === 'dev.ocs.payment.web_payments@1.0'
+  c => c.id === 'dev.ocp.payment.web_payments@1.0'
 );
 
 // Check for SPC support
 const hasSPC = data.capabilities.some(
-  c => c.id === 'dev.ocs.payment.spc@1.0'
+  c => c.id === 'dev.ocp.payment.spc@1.0'
 );
 
 // Also check browser support
@@ -537,7 +537,7 @@ async function placeOrderWithWebPayments(orderData) {
   const response = await fetch('/orders', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/ocs+json; version=1.0',
+      'Content-Type': 'application/ocp+json; version=1.0',
       'Authorization': 'Bearer ' + token,
       'Idempotency-Key': generateUUID()
     },
@@ -586,7 +586,7 @@ async function placeOrderWithWebPayments(orderData) {
     const retryResponse = await fetch('/orders', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/ocs+json; version=1.0',
+        'Content-Type': 'application/ocp+json; version=1.0',
         'Authorization': 'Bearer ' + token,
         'Idempotency-Key': generateUUID(),
         'X-PAYMENT': btoa(JSON.stringify(paymentPayload))
@@ -623,7 +623,7 @@ async function placeOrderWithSPC(orderData) {
   const response = await fetch('/orders', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/ocs+json; version=1.0',
+      'Content-Type': 'application/ocp+json; version=1.0',
       'Authorization': 'Bearer ' + token,
       'Idempotency-Key': generateUUID()
     },
@@ -693,7 +693,7 @@ async function placeOrderWithSPC(orderData) {
     const retryResponse = await fetch('/orders', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/ocs+json; version=1.0',
+        'Content-Type': 'application/ocp+json; version=1.0',
         'Authorization': 'Bearer ' + token,
         'Idempotency-Key': generateUUID(),
         'X-PAYMENT': btoa(JSON.stringify(paymentPayload))
@@ -831,9 +831,9 @@ async function placeOrderWithPayment(orderData) {
 }
 ```
 
-### 6.3 OCS Error Integration
+### 6.3 OCP Error Integration
 
-Map API errors to OCS structured errors:
+Map API errors to OCP structured errors:
 
 ```javascript
 try {
@@ -884,7 +884,7 @@ Enforce rate limits on payment attempts:
 ```javascript
 // Advertise via capability
 {
-  "id": "dev.ocs.server.rate_limits@1.0",
+  "id": "dev.ocp.server.rate_limits@1.0",
   "metadata": {
     "payment_attempts": {
       "limit": 5,
@@ -933,7 +933,7 @@ Enforce rate limits on payment attempts:
 - [ ] Opt-out handling
 - [ ] Fallback when credential missing
 
-**OCS Integration:**
+**OCP Integration:**
 - [ ] Capability discovery
 - [ ] 402 response structure
 - [ ] X-PAYMENT payload format
@@ -957,13 +957,13 @@ Enforce rate limits on payment attempts:
 - **Enhanced Biometrics**: Additional authenticator types
 - **Delegated Authentication**: Third-party payment apps
 
-### 9.3 Contributing to OCS
+### 9.3 Contributing to OCP
 
 To propose changes or new payment capabilities:
 
-1. Open issue on [OCS GitHub](https://github.com/anthropics/open-commerce-standard)
+1. Open issue on [OCP GitHub](https://github.com/anthropics/Open-Commerce-Protocol)
 2. Provide use cases and schema proposals
-3. Follow OCS contribution guidelines
+3. Follow OCP contribution guidelines
 4. Participate in community discussions
 
 ---
@@ -972,8 +972,8 @@ To propose changes or new payment capabilities:
 
 ### Capability IDs
 
-- `dev.ocs.payment.web_payments@1.0`: Web Payments support
-- `dev.ocs.payment.spc@1.0`: Secure Payment Confirmation support
+- `dev.ocp.payment.web_payments@1.0`: Web Payments support
+- `dev.ocp.payment.spc@1.0`: Secure Payment Confirmation support
 
 ### Key Headers
 
@@ -997,8 +997,8 @@ To propose changes or new payment capabilities:
 
 For questions or issues:
 
-- **OCS Documentation**: [docs/](../docs/)
-- **GitHub Issues**: [OCS Repository Issues](https://github.com/anthropics/open-commerce-standard/issues)
+- **OCP Documentation**: [docs/](../docs/)
+- **GitHub Issues**: [OCP Repository Issues](https://github.com/anthropics/Open-Commerce-Protocol/issues)
 - **W3C Specifications**: [Payment Request](https://www.w3.org/TR/payment-request/), [SPC](https://www.w3.org/TR/secure-payment-confirmation/)
 
 ---

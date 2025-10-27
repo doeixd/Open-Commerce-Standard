@@ -1,6 +1,6 @@
-# OCS Examples
+# OCP Examples
 
-This directory contains simple, runnable examples to help you learn OCS quickly.
+This directory contains simple, runnable examples to help you learn OCP quickly.
 
 ## 📁 Files
 
@@ -8,15 +8,15 @@ This directory contains simple, runnable examples to help you learn OCS quickly.
 
 | File | Description | Run It |
 |------|-------------|--------|
-| **simple-server.js** | Minimal OCS server (Node.js/Express) | `npm install express && node simple-server.js` |
-| **simple-client.js** | Basic OCS client with multiple examples | Included in any JS environment |
+| **simple-server.js** | Minimal OCP server (Node.js/Express) | `npm install express && node simple-server.js` |
+| **simple-client.js** | Basic OCP client with multiple examples | Included in any JS environment |
 | **index-with-discovery.html** | HTML page with all 4 discovery mechanisms | Open in browser |
 
 ### Reference Files
 
 | File | Description | Use Case |
 |------|-------------|----------|
-| **.well-known/ocs** | Example discovery endpoint response | Copy to your server's `.well-known/` directory |
+| **.well-known/ocp** | Example discovery endpoint response | Copy to your server's `.well-known/` directory |
 
 ---
 
@@ -36,7 +36,7 @@ curl http://localhost:3000/capabilities
 ```
 
 The server will run on `http://localhost:3000` with these endpoints:
-- `GET /.well-known/ocs` - Discovery
+- `GET /.well-known/ocp` - Discovery
 - `GET /capabilities` - List features
 - `GET /catalogs/main` - Browse products
 - `POST /orders` - Place orders (requires auth header)
@@ -44,7 +44,7 @@ The server will run on `http://localhost:3000` with these endpoints:
 
 ### Using the Client
 
-The client examples work with any OCS server:
+The client examples work with any OCP server:
 
 ```javascript
 // Edit simple-client.js to point to your server
@@ -78,8 +78,8 @@ Or include in a browser:
 ### simple-server.js
 
 **Teaches:**
-- Minimum viable OCS server (3 endpoints)
-- Discovery endpoint (`.well-known/ocs`)
+- Minimum viable OCP server (3 endpoints)
+- Discovery endpoint (`.well-known/ocp`)
 - Cart management
 - Order placement (direct and cart-based)
 - Basic auth middleware
@@ -93,7 +93,7 @@ Or include in a browser:
 
 ```bash
 # Discovery
-curl http://localhost:3000/.well-known/ocs
+curl http://localhost:3000/.well-known/ocp
 
 # Browse products
 curl http://localhost:3000/catalogs/main
@@ -169,7 +169,7 @@ main();
 **Use:** Template for your storefront
 
 **Features demonstrated:**
-- ✅ OCS meta tags
+- ✅ OCP meta tags
 - ✅ JSON-LD EntryPoint
 - ✅ Schema.org Store markup
 - ✅ Comments showing HTTP header config
@@ -183,7 +183,7 @@ python -m http.server 8000
 
 ---
 
-### .well-known/ocs
+### .well-known/ocp
 
 **Teaches:**
 - RFC 8615 well-known URI format
@@ -199,7 +199,7 @@ python -m http.server 8000
 your-server/
 ├── public/
 │   └── .well-known/
-│       └── ocs          ← This file
+│       └── OCP          ← This file
 └── api/
     └── capabilities     ← Your API
 ```
@@ -225,8 +225,8 @@ your-server/
 ### Path 3: "I want to understand discovery"
 
 1. **Study:** `index-with-discovery.html`
-2. **Study:** `.well-known/ocs`
-3. **Read:** [OCS Discovery Spec](../docs/ocs-discovery.md)
+2. **Study:** `.well-known/ocp`
+3. **Read:** [OCP Discovery Spec](../docs/OCP-discovery.md)
 4. **Test:** Use client discovery functions
 
 ---
@@ -252,7 +252,7 @@ your-server/
 ```javascript
 // Add to product object:
 metadata: {
-  'dev.ocs.product.variants@1.0': {
+  'dev.ocp.product.variants@1.0': {
     _version: '1.0',
     options: ['Size', 'Color'],
     variants: [
@@ -268,8 +268,8 @@ metadata: {
 
 // Update capabilities endpoint:
 {
-  id: 'dev.ocs.product.variants@1.0',
-  schemaUrl: 'https://schemas.ocs.dev/product/variants/v1.json'
+  id: 'dev.ocp.product.variants@1.0',
+  schemaUrl: 'https://schemas.OCP.dev/product/variants/v1.json'
 }
 ```
 
@@ -355,7 +355,7 @@ After trying these examples:
 
 1. **Understand Basics?** → Read [Progressive Guide](../docs/progressive-guide.md) to add features
 2. **Ready for Production?** → Study [Full README](../README.md) and [OpenAPI Spec](../src/spec.yaml)
-3. **Need Discovery?** → Read [OCS Discovery Spec](../docs/ocs-discovery.md)
+3. **Need Discovery?** → Read [OCP Discovery Spec](../docs/OCP-discovery.md)
 4. **Want Advanced Features?** → Explore [schemas/](../schemas/) directory
 
 ---

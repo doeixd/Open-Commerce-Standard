@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for advertising store-level constraints and business rules (dev.ocs.store.constraints@1.0).",
+  "description": "Schema for advertising store-level constraints and business rules (dev.ocp.store.constraints@1.0).",
   "properties": {
     "maxCartItems": {
       "type": "integer",

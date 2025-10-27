@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for the dev.ocs.cart.multi_store@1.0 capability. Its presence indicates the server supports carts containing items from multiple stores.",
+  "description": "Schema for the dev.ocp.cart.multi_store@1.0 capability. Its presence indicates the server supports carts containing items from multiple stores.",
   "properties": {
     "maxStoresPerCart": {
       "type": "integer",
@@ -26,17 +26,17 @@
       "type": "array",
       "description": "Standard RFC 9457-compliant error schemas for multi-store cart operations.",
       "items": {
-        "$ref": "https://schemas.ocs.dev/cart/errors/v1.json"
+        "$ref": "https://schemas.OCP.dev/cart/errors/v1.json"
       },
       "example": [
         {
-          "type": "https://schemas.ocs.dev/errors/max-stores-exceeded",
+          "type": "https://schemas.OCP.dev/errors/max-stores-exceeded",
           "title": "Max Stores Exceeded",
           "status": 400,
           "detail": "Cart exceeds maximum number of stores"
         },
         {
-          "type": "https://schemas.ocs.dev/errors/store-not-supported",
+          "type": "https://schemas.OCP.dev/errors/store-not-supported",
           "title": "Store Not Supported",
           "status": 400,
           "detail": "One or more stores are not supported in this cart"

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "array",
-  "description": "Schema for describing applied promotions (dev.ocs.order.applied_promotions@1.0). Returned on the final Order object.",
+  "description": "Schema for describing applied promotions (dev.ocp.order.applied_promotions@1.0). Returned on the final Order object.",
   "items": {
     "type": "object",
     "properties": {

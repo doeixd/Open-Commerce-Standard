@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/cart/errors/v1.json",
+  "$id": "https://schemas.OCP.dev/cart/errors/v1.json",
   "title": "Cart Error Schema (RFC 9457 Compliant)",
   "description": "Standard problem details for cart operations, aligned with RFC 9457 for consistent HTTP API error handling.",
   "type": "object",
@@ -8,7 +8,7 @@
     "type": {
       "type": "string",
       "format": "uri",
-      "description": "URI reference identifying the problem type (e.g., https://schemas.ocs.dev/errors/cart-not-found)"
+      "description": "URI reference identifying the problem type (e.g., https://schemas.OCP.dev/errors/cart-not-found)"
     },
     "title": {
       "type": "string",
@@ -121,7 +121,7 @@
   "required": ["type", "title"],
   "examples": [
     {
-      "type": "https://schemas.ocs.dev/errors/item-not-available",
+      "type": "https://schemas.OCP.dev/errors/item-not-available",
       "title": "Item Not Available",
       "status": 400,
       "detail": "The requested item is no longer available for purchase.",
@@ -129,7 +129,7 @@
       "timestamp": "2023-10-23T12:00:00Z"
     },
     {
-      "type": "https://schemas.ocs.dev/errors/invalid-quantity",
+      "type": "https://schemas.OCP.dev/errors/invalid-quantity",
       "title": "Invalid Quantity",
       "status": 400,
       "detail": "Quantity must be a positive integer.",
@@ -137,7 +137,7 @@
       "timestamp": "2023-10-23T12:00:00Z"
     },
     {
-      "type": "https://schemas.ocs.dev/errors/cart-expired",
+      "type": "https://schemas.OCP.dev/errors/cart-expired",
       "title": "Cart Expired",
       "status": 410,
       "detail": "Your cart has expired due to inactivity.",
@@ -157,7 +157,7 @@
             }
           },
           "responseSchema": {
-            "$ref": "https://schemas.ocs.dev/cart/v1.json"
+            "$ref": "https://schemas.OCP.dev/cart/v1.json"
           }
         }
       ]

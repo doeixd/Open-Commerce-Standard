@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for restaurant profile capability (dev.ocs.restaurant.profile@1.0)",
+  "description": "Schema for restaurant profile capability (dev.ocp.restaurant.profile@1.0)",
   "properties": {
     "cuisine": {
       "type": "array",

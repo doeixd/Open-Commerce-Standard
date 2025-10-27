@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for product physical properties capability (dev.ocs.product.physical_properties@1.0)",
+  "description": "Schema for product physical properties capability (dev.ocp.product.physical_properties@1.0)",
   "properties": {
     "weight": {
       "$ref": "#/$defs/Weight",

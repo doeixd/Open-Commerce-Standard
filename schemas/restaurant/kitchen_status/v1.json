@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for real-time kitchen status (dev.ocs.order.kitchen_status@1.0)",
+  "description": "Schema for real-time kitchen status (dev.ocp.order.kitchen_status@1.0)",
   "properties": {
     "status": {
       "type": "string",

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for product (menu item) customization capability (dev.ocs.product.customization@1.0)",
+  "description": "Schema for product (menu item) customization capability (dev.ocp.product.customization@1.0)",
   "properties": {
     "groups": {
       "type": "array",

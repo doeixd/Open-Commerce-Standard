@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/payment/web_payments/v1.json",
+  "$id": "https://schemas.OCP.dev/payment/web_payments/v1.json",
   "title": "Web Payments Capability",
   "description": "Capability for W3C Payment Request API integration, enabling native browser payment UIs with saved payment methods and tokenization.",
   "type": "object",

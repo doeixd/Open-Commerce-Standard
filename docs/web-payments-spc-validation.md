@@ -3,17 +3,17 @@
 **Date:** October 23, 2025
 **Status:** ✅ Validated
 
-This document validates that the Web Payments and Secure Payment Confirmation integration aligns with OCS patterns and the x402 protocol.
+This document validates that the Web Payments and Secure Payment Confirmation integration aligns with OCP patterns and the x402 protocol.
 
 ---
 
 ## 1. Capability ID Format ✅
 
-All new capability IDs follow the OCS naming convention: `dev.ocs.<category>.<name>@<version>`
+All new capability IDs follow the OCP naming convention: `dev.ocp.<category>.<name>@<version>`
 
-- ✅ `dev.ocs.payment.web_payments@1.0`
-- ✅ `dev.ocs.payment.spc@1.0`
-- ✅ `dev.ocs.auth.webauthn@1.0`
+- ✅ `dev.ocp.payment.web_payments@1.0`
+- ✅ `dev.ocp.payment.spc@1.0`
+- ✅ `dev.ocp.auth.webauthn@1.0`
 
 **Validation:** IDs use lowercase, dot-separated namespaces with semantic version suffix.
 
@@ -21,7 +21,7 @@ All new capability IDs follow the OCS naming convention: `dev.ocs.<category>.<na
 
 ## 2. Schema Structure ✅
 
-All schemas follow OCS JSON Schema patterns:
+All schemas follow OCP JSON Schema patterns:
 
 ### Required Fields
 - ✅ `$schema`: Points to JSON Schema 2020-12
@@ -34,7 +34,7 @@ All schemas follow OCS JSON Schema patterns:
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/payment/web_payments/v1.json",
+  "$id": "https://schemas.OCP.dev/payment/web_payments/v1.json",
   "properties": {
     "_version": { "const": "1.0" },
     "supportedMethods": { "type": "array", "minItems": 1 },
@@ -110,7 +110,7 @@ Both integrations use the `fiat_intent` scheme, not introducing new top-level sc
 
 ---
 
-## 4. OCS Pattern Compliance ✅
+## 4. OCP Pattern Compliance ✅
 
 ### 4.1 Capability Discovery
 
@@ -120,8 +120,8 @@ Capabilities are advertised via `GET /capabilities`:
 {
   "capabilities": [
     {
-      "id": "dev.ocs.payment.web_payments@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/payment/web_payments/v1.json",
+      "id": "dev.ocp.payment.web_payments@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/payment/web_payments/v1.json",
       "metadata": { "_version": "1.0", /* ... */ }
     }
   ]
@@ -142,7 +142,7 @@ Configuration is provided in capability metadata, not hardcoded:
 
 - ✅ Features are optional (servers can choose not to advertise)
 - ✅ Clients degrade gracefully if not supported
-- ✅ No changes to core OCS schemas
+- ✅ No changes to core OCP schemas
 - ✅ Existing implementations unaffected
 
 ### 4.4 Versioning Compliance
@@ -158,11 +158,11 @@ Configuration is provided in capability metadata, not hardcoded:
 
 ### 5.1 Authentication System
 
-Properly integrates with `dev.ocs.auth.flows@1.0`:
+Properly integrates with `dev.ocp.auth.flows@1.0`:
 
 ```json
 {
-  "id": "dev.ocs.auth.flows@1.0",
+  "id": "dev.ocp.auth.flows@1.0",
   "metadata": {
     "methods": ["password", "oauth2", "webauthn"],  // WebAuthn included
     // ...
@@ -172,13 +172,13 @@ Properly integrates with `dev.ocs.auth.flows@1.0`:
 
 **Integration:**
 - ✅ WebAuthn is already a listed auth method
-- ✅ `dev.ocs.auth.webauthn@1.0` extends auth.flows
+- ✅ `dev.ocp.auth.webauthn@1.0` extends auth.flows
 - ✅ SPC uses WebAuthn but for payments, not login
 - ✅ Clear separation: auth vs payment credentials
 
 ### 5.2 Payment System
 
-Complements existing `dev.ocs.payment.x402_fiat@1.0`:
+Complements existing `dev.ocp.payment.x402_fiat@1.0`:
 
 - ✅ Web Payments/SPC handle UI layer for fiat
 - ✅ x402_fiat handles settlement layer
@@ -192,12 +192,12 @@ Complements existing `dev.ocs.payment.x402_fiat@1.0`:
 ### 6.1 HTTPS Required
 
 - ✅ Both APIs require secure contexts
-- ✅ Aligns with OCS security recommendations
+- ✅ Aligns with OCP security recommendations
 - ✅ Payment data never transmitted in plain text
 
 ### 6.2 PCI Compliance
 
-- ✅ No raw card data handled by OCS client/server
+- ✅ No raw card data handled by OCP client/server
 - ✅ Tokenization provided by browser/provider
 - ✅ Sensitive data stays within payment processor
 
@@ -209,7 +209,7 @@ Complements existing `dev.ocs.payment.x402_fiat@1.0`:
 
 ### 6.4 Rate Limiting
 
-- ✅ Can use existing `dev.ocs.server.rate_limits@1.0`
+- ✅ Can use existing `dev.ocp.server.rate_limits@1.0`
 - ✅ SPC includes timeout configuration
 - ✅ Prevents brute force attacks
 
@@ -217,9 +217,9 @@ Complements existing `dev.ocs.payment.x402_fiat@1.0`:
 
 ## 7. Error Handling ✅
 
-### 7.1 OCS Error Format
+### 7.1 OCP Error Format
 
-Errors follow OCS structured error pattern:
+Errors follow OCP structured error pattern:
 
 ```json
 {
@@ -234,7 +234,7 @@ Errors follow OCS structured error pattern:
 }
 ```
 
-**Validation:** ✅ Uses standard OCS error structure
+**Validation:** ✅ Uses standard OCP error structure
 
 ### 7.2 Fallback Support
 
@@ -276,7 +276,7 @@ Errors follow OCS structured error pattern:
 
 ```javascript
 {
-  id: 'dev.ocs.payment.web_payments@1.0',
+  id: 'dev.ocp.payment.web_payments@1.0',
   metadata: {
     _version: '1.0',
     supportedMethods: ['basic-card', 'https://google.com/pay'],
@@ -333,7 +333,7 @@ SPCExtras:
 
 ### 11.1 Internationalization
 
-- ✅ Works with existing `dev.ocs.i18n@1.0`
+- ✅ Works with existing `dev.ocp.i18n@1.0`
 - ✅ Display names use Accept-Language
 - ✅ Error messages support localization
 
@@ -357,13 +357,13 @@ SPCExtras:
 
 | Category | Status | Notes |
 |----------|--------|-------|
-| Capability ID Format | ✅ Pass | Follows OCS conventions |
+| Capability ID Format | ✅ Pass | Follows OCP conventions |
 | Schema Structure | ✅ Pass | Well-formed JSON Schema |
 | x402 Integration | ✅ Pass | No breaking changes |
-| OCS Patterns | ✅ Pass | Optional, discoverable, extensible |
+| OCP Patterns | ✅ Pass | Optional, discoverable, extensible |
 | Auth Integration | ✅ Pass | Properly extends auth.flows |
 | Security | ✅ Pass | HTTPS, PCI, phishing-resistant |
-| Error Handling | ✅ Pass | Standard OCS error format |
+| Error Handling | ✅ Pass | Standard OCP error format |
 | Documentation | ✅ Pass | Comprehensive and clear |
 | Examples | ✅ Pass | Working client and server code |
 | Spec.yaml | ✅ Pass | OpenAPI schemas defined |
@@ -371,7 +371,7 @@ SPCExtras:
 ### Overall Assessment: ✅ APPROVED
 
 The Web Payments and Secure Payment Confirmation integration:
-- ✅ Follows all OCS design patterns
+- ✅ Follows all OCP design patterns
 - ✅ Properly integrates with x402 protocol
 - ✅ Maintains backward compatibility
 - ✅ Provides comprehensive documentation
@@ -393,6 +393,6 @@ The Web Payments and Secure Payment Confirmation integration:
 
 ---
 
-**Validated By:** Claude (OCS Integration Assistant)
+**Validated By:** Claude (OCP Integration Assistant)
 **Date:** October 23, 2025
 **Version:** 1.0

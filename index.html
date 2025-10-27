@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Commerce Standard (OCS) - Documentation</title>
+    <title>Open Commerce Protocol (OCP) - Documentation</title>
     <meta name="description" content="An open, extensible API specification for digital commerce. Universal clients for any compliant server—from catalogs to complex e-commerce platforms.">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://github.com/doeixd/Open-Commerce-Standard">
-    <meta property="og:title" content="Open Commerce Standard (OCS) - Documentation">
+    <meta property="og:url" content="https://github.com/doeixd/Open-Commerce-Protocol">
+    <meta property="og:title" content="Open Commerce Protocol (OCP) - Documentation">
     <meta property="og:description" content="An open, extensible API specification for digital commerce. Universal clients for any compliant server—from catalogs to complex e-commerce platforms.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/doeixd/Open-Commerce-Standard/refs/heads/main/og_image.svg">
+    <meta property="og:image" content="https://raw.githubusercontent.com/doeixd/Open-Commerce-Protocol/refs/heads/main/og_image.svg">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://github.com/doeixd/Open-Commerce-Standard">
-    <meta property="twitter:title" content="Open Commerce Standard (OCS) - Documentation">
+    <meta property="twitter:url" content="https://github.com/doeixd/Open-Commerce-Protocol">
+    <meta property="twitter:title" content="Open Commerce Protocol (OCP) - Documentation">
     <meta property="twitter:description" content="An open, extensible API specification for digital commerce. Universal clients for any compliant server—from catalogs to complex e-commerce platforms.">
-    <meta property="twitter:image" content="https://raw.githubusercontent.com/doeixd/Open-Commerce-Standard/refs/heads/main/og_image.svg">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/doeixd/Open-Commerce-Protocol/refs/heads/main/og_image.svg">
 
     <link rel="icon" type="image/png" href="assets/logo.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-one-dark.min.css" rel="stylesheet" />
@@ -676,9 +676,9 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <img src="assets/logo.png" alt="OCS Logo" class="sidebar-logo">
-                <h1>OCS</h1>
-                <p>Open Commerce Standard</p>
+                <img src="assets/logo.png" alt="OCP Logo" class="sidebar-logo">
+                <h1>OCP</h1>
+                <p>Open Commerce Protocol</p>
                 <span class="version-badge">v1.0.0</span>
             </div>
 
@@ -737,7 +737,7 @@
         <main class="main-content">
             <!-- Introduction -->
             <section id="introduction">
-                <h1>Open Commerce Standard (OCS)</h1>
+                <h1>Open Commerce Protocol (OCP)</h1>
                 
                 <div class="card">
                     <table>
@@ -754,11 +754,11 @@
                     </table>
                 </div>
 
-                <p>The Open Commerce Standard (OCS) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCS supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. OCS provides a unified API for any commerce model, whether you need a multi-item shopping cart for your online store or a streamlined, one-click checkout for your digital service. It integrates web3-native payments via the x402 Protocol for instant, low-fee blockchain transactions.</p>
+                <p>The Open Commerce Protocol (OCP) is an open, extensible API specification for digital commerce, enabling universal clients to interact with any compliant server—from simple product catalogs to complex e-commerce platforms. By leveraging HTTP semantics, capability discovery, and structured metadata, OCP supports physical goods, digital services, and in-store pickup while prioritizing implementer freedom. OCP provides a unified API for any commerce model, whether you need a multi-item shopping cart for your online store or a streamlined, one-click checkout for your digital service. It integrates web3-native payments via the x402 Protocol for instant, low-fee blockchain transactions.</p>
 
                 <div class="info-box">
                     <strong>OpenAPI Specification</strong>
-                    The complete, machine-readable OpenAPI 3.0 specification is available on GitHub: <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">spec.yaml</a>
+                    The complete, machine-readable OpenAPI 3.0 specification is available on GitHub: <a href="https://github.com/doeixd/Open-Commerce-Protocol/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">spec.yaml</a>
                 </div>
             </section>
 
@@ -767,38 +767,38 @@
                 <h2>Overview & Common Questions</h2>
 
                 <div class="card">
-                    <h4>What is OCS?</h4>
+                    <h4>What is OCP?</h4>
                     <p>An open, minimal, and extensible standard for digital commerce. It defines a universal HTTP API for the entire transaction lifecycle: product discovery, cart management, ordering, and real-time updates—supporting physical goods, digital services, and in-store pickup.</p>
                 </div>
 
                 <div class="card">
-                    <h4>Why OCS?</h4>
-                    <p>Traditional e-commerce APIs are fragmented and vendor-specific. OCS provides a consistent, extensible framework that adapts to any business model—from simple catalogs to food delivery platforms to complex apparel stores—without dictating internal logic. It prioritizes implementer freedom while enabling universal, adaptive clients.</p>
+                    <h4>Why OCP?</h4>
+                    <p>Traditional e-commerce APIs are fragmented and vendor-specific. OCP provides a consistent, extensible framework that adapts to any business model—from simple catalogs to food delivery platforms to complex apparel stores—without dictating internal logic. It prioritizes implementer freedom while enabling universal, adaptive clients.</p>
                 </div>
 
                 <div class="card">
-                    <h4>How does OCS work?</h4>
+                    <h4>How does OCP work?</h4>
                     <p>Clients begin by discovering server capabilities (<span class="inline-code">GET /capabilities</span>), then browse catalogs, manage carts, and place orders. Real-time updates stream via Server-Sent Events. Complexity is delegated to structured <span class="inline-code">metadata</span> linked to JSON Schemas, allowing clients to adapt dynamically without hardcoding features.</p>
                 </div>
 
                 <div class="card">
                     <h4>Why X402 for payments?</h4>
-                    <p>OCS integrates the x402 Protocol for flexible, modern payments. X402 is payment-method agnostic—it works with traditional payment processors like Stripe AND blockchain-based payments with stablecoins like USDC. This means you can start with familiar payment methods and optionally add crypto support later, or use both simultaneously. Unlike being locked into one payment provider, x402 gives you the freedom to choose what works best for your business.</p>
+                    <p>OCP integrates the x402 Protocol for flexible, modern payments. X402 is payment-method agnostic—it works with traditional payment processors like Stripe AND blockchain-based payments with stablecoins like USDC. This means you can start with familiar payment methods and optionally add crypto support later, or use both simultaneously. Unlike being locked into one payment provider, x402 gives you the freedom to choose what works best for your business.</p>
                 </div>
 
                 <div class="card">
                     <h4>How does authentication work?</h4>
-                    <p>OCS uses Bearer token authentication (<span class="inline-code">Authorization: Bearer &lt;token&gt;</span>). Token formats (e.g., JWT, API keys) are implementation-specific and may be discoverable via capabilities. Discovery endpoints are public; others require auth.</p>
+                    <p>OCP uses Bearer token authentication (<span class="inline-code">Authorization: Bearer &lt;token&gt;</span>). Token formats (e.g., JWT, API keys) are implementation-specific and may be discoverable via capabilities. Discovery endpoints are public; others require auth.</p>
                 </div>
 
                 <div class="card">
-                    <h4>Who is OCS for?</h4>
+                    <h4>Who is OCP for?</h4>
                     <p>API providers monetizing digital commerce, client developers building universal shopping apps, and AI agents requiring autonomous transactions.</p>
                 </div>
 
                 <div class="card">
                     <h4>How do promotions work?</h4>
-                    <p>Promotions are handled through discoverable capabilities. Servers advertise available promotions via <span class="inline-code">dev.ocs.promotions.discoverable@1.0</span>, clients validate them using <span class="inline-code">POST /carts/{id}/promotions</span>, and applied promotions are recorded in order metadata via <span class="inline-code">dev.ocs.order.applied_promotions@1.0</span>. This flexible system supports discounts, BOGO deals, free shipping, and more.</p>
+                    <p>Promotions are handled through discoverable capabilities. Servers advertise available promotions via <span class="inline-code">dev.ocp.promotions.discoverable@1.0</span>, clients validate them using <span class="inline-code">POST /carts/{id}/promotions</span>, and applied promotions are recorded in order metadata via <span class="inline-code">dev.ocp.order.applied_promotions@1.0</span>. This flexible system supports discounts, BOGO deals, free shipping, and more.</p>
                 </div>
             </section>
 
@@ -806,7 +806,7 @@
             <section id="quick-reference">
                 <h2>Quick Reference</h2>
 
-                <p>A condensed cheat sheet for the most common OCS operations. Perfect for quick lookups while building.</p>
+                <p>A condensed cheat sheet for the most common OCP operations. Perfect for quick lookups while building.</p>
 
                 <h3>Essential Endpoints</h3>
 
@@ -872,7 +872,7 @@
 
                 <div class="code-wrapper">
                     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    <div class="code-block"><pre><code class="language-javascript">// Complete OCS workflow in one snippet
+                    <div class="code-block"><pre><code class="language-javascript">// Complete OCP workflow in one snippet
 const API_BASE = 'https://api.example.com';
 const AUTH_TOKEN = 'your_token';
 
@@ -887,7 +887,7 @@ const cart = await fetch(`${API_BASE}/carts`, {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${AUTH_TOKEN}`,
-    'Content-Type': 'application/ocs+json; version=1.0'
+    'Content-Type': 'application/ocp+json; version=1.0'
   },
   body: JSON.stringify({ storeId: 'store_123' })
 }).then(r => r.json());
@@ -897,7 +897,7 @@ await fetch(`${API_BASE}/carts/${cart.id}/items`, {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${AUTH_TOKEN}`,
-    'Content-Type': 'application/ocs+json; version=1.0',
+    'Content-Type': 'application/ocp+json; version=1.0',
     'Idempotency-Key': crypto.randomUUID()
   },
   body: JSON.stringify({ itemId: 'item_123', quantity: 1 })
@@ -908,7 +908,7 @@ const order = await fetch(`${API_BASE}/orders`, {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${AUTH_TOKEN}`,
-    'Content-Type': 'application/ocs+json; version=1.0',
+    'Content-Type': 'application/ocp+json; version=1.0',
     'Idempotency-Key': crypto.randomUUID()
   },
   body: JSON.stringify({ cartId: cart.id })
@@ -935,12 +935,12 @@ events.addEventListener('order.patch', (e) => {
                         <tbody>
                             <tr>
                                 <td><span class="inline-code">Accept</span></td>
-                                <td><span class="inline-code">application/ocs+json; version=1.0</span></td>
+                                <td><span class="inline-code">application/ocp+json; version=1.0</span></td>
                                 <td>All requests</td>
                             </tr>
                             <tr>
                                 <td><span class="inline-code">Content-Type</span></td>
-                                <td><span class="inline-code">application/ocs+json; version=1.0</span></td>
+                                <td><span class="inline-code">application/ocp+json; version=1.0</span></td>
                                 <td>POST, PATCH requests</td>
                             </tr>
                             <tr>
@@ -963,7 +963,7 @@ events.addEventListener('order.patch', (e) => {
                     <h4>Check for Variants</h4>
                     <div class="code-wrapper">
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                        <div class="code-block"><pre><code class="language-javascript">const hasVariants = item.metadata?.['dev.ocs.product.variants'];
+                        <div class="code-block"><pre><code class="language-javascript">const hasVariants = item.metadata?.['dev.ocp.product.variants'];
 if (hasVariants) {
   // Show size/color picker
   const variants = hasVariants.variants;
@@ -1002,11 +1002,11 @@ eventSource.addEventListener('order.patch', (event) => {
 
             <!-- Philosophy Section -->
             <section id="philosophy">
-                <h2>Understanding OCS: The Philosophy Behind a Minimal Commerce Standard</h2>
+                <h2>Understanding OCP: The Philosophy Behind a Minimal Commerce Standard</h2>
 
                 <div class="card">
                     <p style="font-size: 1.125rem; line-height: 1.8; color: var(--text-primary);">
-                        Let's talk about why OCS exists and why it works the way it does. If you've ever tried to integrate with multiple e-commerce APIs, you know the pain: every platform has its own way of doing things, its own quirks, its own special fields. Building a universal shopping app? Good luck—you'll be writing custom code for every single vendor.
+                        Let's talk about why OCP exists and why it works the way it does. If you've ever tried to integrate with multiple e-commerce APIs, you know the pain: every platform has its own way of doing things, its own quirks, its own special fields. Building a universal shopping app? Good luck—you'll be writing custom code for every single vendor.
                     </p>
                 </div>
 
@@ -1016,9 +1016,9 @@ eventSource.addEventListener('order.patch', (event) => {
 
                 <p>Some APIs have 47 fields on a product object "just in case." Others require you to make 6 API calls just to figure out if something is in stock. And don't even get me started on trying to build a client that works with multiple vendors—it's a nightmare of if-statements and special cases.</p>
 
-                <h3>The OCS Philosophy: Minimal by Default, Complex by Choice</h3>
+                <h3>The OCP Philosophy: Minimal by Default, Complex by Choice</h3>
 
-                <p>OCS takes a different approach. Instead of trying to predict every possible feature you might need and cramming it all into the core API, we keep the core <em>ridiculously simple</em>. Then we give you a way to discover and extend it when you need more.</p>
+                <p>OCP takes a different approach. Instead of trying to predict every possible feature you might need and cramming it all into the core API, we keep the core <em>ridiculously simple</em>. Then we give you a way to discover and extend it when you need more.</p>
 
                 <div class="info-box">
                     <strong>Core Principle</strong>
@@ -1034,13 +1034,13 @@ eventSource.addEventListener('order.patch', (event) => {
                     <li>Building a sophisticated client? You can discover and adapt to every feature the server supports.</li>
                 </ul>
 
-                <h3>Let's Build Something: Your First OCS Client</h3>
+                <h3>Let's Build Something: Your First OCP Client</h3>
 
                 <p>Enough theory. Let's write some code. I'm going to walk you through building a simple client that browses a catalog and places an order. We'll use plain JavaScript and <span class="inline-code">fetch</span>—no frameworks, no magic.</p>
 
                 <h4>Step 1: Discover What the Server Can Do</h4>
 
-                <p>Every OCS interaction starts the same way: ask the server what it supports. This is like walking into a store and asking for the catalog before you order.</p>
+                <p>Every OCP interaction starts the same way: ask the server what it supports. This is like walking into a store and asking for the catalog before you order.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-javascript">// First, let's see what this server can do
@@ -1050,7 +1050,7 @@ const AUTH_TOKEN = 'your_token_here'; // You'd get this from your auth flow
 async function discoverCapabilities() {
   const response = await fetch(`${API_BASE}/capabilities`, {
     headers: {
-      'Accept': 'application/ocs+json; version=1.0'
+      'Accept': 'application/ocp+json; version=1.0'
     }
   });
   
@@ -1064,8 +1064,8 @@ const capabilities = await discoverCapabilities();
 
 // Output might look like:
 // [
-//   { id: "dev.ocs.product.variants@1.0", schemaUrl: "..." },
-//   { id: "dev.ocs.order.shipment_tracking@1.0", schemaUrl: "..." }
+//   { id: "dev.ocp.product.variants@1.0", schemaUrl: "..." },
+//   { id: "dev.ocp.order.shipment_tracking@1.0", schemaUrl: "..." }
 // ]</code></pre></div>
                 </div>
 
@@ -1073,14 +1073,14 @@ const capabilities = await discoverCapabilities();
 
                 <h4>Step 2: Browse the Catalog</h4>
 
-                <p>Now let's get the actual products. In OCS, products live in "catalogs".</p>
+                <p>Now let's get the actual products. In OCP, products live in "catalogs".</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-javascript">// First, let's see what catalogs are available
 async function getCatalogs() {
   const response = await fetch(`${API_BASE}/catalogs`, {
     headers: {
-      'Accept': 'application/ocs+json; version=1.0'
+      'Accept': 'application/ocp+json; version=1.0'
     }
   });
   
@@ -1091,7 +1091,7 @@ async function getCatalogs() {
 async function getCatalog(catalogId) {
   const response = await fetch(`${API_BASE}/catalogs/${catalogId}`, {
     headers: {
-      'Accept': 'application/ocs+json; version=1.0'
+      'Accept': 'application/ocp+json; version=1.0'
     }
   });
   
@@ -1118,7 +1118,7 @@ console.log('Products:', catalog.items);
 
                 <h4>Step 3: Understanding Items and Metadata</h4>
 
-                <p>But what if a product has variants, like different sizes? This is where OCS gets clever. Instead of adding a <span class="inline-code">variants</span> field to every product (even ones that don't need it), we use <span class="inline-code">metadata</span>.</p>
+                <p>But what if a product has variants, like different sizes? This is where OCP gets clever. Instead of adding a <span class="inline-code">variants</span> field to every product (even ones that don't need it), we use <span class="inline-code">metadata</span>.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-javascript">// A product with variants looks like this:
@@ -1130,7 +1130,7 @@ const tshirt = {
   fulfillmentType: "physical",
   metadata: {
     // This key matches the base ID from the capability we discovered earlier!
-    "dev.ocs.product.variants": {
+    "dev.ocp.product.variants": {
       "_version": "1.0",
       options: ["Size", "Color"],
       variants: [
@@ -1154,17 +1154,17 @@ const tshirt = {
 // In your client, you check if the capability exists:
 function hasVariants(item, capabilities) {
   const variantCapability = capabilities.find(
-    cap => cap.id === "dev.ocs.product.variants@1.0"
+    cap => cap.id === "dev.ocp.product.variants@1.0"
   );
 
   return variantCapability &&
-         item.metadata?.["dev.ocs.product.variants"];
+         item.metadata?.["dev.ocp.product.variants"];
 }
 
 // Then render accordingly:
 if (hasVariants(tshirt, capabilities)) {
   // Show size/color picker
-  const variants = tshirt.metadata["dev.ocs.product.variants"];
+  const variants = tshirt.metadata["dev.ocp.product.variants"];
   console.log('Available options:', variants.options);
   console.log('Available variants:', variants.variants);
 }
@@ -1172,7 +1172,7 @@ if (hasVariants(tshirt, capabilities)) {
 // Then render accordingly:
 if (hasVariants(tshirt, capabilities)) {
   // Show size/color picker
-  const variants = tshirt.metadata["dev.ocs.product.variants@1.0"];
+  const variants = tshirt.metadata["dev.ocp.product.variants@1.0"];
   console.log('Available options:', variants.options);
   console.log('Available variants:', variants.variants);
 } else {
@@ -1181,7 +1181,7 @@ if (hasVariants(tshirt, capabilities)) {
 }</code></pre></div>
                 </div>
 
-                <p>This is the magic of OCS. Your client adapts to what the server supports. If variants exist, you show them. If not, you don't. No special cases, no brittle code.</p>
+                <p>This is the magic of OCP. Your client adapts to what the server supports. If variants exist, you show them. If not, you don't. No special cases, no brittle code.</p>
 
                 <h4>Step 4: Creating a Cart and Adding Items</h4>
 
@@ -1194,8 +1194,8 @@ async function createCart() {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${AUTH_TOKEN}`,
-      'Content-Type': 'application/ocs+json; version=1.0',
-      'Accept': 'application/ocs+json; version=1.0'
+      'Content-Type': 'application/ocp+json; version=1.0',
+      'Accept': 'application/ocp+json; version=1.0'
     },
     body: JSON.stringify({
       storeId: 'store_123' // Which store/vendor
@@ -1221,8 +1221,8 @@ async function addToCart(cartId, itemId, quantity = 1, variantId = null) {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${AUTH_TOKEN}`,
-      'Content-Type': 'application/ocs+json; version=1.0',
-      'Accept': 'application/ocs+json; version=1.0',
+      'Content-Type': 'application/ocp+json; version=1.0',
+      'Accept': 'application/ocp+json; version=1.0',
       'Idempotency-Key': crypto.randomUUID() // Prevent duplicate adds
     },
     body: JSON.stringify(body)
@@ -1240,7 +1240,7 @@ await addToCart(cart.id, 'prod_123', 1, 'var_large_black');
 console.log('Added item to cart!');</code></pre></div>
                 </div>
 
-                <p>Notice the <span class="inline-code">Idempotency-Key</span> header? This is important. If the network hiccups and you retry the request, the server won't add the item twice. This is the kind of detail OCS gets right.</p>
+                <p>Notice the <span class="inline-code">Idempotency-Key</span> header? This is important. If the network hiccups and you retry the request, the server won't add the item twice. This is the kind of detail OCP gets right.</p>
 
                 <h4>Step 5: Placing an Order</h4>
 
@@ -1262,8 +1262,8 @@ async function placeOrder(cartId, deliveryAddress = null) {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${AUTH_TOKEN}`,
-      'Content-Type': 'application/ocs+json; version=1.0',
-      'Accept': 'application/ocs+json; version=1.0',
+      'Content-Type': 'application/ocp+json; version=1.0',
+      'Accept': 'application/ocp+json; version=1.0',
       'Idempotency-Key': crypto.randomUUID()
     },
     body: JSON.stringify(body)
@@ -1300,7 +1300,7 @@ console.log('Order placed!', order);
 
                 <h4>Step 6: Tracking the Order in Real-Time</h4>
 
-                <p>Here's where it gets cool. OCS supports real-time order updates via Server-Sent Events (SSE). This means you can show the user live updates as their order progresses.</p>
+                <p>Here's where it gets cool. OCP supports real-time order updates via Server-Sent Events (SSE). This means you can show the user live updates as their order progresses.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-javascript">// Subscribe to order updates
@@ -1364,28 +1364,28 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                 <p>Let's step back and think about what we just built. With less than 200 lines of code, we created a client that can:</p>
 
                 <ul>
-                    <li>Discover what any OCS server supports</li>
+                    <li>Discover what any OCP server supports</li>
                     <li>Browse products with or without variants</li>
                     <li>Manage a shopping cart</li>
                     <li>Place orders for physical, digital, or pickup items</li>
                     <li>Track orders in real-time</li>
                 </ul>
 
-                <p>And here's the kicker: <strong>this same code works with any OCS-compliant server</strong>. A grocery store, a clothing store, a digital goods marketplace—doesn't matter. The API is the same.</p>
+                <p>And here's the kicker: <strong>this same code works with any OCP-compliant server</strong>. A grocery store, a clothing store, a digital goods marketplace—doesn't matter. The API is the same.</p>
 
                 <div class="info-box success">
-                    <strong>The OCS Promise</strong>
+                    <strong>The OCP Promise</strong>
                     Write your client once, work with any vendor. Write your server once, work with any client. That's the power of a minimal, extensible standard.
                 </div>
 
-                <h3>What Makes OCS Different</h3>
+                <h3>What Makes OCP Different</h3>
 
-                <p>So why does OCS succeed where other standards fail? A few key decisions:</p>
+                <p>So why does OCP succeed where other standards fail? A few key decisions:</p>
 
                 <div class="feature-grid">
                     <div class="feature-card">
                         <div class="feature-title">1. Minimal Core</div>
-                        <div class="feature-description">The base API is tiny. You can implement a basic OCS server in an afternoon. This means people actually adopt it.</div>
+                        <div class="feature-description">The base API is tiny. You can implement a basic OCP server in an afternoon. This means people actually adopt it.</div>
                     </div>
 
                     <div class="feature-card">
@@ -1410,15 +1410,15 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
 
                     <div class="feature-card">
                         <div class="feature-title">6. Implementation Freedom</div>
-                        <div class="feature-description">OCS doesn't dictate your business logic. It's a transport layer, not a framework. Use any database, any auth system, any payment processor.</div>
+                        <div class="feature-description">OCP doesn't dictate your business logic. It's a transport layer, not a framework. Use any database, any auth system, any payment processor.</div>
                     </div>
                 </div>
 
                 <h3>The Bottom Line</h3>
 
-                <p>OCS exists because commerce APIs shouldn't be hard. The core flow—browse, cart, order—is universal. The details—variants, tracking, fulfillment—should be discoverable and optional.</p>
+                <p>OCP exists because commerce APIs shouldn't be hard. The core flow—browse, cart, order—is universal. The details—variants, tracking, fulfillment—should be discoverable and optional.</p>
 
-                <p>By keeping the core minimal and making extensions discoverable, OCS gives you the best of both worlds: simplicity when you need it, power when you want it.</p>
+                <p>By keeping the core minimal and making extensions discoverable, OCP gives you the best of both worlds: simplicity when you need it, power when you want it.</p>
 
                 <p>Now go build something cool. The API is simple, the docs are here, and the community is growing. Welcome to open commerce.</p>
             </section>
@@ -1431,7 +1431,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                 <div class="step-card">
                     <div class="step-number">1</div>
                     <div class="step-title">Review the Specification</div>
-                    <p>Read the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">OpenAPI spec</a> for the full API details. The specification defines all endpoints, schemas, and behaviors.</p>
+                    <p>Read the <a href="https://github.com/doeixd/Open-Commerce-Protocol/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">OpenAPI spec</a> for the full API details. The specification defines all endpoints, schemas, and behaviors.</p>
                 </div>
 
                 <div class="step-card">
@@ -1449,7 +1449,7 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                 <div class="step-card">
                     <div class="step-number">4</div>
                     <div class="step-title">Build Clients</div>
-                    <p>Use capability discovery for adaptive apps compatible with any OCS server.</p>
+                    <p>Use capability discovery for adaptive apps compatible with any OCP server.</p>
                 </div>
             </section>
 
@@ -1461,31 +1461,31 @@ const subscription = subscribeToOrderUpdates(order.id, (update) => {
                     <div class="feature-card">
                         <div class="feature-icon">💳</div>
                         <div class="feature-title">Unified Payment Protocol</div>
-                        <div class="feature-description">One Protocol, Any Payment Rail. OCS leverages the x402 protocol's extensible "schemes" to handle any payment type. Use the exact scheme for instant, low-fee crypto settlements and the fiat_intent scheme for secure, compliant processing of traditional payments through providers like Stripe and PayPal.</div>
+                        <div class="feature-description">One Protocol, Any Payment Rail. OCP leverages the x402 protocol's extensible "schemes" to handle any payment type. Use the exact scheme for instant, low-fee crypto settlements and the fiat_intent scheme for secure, compliant processing of traditional payments through providers like Stripe and PayPal.</div>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">🎛️</div>
                         <div class="feature-title">Server-Driven UI Logic</div>
-                        <div class="feature-description">Radically Simplified Client Logic. Stop hardcoding payment provider logic. The OCS server tells your client exactly what payment options are available, how to display them (with names and icons), and what to do next. Your app becomes future-proof by default.</div>
+                        <div class="feature-description">Radically Simplified Client Logic. Stop hardcoding payment provider logic. The OCP server tells your client exactly what payment options are available, how to display them (with names and icons), and what to do next. Your app becomes future-proof by default.</div>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">🔍</div>
                         <div class="feature-title">Dynamic Capability Discovery</div>
-                        <div class="feature-description">An API That Adapts to Any Business. OCS is more than payments. A powerful discovery mechanism allows your client to dynamically adapt to any feature the server supports—from product variants and customizations to real-time delivery tracking.</div>
+                        <div class="feature-description">An API That Adapts to Any Business. OCP is more than payments. A powerful discovery mechanism allows your client to dynamically adapt to any feature the server supports—from product variants and customizations to real-time delivery tracking.</div>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">🛒</div>
                         <div class="feature-title">For Any Checkout Flow</div>
-                        <div class="feature-description">One size doesn't fit all. OCS provides a robust, server-side cart for complex shopping journeys. For quick purchases, it also supports a stateless "Buy Now" flow. Your app can discover which models a server supports and dynamically provide the perfect UI for every product.</div>
+                        <div class="feature-description">One size doesn't fit all. OCP provides a robust, server-side cart for complex shopping journeys. For quick purchases, it also supports a stateless "Buy Now" flow. Your app can discover which models a server supports and dynamically provide the perfect UI for every product.</div>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">🔗</div>
                         <div class="feature-title">Standards Alignment</div>
-                        <div class="feature-description">Built for the Web Ecosystem. OCS integrates seamlessly with Hydra for hypermedia semantics and Interledger/Open Payments for multi-rail payment interoperability—while maintaining its simple, developer-friendly JSON-first approach.</div>
+                        <div class="feature-description">Built for the Web Ecosystem. OCP integrates seamlessly with Hydra for hypermedia semantics and Interledger/Open Payments for multi-rail payment interoperability—while maintaining its simple, developer-friendly JSON-first approach.</div>
                     </div>
                 </div>
             </section>
@@ -1554,20 +1554,20 @@ Server → 201 Created → Client
             <section id="x402-protocol">
                 <h2>A Unified Payment Protocol: x402</h2>
 
-                <p>OCS leverages the <strong>x402 Protocol</strong> to provide a single, unified layer for all payment processing. The core design principle of x402 is its <strong>payment-rail agnosticism</strong>. It is an HTTP-native protocol that can orchestrate any payment type, from traditional credit cards via Stripe to web3-native assets like USDC.</p>
+                <p>OCP leverages the <strong>x402 Protocol</strong> to provide a single, unified layer for all payment processing. The core design principle of x402 is its <strong>payment-rail agnosticism</strong>. It is an HTTP-native protocol that can orchestrate any payment type, from traditional credit cards via Stripe to web3-native assets like USDC.</p>
 
-                <p>This flexibility is achieved through extensible <strong>payment schemes</strong>, which act as "drivers" for different financial networks. OCS specifies two primary schemes:</p>
+                <p>This flexibility is achieved through extensible <strong>payment schemes</strong>, which act as "drivers" for different financial networks. OCP specifies two primary schemes:</p>
 
                 <ol>
-                    <li><strong><span class="inline-code">fiat_intent</span> (For Traditional Payments):</strong> This scheme is designed to work with modern processors like Stripe and PayPal. It orchestrates the secure, token-based "Payment Intent" flow, where sensitive details are never exposed to the OCS server, ensuring security and compliance.</li>
+                    <li><strong><span class="inline-code">fiat_intent</span> (For Traditional Payments):</strong> This scheme is designed to work with modern processors like Stripe and PayPal. It orchestrates the secure, token-based "Payment Intent" flow, where sensitive details are never exposed to the OCP server, ensuring security and compliance.</li>
                     <li><strong><span class="inline-code">exact</span> (For Web3 Payments):</strong> This scheme uses cryptographic signatures (EIP-712) to authorize transactions directly on a blockchain, enabling instant settlement, true micropayments, and autonomous payments by AI agents.</li>
                 </ol>
 
                 <p>This dual-scheme architecture means you are never locked into a single payment world. You can start with the system that makes sense for your business today and expand effortlessly tomorrow.</p>
 
-                <h3>The OCS Advantage: One Protocol, Two Worlds</h3>
+                <h3>The OCP Advantage: One Protocol, Two Worlds</h3>
 
-                <p>Think of OCS as a universal adapter for digital commerce. By building on one simple protocol, you gain the benefits of both traditional and web3 finance.</p>
+                <p>Think of OCP as a universal adapter for digital commerce. By building on one simple protocol, you gain the benefits of both traditional and web3 finance.</p>
 
                 <div class="table-container">
                     <table class="comparison-table">
@@ -1575,7 +1575,7 @@ Server → 201 Created → Client
                             <tr>
                                 <th>Feature</th>
                                 <th>Traditional Payments (Standalone)</th>
-                                <th>OCS with x402 (Unified)</th>
+                                <th>OCP with x402 (Unified)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1615,18 +1615,18 @@ Server → 201 Created → Client
 
                 <h3>Your Commerce, Your Choice: A Strategic Growth Path</h3>
 
-                <p>The power of the OCS payment model lies in its flexibility. You can adopt it incrementally without rewriting your business logic.</p>
+                <p>The power of the OCP payment model lies in its flexibility. You can adopt it incrementally without rewriting your business logic.</p>
 
                 <p>Imagine you're launching a new service. You can start with a simple, familiar integration by enabling the <strong><span class="inline-code">fiat_intent</span></strong> scheme with Stripe. Your customers will pay with credit cards, and the experience will be seamless and secure.</p>
 
-                <p>Months later, you want to tap into a global market or serve an AI-driven use case. You simply enable the <strong><span class="inline-code">exact</span></strong> scheme in your OCS server configuration. Your application will now automatically present crypto as an additional payment option to your users—<strong>no rebuilding of your checkout flow is required.</strong> This allows you to meet your customers where they are, offering the best payment method for their needs, all through one consistent and elegant protocol.</p>
+                <p>Months later, you want to tap into a global market or serve an AI-driven use case. You simply enable the <strong><span class="inline-code">exact</span></strong> scheme in your OCP server configuration. Your application will now automatically present crypto as an additional payment option to your users—<strong>no rebuilding of your checkout flow is required.</strong> This allows you to meet your customers where they are, offering the best payment method for their needs, all through one consistent and elegant protocol.</p>
             </section>
 
             <!-- From Online Stores to Digital Subscriptions -->
             <section id="commerce-models">
                 <h2>From Online Stores to Digital Subscriptions</h2>
 
-                <p>OCS is built for the entire spectrum of digital commerce.</p>
+                <p>OCP is built for the entire spectrum of digital commerce.</p>
 
                 <div class="feature-grid">
                     <div class="feature-card">
@@ -1644,7 +1644,7 @@ Server → 201 Created → Client
                     <div class="feature-card">
                         <div class="feature-icon">🎯</div>
                         <div class="feature-title">Adaptive Client Apps</div>
-                        <div class="feature-description">The power of OCS is that your client application can support all of these models through one consistent and predictable API. Discover capabilities at runtime and render the perfect UI for every product.</div>
+                        <div class="feature-description">The power of OCP is that your client application can support all of these models through one consistent and predictable API. Discover capabilities at runtime and render the perfect UI for every product.</div>
                     </div>
                 </div>
             </section>
@@ -1653,7 +1653,7 @@ Server → 201 Created → Client
              <section id="core-concepts">
                  <h2>Core Concepts</h2>
 
-                 <p>OCS's power lies in <strong>delegating complexity to <span class="inline-code">metadata</span> and making it discoverable</strong>.</p>
+                 <p>OCP's power lies in <strong>delegating complexity to <span class="inline-code">metadata</span> and making it discoverable</strong>.</p>
 
                  <div class="card">
                      <p>Core schemas stay lean—no endless optional fields for variants, sizes, or weights. Domain-specific data resides in a generic <span class="inline-code">metadata</span> object.</p>
@@ -1663,7 +1663,7 @@ Server → 201 Created → Client
 
                  <div class="info-box">
                      <strong>Key Principle</strong>
-                     Instead of bloating core schemas with every possible field, OCS uses structured metadata with discoverable schemas. This keeps the API minimal while supporting unlimited extensibility.
+                     Instead of bloating core schemas with every possible field, OCP uses structured metadata with discoverable schemas. This keeps the API minimal while supporting unlimited extensibility.
                  </div>
              </section>
 
@@ -1671,7 +1671,7 @@ Server → 201 Created → Client
              <section id="versioning-rules">
                  <h2>Versioning Rules</h2>
 
-                 <p>OCS uses semantic versioning for capabilities and the overall standard to ensure smooth evolution without breaking existing clients.</p>
+                 <p>OCP uses semantic versioning for capabilities and the overall standard to ensure smooth evolution without breaking existing clients.</p>
 
                  <div class="card">
                      <h4>PATCH Updates (1.0 → 1.1)</h4>
@@ -1690,15 +1690,15 @@ Server → 201 Created → Client
 
                  <div class="info-box">
                      <strong>Client Version Negotiation</strong>
-                     Clients negotiate versions via the <span class="inline-code">Accept-OCS-Capabilities</span> header (comma-separated list of capability IDs with versions, e.g., <span class="inline-code">dev.ocs.product.variants@2.0</span>). If omitted, servers use default versions. This makes evolution explicit and allows servers to innovate without breaking existing clients.
+                     Clients negotiate versions via the <span class="inline-code">Accept-OCP-Capabilities</span> header (comma-separated list of capability IDs with versions, e.g., <span class="inline-code">dev.ocp.product.variants@2.0</span>). If omitted, servers use default versions. This makes evolution explicit and allows servers to innovate without breaking existing clients.
                  </div>
              </section>
 
-            <!-- The OCS Hypermedia Engine -->
+            <!-- The OCP Hypermedia Engine -->
             <section id="hypermedia-engine">
-                <h2>The OCS Hypermedia Engine: An API That Guides You</h2>
+                <h2>The OCP Hypermedia Engine: An API That Guides You</h2>
 
-                <p>In many APIs, the developer's first step is to read the documentation and hardcode a long list of URL paths into their application. The Open Commerce Standard (OCS) is designed on a more powerful and resilient principle: <strong>Hypermedia as the Engine of Application State (HATEOAS)</strong>.</p>
+                <p>In many APIs, the developer's first step is to read the documentation and hardcode a long list of URL paths into their application. The Open Commerce Protocol (OCP) is designed on a more powerful and resilient principle: <strong>Hypermedia as the Engine of Application State (HATEOAS)</strong>.</p>
 
                 <p>This sounds complex, but the idea is simple: <strong>instead of memorizing paths, your client "discovers" them.</strong> The API itself tells you what you can do next and provides the exact URLs needed to do it.</p>
 
@@ -1733,13 +1733,13 @@ Server → 201 Created → Client
                     <div class="feature-card">
                         <div class="feature-icon">🛡️</div>
                         <div class="feature-title">4. True Server Freedom</div>
-                        <div class="feature-description">OCS doesn't dictate a server's internal architecture. Your returns system can live on a completely different microservice with a different URL structure, and as long as you provide the correct links, any OCS client can use it seamlessly.</div>
+                        <div class="feature-description">OCP doesn't dictate a server's internal architecture. Your returns system can live on a completely different microservice with a different URL structure, and as long as you provide the correct links, any OCP client can use it seamlessly.</div>
                     </div>
                 </div>
 
                 <h3>How It Works: Two Types of Discovery</h3>
 
-                <p>OCS uses two primary mechanisms for this hypermedia-driven discovery.</p>
+                <p>OCP uses two primary mechanisms for this hypermedia-driven discovery.</p>
 
                 <h4>1. Global Discovery: The <code>/capabilities</code> Endpoint</h4>
 
@@ -1753,14 +1753,14 @@ Server → 201 Created → Client
                 <div class="code-block"><pre><code class="language-json">{
   "capabilities": [
     {
-      "id": "dev.ocs.auth.flows@1.0",
+      "id": "dev.ocp.auth.flows@1.0",
       "metadata": {
         "signInUrl": "https://auth.example.com/login",
         "profileUrl": "https://api.example.com/users/me"
       }
     },
     {
-      "id": "dev.ocs.product.search@1.0",
+      "id": "dev.ocp.product.search@1.0",
       "metadata": {
         "urlTemplate": "https://api.example.com/search?q={query}"
       }
@@ -1823,13 +1823,13 @@ if (returnAction) {
                 <ul>
                     <li><strong>Cancellations:</strong> The <code>cancel</code> action only appears if an order is cancellable.</li>
                     <li><strong>Writing Reviews:</strong> The <code>add_review</code> action only appears on a <code>CatalogItem</code> if the logged-in user has purchased it.</li>
-                    <li><strong>Ratings:</strong> The <code>rate_order</code> action appears on completed orders if <code>dev.ocs.order.ratings@1.0</code> is supported.</li>
-                    <li><strong>Returns:</strong> The <code>initiate_return</code> action appears if <code>dev.ocs.order.returns@1.0</code> is supported and the order is eligible.</li>
+                    <li><strong>Ratings:</strong> The <code>rate_order</code> action appears on completed orders if <code>dev.ocp.order.ratings@1.0</code> is supported.</li>
+                    <li><strong>Returns:</strong> The <code>initiate_return</code> action appears if <code>dev.ocp.order.returns@1.0</code> is supported and the order is eligible.</li>
                 </ul>
 
                 <div class="info-box success">
                     <strong>The Result</strong>
-                    By embracing this hypermedia-driven approach, the Open Commerce Standard provides a blueprint for a truly modern, resilient, and intelligent commerce ecosystem.
+                    By embracing this hypermedia-driven approach, the Open Commerce Protocol provides a blueprint for a truly modern, resilient, and intelligent commerce ecosystem.
                 </div>
             </section>
 
@@ -1837,7 +1837,7 @@ if (returnAction) {
             <section id="universal-client">
                 <h2>Example: A Universal Client Buys a T-Shirt</h2>
 
-                <p>This narrative demonstrates how a client uses the full power of OCS to interact with an apparel store.</p>
+                <p>This narrative demonstrates how a client uses the full power of OCP to interact with an apparel store.</p>
 
                 <h3>Step 1: Discover Server Capabilities</h3>
                 <p>The client's first action is to understand the server's features.</p>
@@ -1853,28 +1853,28 @@ if (returnAction) {
                             <div class="code-block"><pre><code class="language-json">{
   "capabilities": [
     {
-      "id": "dev.ocs.cart@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/cart/v1.json"
+      "id": "dev.ocp.cart@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/cart/v1.json"
     },
     {
-      "id": "dev.ocs.product.variants@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/product/variants/v1.json"
+      "id": "dev.ocp.product.variants@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/product/variants/v1.json"
     },
     {
-      "id": "dev.ocs.order.shipment_tracking@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/order/shipment_tracking/v1.json"
+      "id": "dev.ocp.order.shipment_tracking@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/order/shipment_tracking/v1.json"
     },
     {
-      "id": "dev.ocs.order.ratings@1.0"
+      "id": "dev.ocp.order.ratings@1.0"
     },
     {
-      "id": "dev.ocs.order.returns@1.0"
+      "id": "dev.ocp.order.returns@1.0"
     }
   ]
 }</code></pre></div>
                         <div class="info-box">
                             <strong>Client Insight:</strong>
-                            "Okay, this server supports stateful shopping carts (dev.ocs.cart@1.0), products with variants, shipment tracking, order ratings, and returns workflows. I can now enable the UI for these features."
+                            "Okay, this server supports stateful shopping carts (dev.ocp.cart@1.0), products with variants, shipment tracking, order ratings, and returns workflows. I can now enable the UI for these features."
                         </div>
                     </div>
                 </div>
@@ -1886,13 +1886,13 @@ if (returnAction) {
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-json">{
   "id": "prod_123",
-  "name": "Classic OCS Tee",
+  "name": "Classic OCP Tee",
   "price": { "amount": "25.00", "currency": "USD" },
   "fulfillmentType": "physical",
   "available": true,
   "metadata": {
     "x-vendor-style-code": "FW25-TEE-01",
-    "dev.ocs.product.variants": {
+    "dev.ocp.product.variants": {
       "_version": "1.0",
       "options": ["Size", "Color"],
       "variants": [
@@ -1916,7 +1916,7 @@ if (returnAction) {
 
                 <div class="info-box">
                     <strong>Client Insight:</strong>
-                    The client sees the <span class="inline-code">dev.ocs.product.variants</span> key. It now knows it can confidently parse the data within to build a size/color selection UI and disable the "White" option because its stock is 0.
+                    The client sees the <span class="inline-code">dev.ocp.product.variants</span> key. It now knows it can confidently parse the data within to build a size/color selection UI and disable the "White" option because its stock is 0.
                 </div>
 
                 <h3>Step 3: Place the Order</h3>
@@ -1959,7 +1959,7 @@ if (returnAction) {
                             <div class="code-block"><pre><code class="language-http">event: order.patch
 data: [
   {"op": "replace", "path": "/status", "value": "confirmed"},
-  {"op": "add", "path": "/metadata/dev.ocs.order.detailed_status", "value": {
+  {"op": "add", "path": "/metadata/dev.ocp.order.detailed_status", "value": {
     "_version": "1.0",
     "title": "Order Confirmed",
     "description": "Your order has been confirmed and will be processed soon."
@@ -1969,8 +1969,8 @@ data: [
 event: order.patch
 data: [
   {"op": "replace", "path": "/status", "value": "in_transit"},
-  {"op": "replace", "path": "/metadata/dev.ocs.order.detailed_status/title", "value": "Out for Delivery"},
-  {"op": "add", "path": "/metadata/dev.ocs.order.delivery_tracking", "value": {
+  {"op": "replace", "path": "/metadata/dev.ocp.order.detailed_status/title", "value": "Out for Delivery"},
+  {"op": "add", "path": "/metadata/dev.ocp.order.delivery_tracking", "value": {
     "_version": "1.0",
     "driver": { "name": "Jane D.", "vehicle": "Blue Sedan" },
     "status": "en_route_to_customer",
@@ -1980,10 +1980,10 @@ data: [
 ]
 
 event: order.patch
-data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]</code></pre></div>
+data: [{"op": "replace", "path": "/metadata/dev.ocp.order.delivery_tracking/liveLocation", "value": {"latitude": 40.7140, "longitude": -74.0045}}]</code></pre></div>
                         <div class="info-box">
                             <strong>Client Insight:</strong>
-                            The client's UI updates the status to "Shipped." Because it saw the <span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span> capability in Step 1, it knows to look for the <span class="inline-code">dev.ocs.order.shipment_tracking</span> key in the metadata and can now display a "Track Your Shipment" button that links to the <span class="inline-code">trackingUrl</span>. If ratings are supported, it can also show a "Rate Your Order" button.
+                            The client's UI updates the status to "Shipped." Because it saw the <span class="inline-code">dev.ocp.order.shipment_tracking@1.0</span> capability in Step 1, it knows to look for the <span class="inline-code">dev.ocp.order.shipment_tracking</span> key in the metadata and can now display a "Track Your Shipment" button that links to the <span class="inline-code">trackingUrl</span>. If ratings are supported, it can also show a "Rate Your Order" button.
                         </div>
                     </div>
                 </div>
@@ -1999,7 +1999,7 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
 
                 <h3>Using Saved User Profiles for Address Pre-filling</h3>
 
-                <p>When <span class="inline-code">dev.ocs.user.profile@1.0</span> is supported, clients can fetch and use saved addresses to streamline checkout.</p>
+                <p>When <span class="inline-code">dev.ocp.user.profile@1.0</span> is supported, clients can fetch and use saved addresses to streamline checkout.</p>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
@@ -2055,7 +2055,7 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
 
                 <h3>Guest Checkout with Temporary Customer Info</h3>
 
-                <p>For anonymous users, <span class="inline-code">dev.ocs.cart.guest@1.0</span> allows attaching temporary customer information to carts.</p>
+                <p>For anonymous users, <span class="inline-code">dev.ocp.cart.guest@1.0</span> allows attaching temporary customer information to carts.</p>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
@@ -2101,7 +2101,7 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
     "address": "456 Billing Rd, Business City, CA 67890"
   },
   "metadata": {
-    "dev.ocs.order.customer_fields": {
+    "dev.ocp.order.customer_fields": {
       "_version": "1.0",
       "taxId": "US123456789",
       "customsDeclaration": {
@@ -2125,7 +2125,7 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
             <section id="advanced-scenarios">
                 <h2>Advanced Commerce Scenarios</h2>
 
-                <p>OCS handles complex commerce scenarios through discoverable capabilities. Here are examples of how clients adapt to advanced features like hybrid fulfillment, subscriptions, pre-orders, and service scheduling.</p>
+                <p>OCP handles complex commerce scenarios through discoverable capabilities. Here are examples of how clients adapt to advanced features like hybrid fulfillment, subscriptions, pre-orders, and service scheduling.</p>
 
                 <h3>Hybrid Fulfillment: Physical + Digital Bundles</h3>
 
@@ -2167,7 +2167,7 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
   "id": "order_sub_123",
   "status": "confirmed",
   "metadata": {
-    "dev.ocs.order.subscription": {
+    "dev.ocp.order.subscription": {
       "_version": "1.0",
       "frequency": "monthly",
       "nextBillingDate": "2025-11-15T00:00:00Z",
@@ -2202,7 +2202,7 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
   "fulfillmentType": "physical",
   "available": true,
   "metadata": {
-    "dev.ocs.order.preorder": {
+    "dev.ocp.order.preorder": {
       "_version": "1.0",
       "releaseDate": "2025-11-10T00:00:00Z",
       "paymentTiming": "immediate"
@@ -2222,7 +2222,7 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
   "fulfillmentType": "pickup",
   "available": true,
   "metadata": {
-    "dev.ocs.service.scheduling": {
+    "dev.ocp.service.scheduling": {
       "_version": "1.0",
       "duration": 45,
       "location": "Main Street Salon",
@@ -2252,7 +2252,7 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
 
                 <h3>Error Handling: Item Availability Changes</h3>
 
-                <p>When items become unavailable during checkout, OCS provides structured error responses with recovery options.</p>
+                <p>When items become unavailable during checkout, OCP provides structured error responses with recovery options.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-json">{
@@ -2289,7 +2289,7 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
             <section id="internationalization">
                 <h2>Internationalization (i18n)</h2>
 
-                <p>OCS provides comprehensive internationalization support, allowing clients to deliver culturally appropriate experiences in any language. The system follows OCS principles of server-driven discovery and client adaptability.</p>
+                <p>OCP provides comprehensive internationalization support, allowing clients to deliver culturally appropriate experiences in any language. The system follows OCP principles of server-driven discovery and client adaptability.</p>
 
                 <h3>Locale Discovery</h3>
 
@@ -2299,8 +2299,8 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
                     <div class="code-block"><pre><code class="language-json">{
   "capabilities": [
     {
-      "id": "dev.ocs.i18n@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/i18n/v1.json",
+      "id": "dev.ocp.i18n@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/i18n/v1.json",
       "metadata": {
         "_version": "1.0",
         "defaultLocale": "en-US",
@@ -2365,18 +2365,18 @@ data: [{"op": "replace", "path": "/metadata/dev.ocs.order.delivery_tracking/live
 
                 <h3>Language Negotiation</h3>
 
-                <p>OCS uses standard HTTP headers for language negotiation, following RFC 7231.</p>
+                <p>OCP uses standard HTTP headers for language negotiation, following RFC 7231.</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-http">// Client request with language preferences
 GET /catalogs/catalog_123 HTTP/1.1
 Accept-Language: fr-FR, fr;q=0.9, en;q=0.8
-Accept: application/ocs+json; version=1.0
+Accept: application/ocp+json; version=1.0
 
 // Server response with selected language
 HTTP/1.1 200 OK
 Content-Language: fr-FR
-Content-Type: application/ocs+json; version=1.0
+Content-Type: application/ocp+json; version=1.0
 
 {
   "id": "catalog_123",
@@ -2402,7 +2402,7 @@ Content-Type: application/ocs+json; version=1.0
   "name": "Classic T-Shirt",  // English
   "description": "A comfortable cotton t-shirt",
   "metadata": {
-    "dev.ocs.product.variants": {
+    "dev.ocp.product.variants": {
       "_version": "1.0",
       "options": ["Size", "Color"],  // Localized option names
       "variants": [
@@ -2427,7 +2427,7 @@ Content-Type: application/ocs+json; version=1.0
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-json">{
-  "type": "https://schemas.ocs.dev/errors/cart-expired",
+  "type": "https://schemas.OCP.dev/errors/cart-expired",
   "title": "Cart Expired",
   "status": 410,
   "detail": "Cart expired after 3600 seconds of inactivity",
@@ -2522,7 +2522,7 @@ function negotiateLocale(acceptLanguage, supportedLocales, defaultLocale) {
 // Usage in API handler
 app.get('/catalogs/:id', (req, res) => {
   const capabilities = getServerCapabilities();
-  const i18n = capabilities.find(cap => cap.id === 'dev.ocs.i18n@1.0');
+  const i18n = capabilities.find(cap => cap.id === 'dev.ocp.i18n@1.0');
 
   if (i18n) {
     const selectedLocale = negotiateLocale(
@@ -2546,17 +2546,17 @@ app.get('/catalogs/:id', (req, res) => {
 
                 <div class="info-box">
                     <strong>Server Requirements:</strong>
-                    When advertising dev.ocs.i18n@1.0, servers must implement proper locale negotiation, provide accurate formatting rules, and ensure all user-facing content is translated according to the negotiated locale.
+                    When advertising dev.ocp.i18n@1.0, servers must implement proper locale negotiation, provide accurate formatting rules, and ensure all user-facing content is translated according to the negotiated locale.
                 </div>
 
                 <div class="info-box">
                     <strong>Visual Example:</strong>
-                    Imagine the same e-commerce app UI displayed side-by-side: on the left in English (LTR) showing "$1,299.50", and on the right in Arabic (RTL) showing "ر.س ١٬٢٩٩.٥٠" with right-aligned text and RTL layout. This demonstrates how OCS i18n enables truly global commerce experiences.
+                    Imagine the same e-commerce app UI displayed side-by-side: on the left in English (LTR) showing "$1,299.50", and on the right in Arabic (RTL) showing "ر.س ١٬٢٩٩.٥٠" with right-aligned text and RTL layout. This demonstrates how OCP i18n enables truly global commerce experiences.
                 </div>
 
                 <div class="info-box success">
                     <strong>Global-Ready by Design:</strong>
-                    OCS internationalization enables truly global commerce. Any client can provide a fully localized experience in any supported language, with culturally correct formatting and proper UI layout for RTL languages.
+                    OCP internationalization enables truly global commerce. Any client can provide a fully localized experience in any supported language, with culturally correct formatting and proper UI layout for RTL languages.
                 </div>
             </section>
 
@@ -2564,15 +2564,15 @@ app.get('/catalogs/:id', (req, res) => {
             <section id="standards-alignment">
                 <h2>Standards Alignment</h2>
 
-                <p>OCS is designed to integrate seamlessly with the broader web standards ecosystem while maintaining its core principles: <strong>HTTP-native</strong>, <strong>JSON-first</strong>, and <strong>developer-friendly</strong>. This section outlines how OCS aligns with adjacent standards for enhanced interoperability.</p>
+                <p>OCP is designed to integrate seamlessly with the broader web standards ecosystem while maintaining its core principles: <strong>HTTP-native</strong>, <strong>JSON-first</strong>, and <strong>developer-friendly</strong>. This section outlines how OCP aligns with adjacent standards for enhanced interoperability.</p>
 
                 <h3>🔗 Hypermedia Semantics (Hydra)</h3>
 
-                <p>OCS enhances its hypermedia capabilities by providing optional fields that map cleanly to Hydra's link and operation semantics, as well as standard HTTP Link headers.</p>
+                <p>OCP enhances its hypermedia capabilities by providing optional fields that map cleanly to Hydra's link and operation semantics, as well as standard HTTP Link headers.</p>
 
                 <h4>Optional <span class="inline-code">rel</span> and <span class="inline-code">href</span> Fields</h4>
 
-                <p>Actions and capabilities in OCS now support two optional metadata fields:</p>
+                <p>Actions and capabilities in OCP now support two optional metadata fields:</p>
 
                 <ul>
                     <li><strong><span class="inline-code">rel</span></strong>: Link relation type that mirrors HTTP Link rel and Hydra relation (e.g., <span class="inline-code">self</span>, <span class="inline-code">cancel</span>, <span class="inline-code">create</span>)</li>
@@ -2600,15 +2600,15 @@ app.get('/catalogs/:id', (req, res) => {
 
                 <h4>JSON-LD Context</h4>
 
-                <p>For Semantic Web compatibility, OCS provides an optional JSON-LD context at <span class="inline-code">schemas/context.jsonld</span>. Servers may include a top-level <span class="inline-code">@context</span> field in responses:</p>
+                <p>For Semantic Web compatibility, OCP provides an optional JSON-LD context at <span class="inline-code">schemas/context.jsonld</span>. Servers may include a top-level <span class="inline-code">@context</span> field in responses:</p>
 
                 <div class="code-wrapper">
                     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-json">{
-  "@context": "https://schemas.ocs.dev/context.jsonld",
+  "@context": "https://schemas.OCP.dev/context.jsonld",
   "capabilities": [
     {
-      "id": "dev.ocs.cart@1.0",
+      "id": "dev.ocp.cart@1.0",
       "rel": "self",
       "href": "/cart"
     }
@@ -2620,7 +2620,7 @@ app.get('/catalogs/:id', (req, res) => {
 
                 <h3>💸 Payment Interoperability (Interledger / Open Payments)</h3>
 
-                <p>OCS preserves its elegant HTTP 402 payment flow while enabling multi-rail interoperability through optional Interledger/Open Payments metadata.</p>
+                <p>OCP preserves its elegant HTTP 402 payment flow while enabling multi-rail interoperability through optional Interledger/Open Payments metadata.</p>
 
                 <h4>Enhanced Payment Requirements</h4>
 
@@ -2643,13 +2643,13 @@ app.get('/catalogs/:id', (req, res) => {
 
                 <h4>Mapping to Open Payments</h4>
 
-                <p>OCS payment fields map cleanly to Interledger/Open Payments concepts:</p>
+                <p>OCP payment fields map cleanly to Interledger/Open Payments concepts:</p>
 
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>OCS Field</th>
+                                <th>OCP Field</th>
                                 <th>Open Payments Equivalent</th>
                                 <th>Notes</th>
                             </tr>
@@ -2681,12 +2681,12 @@ app.get('/catalogs/:id', (req, res) => {
 
                 <h4>Unified Payment Flow</h4>
 
-                <p>With these enhancements, a single OCS response can support multiple payment rails:</p>
+                <p>With these enhancements, a single OCP response can support multiple payment rails:</p>
 
                 <div class="code-wrapper">
                     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     <div class="code-block"><pre><code class="language-json">{
-  "@context": "https://schemas.ocs.dev/context.jsonld",
+  "@context": "https://schemas.OCP.dev/context.jsonld",
   "x402Version": 1,
   "accepts": [
     {
@@ -2712,7 +2712,7 @@ app.get('/catalogs/:id', (req, res) => {
 
                 <div class="info-box success">
                     <strong>Multi-Rail Interoperability:</strong>
-                    This response is valid OCS, valid JSON-LD, and can settle via x402, Interledger/Open Payments, or traditional payment processors—all through the same elegant HTTP 402 flow.
+                    This response is valid OCP, valid JSON-LD, and can settle via x402, Interledger/Open Payments, or traditional payment processors—all through the same elegant HTTP 402 flow.
                 </div>
 
                 <h3>📋 Implementation Status</h3>
@@ -2724,14 +2724,14 @@ app.get('/catalogs/:id', (req, res) => {
                     <li><strong>Progressive Enhancement</strong>: Servers can adopt features incrementally</li>
                 </ul>
 
-                <p>For detailed implementation guidelines, see the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/docs/standards-alignment.md" target="_blank" style="color: var(--primary); text-decoration: underline;">Standards Alignment Roadmap</a> documentation.</p>
+                <p>For detailed implementation guidelines, see the <a href="https://github.com/doeixd/Open-Commerce-Protocol/blob/main/docs/standards-alignment.md" target="_blank" style="color: var(--primary); text-decoration: underline;">Standards Alignment Roadmap</a> documentation.</p>
             </section>
 
             <!-- Capabilities Reference -->
             <section id="capabilities">
                 <h2>Capabilities Reference</h2>
 
-                <p>Capabilities are the heart of OCS's extensibility. The following standard capabilities are defined. For implementation details on the capabilities endpoint and response format, see the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L32-L48" target="_blank" style="color: var(--primary); text-decoration: underline;">/capabilities endpoint</a> in the spec.</p>
+                <p>Capabilities are the heart of OCP's extensibility. The following standard capabilities are defined. For implementation details on the capabilities endpoint and response format, see the <a href="https://github.com/doeixd/Open-Commerce-Protocol/blob/main/src/spec.yaml#L32-L48" target="_blank" style="color: var(--primary); text-decoration: underline;">/capabilities endpoint</a> in the spec.</p>
 
                 <div class="table-container">
                     <table>
@@ -2744,216 +2744,216 @@ app.get('/catalogs/:id', (req, res) => {
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.cart@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.cart@1.0</span></td>
                                 <td>Server-wide</td>
                                 <td>Indicates support for stateful, server-side shopping carts with configurable lifecycle policies (expiration, limits, persistence).</td>
                                 <td>[cart/v1.json](./schemas/cart/v1.json)</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.order.direct@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.order.direct@1.0</span></td>
                                 <td>Server-wide</td>
                                 <td>Indicates support for cart-less "Buy Now" orders created directly from items, bypassing the cart entirely.</td>
                                 <td>[order/direct/v1.json](./schemas/order/direct/v1.json)</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.product.variants@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.product.variants@1.0</span></td>
                                 <td>Product (CatalogItem)</td>
                                 <td>Defines user-selectable options (e.g., size, color) and their corresponding variants, each with its own ID, price, and stock.</td>
                                 <td>[product/variants/v1.json](./schemas/product/variants/v1.json)</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.product.customization@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.product.customization@1.0</span></td>
                                 <td>Product (CatalogItem)</td>
                                 <td>Defines complex, selectable modifiers for a menu item (e.g., toppings, sides, customizations).</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.product.addons@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.product.addons@1.0</span></td>
                                 <td>Product (CatalogItem)</td>
                                 <td>Defines simple, selectable add-ons for a product, such as gift wrapping, extended warranty, or side dishes.</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.product.physical_properties@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.product.physical_properties@1.0</span></td>
                                 <td>Product (CatalogItem)</td>
                                 <td>Defines physical properties like weight and dimensions, primarily for shipping estimation.</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.restaurant.profile@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.restaurant.profile@1.0</span></td>
                                 <td>Store</td>
                                 <td>Adds restaurant-specific data like cuisine, hours, price range, and ratings.</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.order.kitchen_status@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.order.kitchen_status@1.0</span></td>
                                 <td>Order</td>
                                 <td>Provides real-time updates on an order's status within the kitchen.</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.order.delivery_tracking@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.order.delivery_tracking@1.0</span></td>
                                 <td>Order</td>
                                 <td>Provides a real-time data structure for tracking a delivery, including driver info, GPS, and ETA.</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.order.shipment_tracking@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.order.shipment_tracking@1.0</span></td>
                                 <td>Order</td>
                                 <td>Provides an array of shipment objects, each with a carrier, tracking number, and URL to track the package.</td>
                             </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.order.tipping@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.order.tipping@1.0</span></td>
                                   <td>Order</td>
                                   <td>Allows for adding tips to the order.</td>
                                   <td>[order/tipping/v1.json](./schemas/order/tipping/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.order.ratings@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.order.ratings@1.0</span></td>
                                   <td>Order</td>
                                   <td>Allows customers to submit ratings and feedback for completed orders.</td>
                                   <td>N/A</td>
                               </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.order.digital_access@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.order.digital_access@1.0</span></td>
                                 <td>Order</td>
                                 <td>Provides an array of objects containing access details for digital goods, such as download URLs or license keys.</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.order.detailed_status@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.order.detailed_status@1.0</span></td>
                                 <td>Order</td>
                                 <td>Provides a rich, human-readable status (title, description, progress) for display in a UI, augmenting the core status field.</td>
                             </tr>
                             <tr>
-                                <td><span class="inline-code">dev.ocs.order.cancellation@1.0</span></td>
+                                <td><span class="inline-code">dev.ocp.order.cancellation@1.0</span></td>
                                 <td>Order (Action)</td>
                                 <td>Enables the workflow for cancelling an order via a dedicated endpoint, discoverable through the Order.actions field.</td>
                             </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.order.returns@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.order.returns@1.0</span></td>
                                   <td>Order (Action)</td>
                                   <td>Enables a discoverable workflow for item returns, initiated via an action on the Order and navigated via hypermedia links.</td>
                                   <td>N/A (Workflow)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.order.refunds@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.order.refunds@1.0</span></td>
                                   <td>Order (Metadata)</td>
                                   <td>Provides a standardized, auditable record of all monetary refunds associated with an order.</td>
                                   <td>[order/refunds/v1.json](./schemas/order/refunds/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.promotions.discoverable@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.promotions.discoverable@1.0</span></td>
                                   <td>Store, Catalog</td>
                                   <td>Allows a server to advertise publicly available promotions to clients.</td>
                                   <td>[promotions/discoverable/v1.json](./schemas/promotions/discoverable/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.promotions.policies@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.promotions.policies@1.0</span></td>
                                   <td>Server-wide</td>
                                   <td>Defines promotion stacking rules, validation policies, and exclusion rules to help clients provide better UX and prevent promotion conflicts.</td>
                                   <td>[promotions/policies/v1.json](./schemas/promotions/policies/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.order.applied_promotions@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.order.applied_promotions@1.0</span></td>
                                   <td>Order</td>
                                   <td>Provides a final, authoritative record of all value modifications on the completed order.</td>
                                   <td>[order/applied_promotions/v1.json](./schemas/order/applied_promotions/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.order.fulfillment_intent@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.order.fulfillment_intent@1.0</span></td>
                                   <td>CreateOrderRequest</td>
                                   <td>Allows a client to specify a precise fulfillment plan for the items in a cart, supporting mixed fulfillment and split orders.</td>
                                   <td>[order/fulfillment_intent/v1.json](./schemas/order/fulfillment_intent/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.store.constraints@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.store.constraints@1.0</span></td>
                                   <td>Store</td>
                                   <td>Advertises server-side business rules (e.g., promotion policies, return windows) to help clients prevent errors.</td>
                                   <td>[store/constraints/v1.json](./schemas/store/constraints/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.payment.x402_fiat@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.payment.x402_fiat@1.0</span></td>
                                   <td>Server-wide</td>
                                   <td>Advertises support for fiat payments via the x402 fiat_intent scheme and provides public keys for payment providers.</td>
                                   <td>[payment/x402_fiat/v1.json](./schemas/payment/x402_fiat/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.auth.flows@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.auth.flows@1.0</span></td>
                                   <td>Server-wide</td>
                                   <td>Provides URLs for authentication flows (sign-in, sign-out, profile, registration).</td>
                                   <td>[auth/flows/v1.json](./schemas/auth/flows/v1.json)</td>
                               </tr>
                              <tr>
-                                 <td><span class="inline-code">dev.ocs.product.search@1.0</span></td>
+                                 <td><span class="inline-code">dev.ocp.product.search@1.0</span></td>
                                  <td>Server-wide</td>
                                  <td>Provides a URL template for product search with supported sort options.</td>
                              </tr>
                              <tr>
-                                 <td><span class="inline-code">dev.ocs.product.categorization@1.0</span></td>
+                                 <td><span class="inline-code">dev.ocp.product.categorization@1.0</span></td>
                                  <td>Product (CatalogItem)</td>
                                  <td>Provides an ordered category path (breadcrumb) for navigation.</td>
                              </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.product.relations@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.product.relations@1.0</span></td>
                                   <td>Product (CatalogItem)</td>
                                   <td>Provides related products (recommendations, accessories, alternatives).</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.order.subscription@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.order.subscription@1.0</span></td>
                                   <td>Order</td>
                                   <td>Defines recurring subscription orders with frequency, billing cycles, and cancellation policies.</td>
                                   <td>[order/subscription/v1.json](./schemas/order/subscription/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.order.preorder@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.order.preorder@1.0</span></td>
                                   <td>Product (CatalogItem)</td>
                                   <td>Defines preorder information for items not yet available, including release dates and payment timing.</td>
                                   <td>[order/preorder/v1.json](./schemas/order/preorder/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.service.scheduling@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.service.scheduling@1.0</span></td>
                                   <td>Product (CatalogItem)</td>
                                   <td>Defines scheduling information for service-based items like appointments, including time slots and booking constraints.</td>
                                   <td>[service/scheduling/v1.json](./schemas/service/scheduling/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.i18n@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.i18n@1.0</span></td>
                                   <td>Server-wide</td>
                                   <td>Provides internationalization support including supported locales, default locale, and formatting rules for numbers, currencies, and dates.</td>
                                   <td>[i18n/v1.json](./schemas/i18n/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.store.info@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.store.info@1.0</span></td>
                                   <td>Store</td>
                                   <td>Provides general store information including location, hours, website, and contact details, referencing schema.org LocalBusiness properties.</td>
                                   <td>[store/info/v1.json](./schemas/store/info/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.store.policies@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.store.policies@1.0</span></td>
                                   <td>Store</td>
                                   <td>Provides URLs to store policies such as return policy, privacy policy, terms of service, etc.</td>
                                   <td>[store/policies/v1.json](./schemas/store/policies/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.store.shipping@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.store.shipping@1.0</span></td>
                                   <td>Store</td>
                                   <td>Defines comprehensive shipping policies including delivery areas, pricing calculations, processing times, shipping options, and providers.</td>
                                   <td>[store/shipping/v1.json](./schemas/store/shipping/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.user.profile@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.user.profile@1.0</span></td>
                                   <td>Server-wide</td>
                                   <td>Provides user-specific data like saved addresses and preferences via a discoverable profile endpoint.</td>
                                   <td>[user/profile/v1.json](./schemas/user/profile/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.cart.guest@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.cart.guest@1.0</span></td>
                                   <td>Server-wide</td>
                                   <td>Allows carts to include temporary customer information for anonymous guest checkouts.</td>
                                   <td>N/A (Extends Cart schema)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.order.customer_fields@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.order.customer_fields@1.0</span></td>
                                   <td>Order</td>
                                   <td>Defines common custom fields for international commerce, tax, and customs purposes.</td>
                                   <td>[order/customer_fields/v1.json](./schemas/order/customer_fields/v1.json)</td>
                               </tr>
                               <tr>
-                                  <td><span class="inline-code">dev.ocs.server.webhooks@1.0</span></td>
+                                  <td><span class="inline-code">dev.ocp.server.webhooks@1.0</span></td>
                                   <td>Server-wide</td>
                                   <td>Enables server-to-server event notifications via webhooks. Servers advertise supported events and provide subscription management endpoints for asynchronous backend system integrations (inventory, shipping, ERP, AI agents, etc.).</td>
                                   <td>[server/webhooks/v1.json](./schemas/server/webhooks/v1.json)</td>
@@ -2967,7 +2967,7 @@ app.get('/catalogs/:id', (req, res) => {
             <section id="endpoints">
                 <h2>API Endpoints</h2>
 
-                <p>This section provides an overview of the core OCS endpoints. For complete details including request/response schemas, parameters, and error codes, refer to the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">OpenAPI specification</a>.</p>
+                <p>This section provides an overview of the core OCP endpoints. For complete details including request/response schemas, parameters, and error codes, refer to the <a href="https://github.com/doeixd/Open-Commerce-Protocol/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">OpenAPI specification</a>.</p>
 
                 <h3>Discovery Endpoints</h3>
 
@@ -3164,7 +3164,7 @@ app.get('/catalogs/:id', (req, res) => {
 
                  <h3>Webhooks</h3>
 
-                 <p>Webhooks enable server-to-server event notifications, allowing external systems to receive real-time updates when events occur in your OCS implementation. Unlike client-pull mechanisms (like <span class="inline-code">actions</span>) or client-initiated streams (like SSE), webhooks are <strong>server-push</strong>: your OCS server proactively sends HTTP POST requests to registered URLs when specific events happen.</p>
+                 <p>Webhooks enable server-to-server event notifications, allowing external systems to receive real-time updates when events occur in your OCP implementation. Unlike client-pull mechanisms (like <span class="inline-code">actions</span>) or client-initiated streams (like SSE), webhooks are <strong>server-push</strong>: your OCP server proactively sends HTTP POST requests to registered URLs when specific events happen.</p>
 
                  <div class="card" style="margin: 1.5rem 0; background: var(--bg-tertiary); border-left: 4px solid var(--primary);">
                      <h4 style="margin-bottom: 1rem;">Why Webhooks?</h4>
@@ -3187,7 +3187,7 @@ app.get('/catalogs/:id', (req, res) => {
                          <li><strong>Analytics & Business Intelligence:</strong> Data warehouses and analytics platforms can ingest events as they happen, ensuring dashboards and reports always reflect current state without polling delays.</li>
                      </ul>
 
-                     <p style="margin-top: 1rem;"><strong>Security:</strong> All webhook payloads are signed with HMAC-SHA256. Subscribers verify the signature using a shared secret to ensure requests genuinely come from your OCS server and haven't been tampered with.</p>
+                     <p style="margin-top: 1rem;"><strong>Security:</strong> All webhook payloads are signed with HMAC-SHA256. Subscribers verify the signature using a shared secret to ensure requests genuinely come from your OCP server and haven't been tampered with.</p>
                  </div>
 
                  <div class="card" style="margin: 1.5rem 0;">
@@ -3289,7 +3289,7 @@ app.get('/catalogs/:id', (req, res) => {
             <section id="authentication">
                 <h2>Authentication</h2>
 
-                <p>OCS uses Bearer token authentication for all protected endpoints. This provides a flexible, standardized way to secure API resources while allowing implementers to choose their preferred authentication method.</p>
+                <p>OCP uses Bearer token authentication for all protected endpoints. This provides a flexible, standardized way to secure API resources while allowing implementers to choose their preferred authentication method.</p>
 
                 <h3>How It Works</h3>
 
@@ -3301,7 +3301,7 @@ app.get('/catalogs/:id', (req, res) => {
 
                 <h3>Token Format Flexibility</h3>
 
-                <p>OCS doesn't mandate a specific token format. The authentication method is determined by the server implementation and may include:</p>
+                <p>OCP doesn't mandate a specific token format. The authentication method is determined by the server implementation and may include:</p>
 
                 <div class="feature-grid">
                     <div class="feature-card">
@@ -3327,7 +3327,7 @@ app.get('/catalogs/:id', (req, res) => {
 
                 <h3>Public vs Protected Endpoints</h3>
 
-                <p>Not all OCS endpoints require authentication. Discovery endpoints are intentionally public to allow clients to explore available products and services before authenticating.</p>
+                <p>Not all OCP endpoints require authentication. Discovery endpoints are intentionally public to allow clients to explore available products and services before authenticating.</p>
 
                 <div class="table-container">
                     <table>
@@ -3364,8 +3364,8 @@ const response = await fetch(`${API_BASE}/carts`, {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${AUTH_TOKEN}`,
-    'Content-Type': 'application/ocs+json; version=1.0',
-    'Accept': 'application/ocs+json; version=1.0'
+    'Content-Type': 'application/ocp+json; version=1.0',
+    'Accept': 'application/ocp+json; version=1.0'
   },
   body: JSON.stringify({
     storeId: 'store_123'
@@ -3408,11 +3408,11 @@ if (response.status === 401) {
 
                 <h3>Discoverable Authentication Methods</h3>
 
-                <p>As OCS evolves, servers will be able to advertise their supported authentication methods via the capabilities endpoint. This allows clients to automatically adapt to different authentication requirements.</p>
+                <p>As OCP evolves, servers will be able to advertise their supported authentication methods via the capabilities endpoint. This allows clients to automatically adapt to different authentication requirements.</p>
 
                 <div class="info-box">
                     <strong>Future Direction</strong>
-                    Standard authentication capabilities are planned, such as <span class="inline-code">dev.ocs.auth.oauth2.pkce@1.0</span> or <span class="inline-code">dev.ocs.auth.siwe@1.0</span>. When implemented, clients will be able to discover authentication flows dynamically via <span class="inline-code">GET /capabilities</span>.
+                    Standard authentication capabilities are planned, such as <span class="inline-code">dev.ocp.auth.oauth2.pkce@1.0</span> or <span class="inline-code">dev.ocp.auth.siwe@1.0</span>. When implemented, clients will be able to discover authentication flows dynamically via <span class="inline-code">GET /capabilities</span>.
                 </div>
 
                 <h3>Best Practices</h3>
@@ -3427,7 +3427,7 @@ if (response.status === 401) {
 
                 <div class="info-box">
                     <strong>Specification Reference</strong>
-                    For complete details on the security scheme and authentication flow, see the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L672-L677" target="_blank" style="color: var(--primary); text-decoration: underline;">securitySchemes section</a> in the OpenAPI spec.
+                    For complete details on the security scheme and authentication flow, see the <a href="https://github.com/doeixd/Open-Commerce-Protocol/blob/main/src/spec.yaml#L672-L677" target="_blank" style="color: var(--primary); text-decoration: underline;">securitySchemes section</a> in the OpenAPI spec.
                 </div>
             </section>
 
@@ -3435,16 +3435,16 @@ if (response.status === 401) {
             <section id="content-type">
                 <h2>Content Type</h2>
 
-                <p>All API requests and responses use the custom media type <span class="inline-code">application/ocs+json; version=1.0</span>. Clients should set the <span class="inline-code">Accept</span> and <span class="inline-code">Content-Type</span> headers accordingly:</p>
+                <p>All API requests and responses use the custom media type <span class="inline-code">application/ocp+json; version=1.0</span>. Clients should set the <span class="inline-code">Accept</span> and <span class="inline-code">Content-Type</span> headers accordingly:</p>
 
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                <div class="code-block"><pre><code class="language-text">Accept: application/ocs+json; version=1.0
-Content-Type: application/ocs+json; version=1.0</code></pre></div>
+                <div class="code-block"><pre><code class="language-text">Accept: application/ocp+json; version=1.0
+Content-Type: application/ocp+json; version=1.0</code></pre></div>
                 </div>
 
                 <div class="info-box">
                     <strong>Note</strong>
-                    This content type is used throughout the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">OpenAPI specification</a> for all request and response bodies.
+                    This content type is used throughout the <a href="https://github.com/doeixd/Open-Commerce-Protocol/blob/main/src/spec.yaml" target="_blank" style="color: var(--primary); text-decoration: underline;">OpenAPI specification</a> for all request and response bodies.
                 </div>
             </section>
 
@@ -3452,7 +3452,7 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
             <section id="schemas">
                 <h2>Core Schemas</h2>
 
-                <p>OCS defines several core data structures used throughout the API. Below are examples of the most important schemas. For complete schema definitions including all fields, validation rules, and examples, consult the <a href="https://github.com/doeixd/Open-Commerce-Standard/blob/main/src/spec.yaml#L418" target="_blank" style="color: var(--primary); text-decoration: underline;">components/schemas section</a> of the OpenAPI spec.</p>
+                <p>OCP defines several core data structures used throughout the API. Below are examples of the most important schemas. For complete schema definitions including all fields, validation rules, and examples, consult the <a href="https://github.com/doeixd/Open-Commerce-Protocol/blob/main/src/spec.yaml#L418" target="_blank" style="color: var(--primary); text-decoration: underline;">components/schemas section</a> of the OpenAPI spec.</p>
 
                 <h3>Money</h3>
                 <div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
@@ -3510,7 +3510,7 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
 
                 <div class="card">
                     <h4>Use full Capability IDs as metadata keys</h4>
-                    <p>E.g., <span class="inline-code">"dev.ocs.product.variants@1.0"</span> to link to schemas.</p>
+                    <p>E.g., <span class="inline-code">"dev.ocp.product.variants@1.0"</span> to link to schemas.</p>
                 </div>
 
                 <div class="card">
@@ -3539,7 +3539,7 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
                     <li><strong>Handle SSE gracefully:</strong> Implement reconnection logic for Server-Sent Events connections.</li>
                     <li><strong>Validate metadata schemas:</strong> Use the provided JSON Schema URLs to validate metadata structure.</li>
                     <li><strong>Support mixed carts:</strong> Allow users to purchase physical, digital, and pickup items in a single order.</li>
-                    <li><strong>Implement proper error handling:</strong> Handle all standard HTTP error codes and OCS-specific error responses.</li>
+                    <li><strong>Implement proper error handling:</strong> Handle all standard HTTP error codes and OCP-specific error responses.</li>
                     <li><strong>Cache capabilities:</strong> Cache the capabilities response to reduce unnecessary API calls.</li>
                 </ul>
             </section>
@@ -3548,7 +3548,7 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
             <section id="error-handling">
                 <h2>Error Handling</h2>
 
-                <p>The OCS error handling system is designed as a first-class communication platform that serves three distinct audiences: the <strong>machine</strong> (for programmatic recovery), the <strong>developer</strong> (for debugging), and the <strong>end-user</strong> (for clear, localized guidance). It combines proactive error prevention with rich, contextual error responses.</p>
+                <p>The OCP error handling system is designed as a first-class communication platform that serves three distinct audiences: the <strong>machine</strong> (for programmatic recovery), the <strong>developer</strong> (for debugging), and the <strong>end-user</strong> (for clear, localized guidance). It combines proactive error prevention with rich, contextual error responses.</p>
 
                 <div class="info-box">
                     <strong>Philosophy</strong>
@@ -3562,7 +3562,7 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
                 <div class="step-card">
                     <div class="step-number">1</div>
                     <div class="step-title">Discover Store Constraints</div>
-                    <p>Check if the server supports <span class="inline-code">dev.ocs.store.constraints@1.0</span> in the capabilities response. If available, fetch store metadata to understand business rules.</p>
+                    <p>Check if the server supports <span class="inline-code">dev.ocp.store.constraints@1.0</span> in the capabilities response. If available, fetch store metadata to understand business rules.</p>
                 </div>
 
                 <div class="step-card">
@@ -3575,7 +3575,7 @@ Content-Type: application/ocs+json; version=1.0</code></pre></div>
                     <div class="code-block"><pre><code class="language-javascript">// Example: Prevent invalid cart sizes
 async function getStoreConstraints(storeId) {
   const store = await fetch(`${API_BASE}/stores/${storeId}`).then(r => r.json());
-  return store.metadata?.['dev.ocs.store.constraints@1.0'];
+  return store.metadata?.['dev.ocp.store.constraints@1.0'];
 }
 
 const constraints = await getStoreConstraints('store_123');
@@ -3587,7 +3587,7 @@ if (constraints?.maxCartItems) {
 
                 <h3>2. Rich Error Responses</h3>
 
-                <p>When errors do occur, OCS provides structured responses with multiple layers of information.</p>
+                <p>When errors do occur, OCP provides structured responses with multiple layers of information.</p>
 
                 <div class="feature-grid">
                     <div class="feature-card">
@@ -3838,7 +3838,7 @@ if (constraints?.maxCartItems) {
 
                 <div class="info-box success">
                     <strong>Result</strong>
-                    With OCS error handling, your application can prevent most errors proactively and handle the rest gracefully, creating a smooth, professional user experience.
+                    With OCP error handling, your application can prevent most errors proactively and handle the rest gracefully, creating a smooth, professional user experience.
                 </div>
             </section>
 
@@ -3846,13 +3846,13 @@ if (constraints?.maxCartItems) {
             <section id="future-direction">
                 <h2>Future Direction</h2>
 
-                <p>OCS is a living standard. The future direction includes:</p>
+                <p>OCP is a living standard. The future direction includes:</p>
 
                 <ul>
                     <li><strong>A Richer Capability Library:</strong> Developing more standard schemas for concepts like <span class="inline-code">product.reviews</span>, <span class="inline-code">order.returns</span>, and <span class="inline-code">service.bookings</span>.</li>
                     <li><strong>Alternative Transport Layers:</strong> Exploring implementations over transports beyond HTTP, such as asynchronous message queues or other protocols.</li>
-                    <li><strong>Tooling and SDKs:</strong> Fostering a community to build server middleware and client libraries that make implementing OCS trivial.</li>
-                    <li><strong>Authentication Capabilities:</strong> Defining standard capabilities for advertising supported authentication methods (e.g., <span class="inline-code">dev.ocs.auth.oauth2.pkce@1.0</span>).</li>
+                    <li><strong>Tooling and SDKs:</strong> Fostering a community to build server middleware and client libraries that make implementing OCP trivial.</li>
+                    <li><strong>Authentication Capabilities:</strong> Defining standard capabilities for advertising supported authentication methods (e.g., <span class="inline-code">dev.ocp.auth.oauth2.pkce@1.0</span>).</li>
                 </ul>
             </section>
 
@@ -3864,7 +3864,7 @@ if (constraints?.maxCartItems) {
 
                 <div class="info-box">
                     <strong>Get Involved</strong>
-                    Join the community in building the future of open commerce. Your feedback and contributions help make OCS better for everyone.
+                    Join the community in building the future of open commerce. Your feedback and contributions help make OCP better for everyone.
                 </div>
             </section>
 
@@ -3872,7 +3872,7 @@ if (constraints?.maxCartItems) {
             <section id="license">
                 <h2>License</h2>
 
-                <p>The Open Commerce Standard is open-source and available under the <strong>MIT License</strong>.</p>
+                <p>The Open Commerce Protocol is open-source and available under the <strong>MIT License</strong>.</p>
 
                 <div class="card">
                     <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.</p>

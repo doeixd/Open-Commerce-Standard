@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "title": "Webhook Support",
-  "description": "Schema for the dev.ocs.server.webhooks@1.0 capability. Describes the server's webhook capabilities for server-to-server event notifications.",
+  "description": "Schema for the dev.ocp.server.webhooks@1.0 capability. Describes the server's webhook capabilities for server-to-server event notifications.",
   "properties": {
     "supportedEvents": {
       "type": "array",

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for the dev.ocs.order.direct@1.0 capability. Its presence indicates the server supports creating orders directly from a list of items, bypassing the cart entirely. This enables streamlined 'Buy Now' flows for simple, one-click purchases.",
+  "description": "Schema for the dev.ocp.order.direct@1.0 capability. Its presence indicates the server supports creating orders directly from a list of items, bypassing the cart entirely. This enables streamlined 'Buy Now' flows for simple, one-click purchases.",
   "properties": {
     "maxItemsPerOrder": {
       "type": "integer",

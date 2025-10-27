@@ -1,8 +1,8 @@
 /**
- * Simple OCS Server - Bare Minimum Example
+ * Simple OCP Server - Bare Minimum Example
  *
- * A minimal OCS-compliant server that demonstrates:
- * 1. Discovery (.well-known/ocs)
+ * A minimal OCP-compliant server that demonstrates:
+ * 1. Discovery (.well-known/ocp)
  * 2. Capabilities endpoint
  * 3. Product catalog
  * 4. Direct order placement
@@ -31,19 +31,19 @@ const store = {
   products: [
     {
       id: 'coffee_mug',
-      name: 'OCS Coffee Mug',
+      name: 'OCP Coffee Mug',
       price: { amount: '15.00', currency: 'USD' },
       fulfillmentType: 'physical',
       available: true,
-      description: 'Ceramic mug with OCS logo',
+      description: 'Ceramic mug with OCP logo',
     },
     {
       id: 'digital_guide',
-      name: 'OCS Implementation Guide',
+      name: 'OCP Implementation Guide',
       price: { amount: '9.99', currency: 'USD' },
       fulfillmentType: 'digital',
       available: true,
-      description: 'PDF guide to implementing OCS',
+      description: 'PDF guide to implementing OCP',
     },
   ],
   orders: [],
@@ -53,15 +53,15 @@ const store = {
 // --- Discovery Endpoints ---
 
 // 1. RFC 8615 Well-Known Discovery (Level 4)
-app.get('/.well-known/ocs', (req, res) => {
+app.get('/.well-known/ocp', (req, res) => {
   res
     .header('Cache-Control', 'max-age=86400')
     .header('Access-Control-Allow-Origin', '*')
     .json({
-      ocs: {
+      OCP: {
         capabilities: `http://localhost:${PORT}/capabilities`,
         version: '1.0',
-        context: 'https://schemas.ocs.dev/context.jsonld',
+        context: 'https://schemas.OCP.dev/context.jsonld',
       },
     });
 });
@@ -71,43 +71,43 @@ app.get('/capabilities', (req, res) => {
   res.json({
     capabilities: [
       {
-        id: 'dev.ocs.cart@1.0',
-        schemaUrl: 'https://schemas.ocs.dev/cart/v1.json',
+        id: 'dev.ocp.cart@1.0',
+        schemaUrl: 'https://schemas.OCP.dev/cart/v1.json',
         metadata: {
           lifetimeSeconds: 3600,
           maxItems: 50,
         },
       },
       {
-        id: 'dev.ocs.order.direct@1.0',
-        schemaUrl: 'https://schemas.ocs.dev/order/direct/v1.json',
+        id: 'dev.ocp.order.direct@1.0',
+        schemaUrl: 'https://schemas.OCP.dev/order/direct/v1.json',
       },
       {
-        id: 'dev.ocs.discovery@1.0',
-        schemaUrl: 'https://schemas.ocs.dev/capabilities/discovery/v1.json',
+        id: 'dev.ocp.discovery@1.0',
+        schemaUrl: 'https://schemas.OCP.dev/capabilities/discovery/v1.json',
         metadata: {
           _version: '1.0',
-          wellKnownUrl: `http://localhost:${PORT}/.well-known/ocs`,
+          wellKnownUrl: `http://localhost:${PORT}/.well-known/ocp`,
           htmlMetaEnabled: false,
           jsonLdEnabled: false,
           httpHeadersEnabled: true,
         },
       },
       {
-        id: 'dev.ocs.payment.web_payments@1.0',
-        schemaUrl: 'https://schemas.ocs.dev/payment/web_payments/v1.json',
+        id: 'dev.ocp.payment.web_payments@1.0',
+        schemaUrl: 'https://schemas.OCP.dev/payment/web_payments/v1.json',
         metadata: {
           _version: '1.0',
           supportedMethods: ['basic-card', 'https://google.com/pay'],
-          merchantName: 'OCS Demo Store',
+          merchantName: 'OCP Demo Store',
           supportedNetworks: ['visa', 'mastercard', 'amex'],
           requireShippingAddress: false,
           requireBillingAddress: false,
         },
       },
       {
-        id: 'dev.ocs.payment.spc@1.0',
-        schemaUrl: 'https://schemas.ocs.dev/payment/spc/v1.json',
+        id: 'dev.ocp.payment.spc@1.0',
+        schemaUrl: 'https://schemas.OCP.dev/payment/spc/v1.json',
         metadata: {
           _version: '1.0',
           supportedRps: ['bank.example.com'],
@@ -119,8 +119,8 @@ app.get('/capabilities', (req, res) => {
         },
       },
       {
-        id: 'dev.ocs.hypermedia.schema_aware_actions@1.0',
-        schemaUrl: 'https://schemas.ocs.dev/hypermedia/schema_aware_actions/v1.json',
+        id: 'dev.ocp.hypermedia.schema_aware_actions@1.0',
+        schemaUrl: 'https://schemas.OCP.dev/hypermedia/schema_aware_actions/v1.json',
         metadata: {
           _version: '1.0',
           enabled: true,
@@ -130,8 +130,8 @@ app.get('/capabilities', (req, res) => {
         },
       },
       {
-        id: 'dev.ocs.resource.versioning@1.0',
-        schemaUrl: 'https://schemas.ocs.dev/resource/versioning/v1.json',
+        id: 'dev.ocp.resource.versioning@1.0',
+        schemaUrl: 'https://schemas.OCP.dev/resource/versioning/v1.json',
       },
     ],
   });
@@ -164,7 +164,7 @@ app.get('/catalogs/:id', (req, res) => {
     return res.status(404)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/catalog-not-found',
+        type: 'https://schemas.OCP.dev/errors/catalog-not-found',
         title: 'Catalog Not Found',
         status: 404,
         detail: 'Catalog not found',
@@ -190,7 +190,7 @@ app.post('/carts', requireAuth, (req, res) => {
     return res.status(400)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/max-concurrent-carts-exceeded',
+        type: 'https://schemas.OCP.dev/errors/max-concurrent-carts-exceeded',
         title: 'Max Concurrent Carts Exceeded',
         status: 400,
         detail: 'Maximum number of concurrent carts exceeded',
@@ -220,7 +220,7 @@ app.get('/carts/:id', requireAuth, (req, res) => {
     return res.status(404)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/cart-not-found',
+        type: 'https://schemas.OCP.dev/errors/cart-not-found',
         title: 'Cart Not Found',
         status: 404,
         detail: 'Cart not found or expired',
@@ -241,7 +241,7 @@ app.post('/carts/:id/items', requireAuth, (req, res) => {
     return res.status(404)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/cart-not-found',
+        type: 'https://schemas.OCP.dev/errors/cart-not-found',
         title: 'Cart Not Found',
         status: 404,
         detail: 'Cart not found or expired',
@@ -257,7 +257,7 @@ app.post('/carts/:id/items', requireAuth, (req, res) => {
     return res.status(404)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/item-not-available',
+        type: 'https://schemas.OCP.dev/errors/item-not-available',
         title: 'Item Not Available',
         status: 404,
         detail: 'Product not found or not available',
@@ -271,7 +271,7 @@ app.post('/carts/:id/items', requireAuth, (req, res) => {
     return res.status(400)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/item-out-of-stock',
+        type: 'https://schemas.OCP.dev/errors/item-out-of-stock',
         title: 'Item Out of Stock',
         status: 400,
         detail: 'Item is out of stock',
@@ -286,7 +286,7 @@ app.post('/carts/:id/items', requireAuth, (req, res) => {
     return res.status(400)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/invalid-quantity',
+        type: 'https://schemas.OCP.dev/errors/invalid-quantity',
         title: 'Invalid Quantity',
         status: 400,
         detail: 'Quantity must be at least 1',
@@ -308,7 +308,7 @@ app.post('/carts/:id/items', requireAuth, (req, res) => {
               required: ['catalogItemId', 'quantity']
             },
             responseSchema: {
-              $ref: 'https://schemas.ocs.dev/cart/item/v1.json'
+              $ref: 'https://schemas.OCP.dev/cart/item/v1.json'
             }
           }
         ]
@@ -320,7 +320,7 @@ app.post('/carts/:id/items', requireAuth, (req, res) => {
     return res.status(400)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/max-items-exceeded',
+        type: 'https://schemas.OCP.dev/errors/max-items-exceeded',
         title: 'Max Items Exceeded',
         status: 400,
         detail: 'Cart has reached maximum number of items',
@@ -369,7 +369,7 @@ app.post('/orders', requireAuth, (req, res) => {
       return res.status(404)
         .header('Content-Type', 'application/problem+json')
         .json({
-          type: 'https://schemas.ocs.dev/errors/cart-not-found',
+          type: 'https://schemas.OCP.dev/errors/cart-not-found',
           title: 'Cart Not Found',
           status: 404,
           detail: 'Cart not found or expired',
@@ -413,7 +413,7 @@ app.post('/orders', requireAuth, (req, res) => {
     return res.status(400)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/delivery-address-required',
+        type: 'https://schemas.OCP.dev/errors/delivery-address-required',
         title: 'Delivery Address Required',
         status: 400,
         detail: 'Order contains physical items but no delivery address provided',
@@ -426,7 +426,7 @@ app.post('/orders', requireAuth, (req, res) => {
     return res.status(400)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/pickup-location-required',
+        type: 'https://schemas.OCP.dev/errors/pickup-location-required',
         title: 'Pickup Location Required',
         status: 400,
         detail: 'Order contains pickup items but no pickup location provided',
@@ -452,7 +452,7 @@ app.post('/orders', requireAuth, (req, res) => {
     // Add schema-aware hypermedia actions
     actions: buildOrderActions(orderId, 'confirmed'),
     metadata: {
-      'dev.ocs.resource.versioning@1.0': {
+      'dev.ocp.resource.versioning@1.0': {
         _version: '1.0',
         chainId: chainId,
         version: 1,
@@ -481,7 +481,7 @@ app.get('/orders/:id', requireAuth, (req, res) => {
     return res.status(404)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/order-not-found',
+        type: 'https://schemas.OCP.dev/errors/order-not-found',
         title: 'Order Not Found',
         status: 404,
         detail: 'Order not found',
@@ -517,7 +517,7 @@ app.post('/orders/:id/cancel', requireAuth, (req, res) => {
     return res.status(404)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/order-not-found',
+        type: 'https://schemas.OCP.dev/errors/order-not-found',
         title: 'Order Not Found',
         status: 404,
         detail: 'Order not found',
@@ -526,11 +526,11 @@ app.post('/orders/:id/cancel', requireAuth, (req, res) => {
       });
   }
 
-  const versioning = previousOrder.metadata['dev.ocs.resource.versioning@1.0'];
+  const versioning = previousOrder.metadata['dev.ocp.resource.versioning@1.0'];
   if (!versioning || !versioning.isLatest) {
-    const latest = store.orders.find(o => o.metadata['dev.ocs.resource.versioning@1.0']?.chainId === versioning.chainId && o.metadata['dev.ocs.resource.versioning@1.0']?.isLatest);
+    const latest = store.orders.find(o => o.metadata['dev.ocp.resource.versioning@1.0']?.chainId === versioning.chainId && o.metadata['dev.ocp.resource.versioning@1.0']?.isLatest);
     return res.status(409).json({
-      type: 'https://schemas.ocs.dev/errors/stale-version',
+      type: 'https://schemas.OCP.dev/errors/stale-version',
       title: 'Stale Version',
       status: 409,
       detail: 'This order version has been superseded.',
@@ -542,7 +542,7 @@ app.post('/orders/:id/cancel', requireAuth, (req, res) => {
     return res.status(400)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/order-not-cancellable',
+        type: 'https://schemas.OCP.dev/errors/order-not-cancellable',
         title: 'Order Not Cancellable',
         status: 400,
         detail: 'Order cannot be cancelled in its current state',
@@ -562,7 +562,7 @@ app.post('/orders/:id/cancel', requireAuth, (req, res) => {
     actions: [], // No actions on a cancelled order
     metadata: {
       ...previousOrder.metadata,
-      'dev.ocs.resource.versioning@1.0': {
+      'dev.ocp.resource.versioning@1.0': {
         ...versioning,
         version: versioning.version + 1,
         revises: previousOrder.id,
@@ -580,8 +580,8 @@ app.post('/orders/:id/cancel', requireAuth, (req, res) => {
   // 2. Update the old version
   previousOrder.status = 'superseded';
   previousOrder.actions = [];
-  previousOrder.metadata['dev.ocs.resource.versioning@1.0'].isLatest = false;
-  previousOrder.metadata['dev.ocs.resource.versioning@1.0'].supersededBy = newOrderId;
+  previousOrder.metadata['dev.ocp.resource.versioning@1.0'].isLatest = false;
+  previousOrder.metadata['dev.ocp.resource.versioning@1.0'].supersededBy = newOrderId;
 
   // 3. Save the new version
   store.orders.push(newOrder);
@@ -605,10 +605,10 @@ function buildOrderActions(orderId, status) {
       title: 'Cancel Order',
       description: 'Cancel this order. Refunds will be processed within 5-7 business days.',
       requestSchema: {
-        $ref: 'https://schemas.ocs.dev/order/actions/cancel_request/v1.json'
+        $ref: 'https://schemas.OCP.dev/order/actions/cancel_request/v1.json'
       },
       responseSchema: {
-        $ref: 'https://schemas.ocs.dev/order/v1.json'
+        $ref: 'https://schemas.OCP.dev/order/v1.json'
       },
       errorSchemas: [
         {
@@ -675,7 +675,7 @@ function buildOrderActions(orderId, status) {
         }
       },
       responseSchema: {
-        $ref: 'https://schemas.ocs.dev/order/v1.json'
+        $ref: 'https://schemas.OCP.dev/order/v1.json'
       },
       examples: {
         request: {
@@ -695,10 +695,10 @@ function buildOrderActions(orderId, status) {
       title: 'Return Items',
       description: 'Start a return for one or more items from this order',
       requestSchema: {
-        $ref: 'https://schemas.ocs.dev/order/actions/return_request/v1.json'
+        $ref: 'https://schemas.OCP.dev/order/actions/return_request/v1.json'
       },
       responseSchema: {
-        $ref: 'https://schemas.ocs.dev/order/return/v1.json'
+        $ref: 'https://schemas.OCP.dev/order/return/v1.json'
       },
       errorSchemas: [
         {
@@ -735,7 +735,7 @@ function requireAuth(req, res, next) {
     return res.status(401)
       .header('Content-Type', 'application/problem+json')
       .json({
-        type: 'https://schemas.ocs.dev/errors/unauthorized',
+        type: 'https://schemas.OCP.dev/errors/unauthorized',
         title: 'Unauthorized',
         status: 401,
         detail: 'Valid authorization token required',
@@ -754,9 +754,9 @@ function requireAuth(req, res, next) {
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════╗
-║   🚀 OCS Demo Server Running                          ║
+║   🚀 OCP Demo Server Running                          ║
 ╟────────────────────────────────────────────────────────╢
-║   Discovery:     http://localhost:${PORT}/.well-known/ocs   ║
+║   Discovery:     http://localhost:${PORT}/.well-known/ocp   ║
 ║   Capabilities:  http://localhost:${PORT}/capabilities      ║
 ║   Catalog:       http://localhost:${PORT}/catalogs/main    ║
 ╟────────────────────────────────────────────────────────╢
@@ -772,7 +772,7 @@ app.listen(PORT, () => {
 /*
 
 # 1. Discover API
-curl http://localhost:3000/.well-known/ocs
+curl http://localhost:3000/.well-known/ocp
 
 # 2. Check capabilities
 curl http://localhost:3000/capabilities

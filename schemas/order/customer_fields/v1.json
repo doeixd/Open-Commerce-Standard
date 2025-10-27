@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for order customer fields capability (dev.ocs.order.customer_fields@1.0), defining common custom fields for international commerce and tax purposes.",
+  "description": "Schema for order customer fields capability (dev.ocp.order.customer_fields@1.0), defining common custom fields for international commerce and tax purposes.",
   "properties": {
     "taxId": {
       "type": "string",

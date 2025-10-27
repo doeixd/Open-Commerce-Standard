@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "array",
-  "description": "Schema for order shipment tracking capability (dev.ocs.order.shipment_tracking@1.0)",
+  "description": "Schema for order shipment tracking capability (dev.ocp.order.shipment_tracking@1.0)",
   "items": {
     "type": "object",
     "properties": {

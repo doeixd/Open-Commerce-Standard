@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/resource/versioning/v1.json",
+  "$id": "https://schemas.OCP.dev/resource/versioning/v1.json",
   "title": "Immutable Resource Versioning",
-  "description": "Metadata for a resource that supports immutable versioning (dev.ocs.resource.versioning@1.0). Mutations create a new version of the resource with a new ID, forming a linked chain of historical states.",
+  "description": "Metadata for a resource that supports immutable versioning (dev.ocp.resource.versioning@1.0). Mutations create a new version of the resource with a new ID, forming a linked chain of historical states.",
   "type": "object",
   "properties": {
     "_version": {

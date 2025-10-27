@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/order/actions/tip_request/v1.json",
+  "$id": "https://schemas.OCP.dev/order/actions/tip_request/v1.json",
   "title": "Add Tip Request",
   "description": "Request schema for adding a tip to a completed order",
   "type": "object",

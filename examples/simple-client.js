@@ -1,7 +1,7 @@
 /**
- * Simple OCS Client - Bare Minimum Example
+ * Simple OCP Client - Bare Minimum Example
  *
- * This shows the simplest possible OCS client that can:
+ * This shows the simplest possible OCP client that can:
  * 1. Discover server capabilities
  * 2. Browse products
  * 3. Place an order
@@ -14,12 +14,12 @@ const BASE_URL = 'https://shop.example.com';
 const AUTH_TOKEN = 'your_bearer_token_here';
 
 // Helper: Make authenticated requests
-async function ocsRequest(endpoint, options = {}) {
+async function ocpRequest(endpoint, options = {}) {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/ocs+json; version=1.0',
-      'Accept': 'application/ocs+json; version=1.0',
+      'Content-Type': 'application/ocp+json; version=1.0',
+      'Accept': 'application/ocp+json; version=1.0',
       'Authorization': `Bearer ${AUTH_TOKEN}`,
       ...options.headers,
     },
@@ -45,7 +45,7 @@ async function ocsRequest(endpoint, options = {}) {
 // Step 1: Discover what the server supports
 async function getCapabilities() {
   console.log('📋 Discovering server capabilities...');
-  const data = await ocsRequest('/capabilities');
+  const data = await ocpRequest('/capabilities');
 
   console.log('✅ Server supports:');
   data.capabilities.forEach(cap => {
@@ -58,7 +58,7 @@ async function getCapabilities() {
 // Step 2: Browse available products
 async function browseProducts(catalogId = 'main') {
   console.log('\n🛍️  Browsing catalog...');
-  const catalog = await ocsRequest(`/catalogs/${catalogId}`);
+  const catalog = await ocpRequest(`/catalogs/${catalogId}`);
 
   console.log(`✅ Found ${catalog.items.length} products in "${catalog.name}":`);
   catalog.items.forEach(item => {
@@ -85,7 +85,7 @@ async function placeOrder(items, address) {
     orderData.deliveryAddress = { address };
   }
 
-  const order = await ocsRequest('/orders', {
+  const order = await ocpRequest('/orders', {
     method: 'POST',
     body: JSON.stringify(orderData),
   });
@@ -100,7 +100,7 @@ async function placeOrder(items, address) {
 // Step 4: Check order status
 async function checkOrderStatus(orderId) {
   console.log(`\n🔍 Checking order ${orderId}...`);
-  const order = await ocsRequest(`/orders/${orderId}`);
+  const order = await ocpRequest(`/orders/${orderId}`);
 
   console.log(`✅ Order status: ${order.status}`);
   return order;
@@ -109,7 +109,7 @@ async function checkOrderStatus(orderId) {
 // Main flow: Complete shopping journey
 async function main() {
   try {
-    console.log('🚀 Starting OCS client demo\n');
+    console.log('🚀 Starting OCP client demo\n');
 
     // 1. Check capabilities
     const capabilities = await getCapabilities();
@@ -148,7 +148,7 @@ async function cartBasedFlow() {
   try {
     // 1. Create cart
     console.log('Creating cart...');
-    const cart = await ocsRequest('/carts', {
+    const cart = await ocpRequest('/carts', {
       method: 'POST',
       body: JSON.stringify({ storeId: 'main' }),
     });
@@ -162,7 +162,7 @@ async function cartBasedFlow() {
       if (!product.available) continue;
 
       console.log(`\nAdding ${product.name} to cart...`);
-      await ocsRequest(`/carts/${cart.id}/items`, {
+      await ocpRequest(`/carts/${cart.id}/items`, {
         method: 'POST',
         body: JSON.stringify({
           catalogItemId: product.id,
@@ -174,7 +174,7 @@ async function cartBasedFlow() {
 
     // 4. Get final cart state
     console.log('\n📋 Getting final cart...');
-    const finalCart = await ocsRequest(`/carts/${cart.id}`);
+    const finalCart = await ocpRequest(`/carts/${cart.id}`);
     console.log(`Total: ${finalCart.total.amount} ${finalCart.total.currency}`);
 
     // 5. Checkout
@@ -182,7 +182,7 @@ async function cartBasedFlow() {
       item => item.fulfillmentType === 'physical'
     );
 
-    const order = await ocsRequest('/orders', {
+    const order = await ocpRequest('/orders', {
       method: 'POST',
       body: JSON.stringify({
         cartId: cart.id,
@@ -210,7 +210,7 @@ async function variantExample() {
 
     // Find a product with variants
     const productWithVariants = products.find(
-      p => p.metadata && p.metadata['dev.ocs.product.variants@1.0']
+      p => p.metadata && p.metadata['dev.ocp.product.variants@1.0']
     );
 
     if (!productWithVariants) {
@@ -218,7 +218,7 @@ async function variantExample() {
       return;
     }
 
-    const variants = productWithVariants.metadata['dev.ocs.product.variants@1.0'];
+    const variants = productWithVariants.metadata['dev.ocp.product.variants@1.0'];
 
     console.log(`Product: ${productWithVariants.name}`);
     console.log(`Options: ${variants.options.join(', ')}`);
@@ -287,7 +287,7 @@ async function revisionExample() {
   try {
     // 1. Create an initial order
     console.log('Creating initial order...');
-    const orderV1 = await ocsRequest('/orders', {
+    const orderV1 = await ocpRequest('/orders', {
       method: 'POST',
       body: JSON.stringify({
         items: [{ catalogItemId: 'coffee_mug', quantity: 1 }],
@@ -308,8 +308,8 @@ async function revisionExample() {
     const response = await fetch(`${BASE_URL}${cancelAction.href}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/ocs+json; version=1.0',
-        'Accept': 'application/ocs+json; version=1.0',
+        'Content-Type': 'application/ocp+json; version=1.0',
+        'Accept': 'application/ocp+json; version=1.0',
         'Authorization': `Bearer ${AUTH_TOKEN}`
       },
       body: JSON.stringify({ reason: 'Client test' })
@@ -323,15 +323,15 @@ async function revisionExample() {
     const orderV2 = await response.json();
     console.log('✅ Received 201 Created. A new version was made.');
     console.log(`   Order V2 ID: ${orderV2.id}`);
-    console.log(`   V2 revises V1: ${orderV2.metadata['dev.ocs.resource.versioning@1.0'].revises === orderV1.id}`);
+    console.log(`   V2 revises V1: ${orderV2.metadata['dev.ocp.resource.versioning@1.0'].revises === orderV1.id}`);
     console.log(`   V2 status: ${orderV2.status}`);
 
     // 5. Verify the old version is now superseded
     console.log('\nVerifying old version status...');
-    const oldOrderResponse = await ocsRequest(`/orders/${orderV1.id}`);
+    const oldOrderResponse = await ocpRequest(`/orders/${orderV1.id}`);
     console.log(`✅ Order V1 is now 'superseded': ${oldOrderResponse.status === 'superseded'}`);
-    console.log(`   V1 isLatest is false: ${oldOrderResponse.metadata['dev.ocs.resource.versioning@1.0'].isLatest === false}`);
-    console.log(`   V1 superseded by V2: ${oldOrderResponse.metadata['dev.ocs.resource.versioning@1.0'].supersededBy === orderV2.id}`);
+    console.log(`   V1 isLatest is false: ${oldOrderResponse.metadata['dev.ocp.resource.versioning@1.0'].isLatest === false}`);
+    console.log(`   V1 superseded by V2: ${oldOrderResponse.metadata['dev.ocp.resource.versioning@1.0'].supersededBy === orderV2.id}`);
 
     console.log('\n✨ Revision demo complete!');
   } catch (error) {
@@ -402,7 +402,7 @@ function simulateClientOnlyCart() {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    ocsRequest,
+    ocpRequest,
     getCapabilities,
     browseProducts,
     placeOrder,

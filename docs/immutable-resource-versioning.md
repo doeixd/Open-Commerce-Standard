@@ -1,8 +1,8 @@
-# **OCS Official Guide: Immutable Resource Versioning**
+# **OCP Official Guide: Immutable Resource Versioning**
 
-**Capability ID:** `dev.ocs.resource.versioning@1.0`
+**Capability ID:** `dev.ocp.resource.versioning@1.0`
 **Status:** **Final 1.0**
-**Applies To:** Core OCS resources requiring an audit trail (e.g., Order, Cart, User Profile).
+**Applies To:** Core OCP resources requiring an audit trail (e.g., Order, Cart, User Profile).
 
 ## **1. Introduction & Core Philosophy**
 
@@ -15,7 +15,7 @@ The mutable approach introduces critical risks:
 *   **Lack of Traceability:** It is difficult to answer critical business questions like "What sequence of events led to this order being flagged for fraud?" or "Who authorized this refund and when?"
 
 ### 1.2 The Immutable Solution: Treating State as a Sequence of Events
-This capability transforms the OCS standard by adopting a core principle from event sourcing and financial ledger systems: **every change of state is an event that creates a new, immutable version of the resource.**
+This capability transforms the OCP standard by adopting a core principle from event sourcing and financial ledger systems: **every change of state is an event that creates a new, immutable version of the resource.**
 
 An "update" is no longer a destructive `PATCH`. It is a creative `POST` to an action endpoint that results in a **new resource with a new ID**, which supersedes the previous one.
 
@@ -36,7 +36,7 @@ A new order version (`order_def2`) is created, and the old version (`order_abc1`
 ## **2. Formal Specification**
 
 ### 2.1 Capability ID
-`dev.ocs.resource.versioning@1.0`
+`dev.ocp.resource.versioning@1.0`
 
 ### 2.2 Description
 Indicates that a resource supports immutable versioning. Mutations create a new version of the resource with a new, unique ID, forming a linked chain of historical states. This capability is advertised server-wide in `GET /capabilities`, and its metadata is embedded in the specific resources that support it.
@@ -64,7 +64,7 @@ A versioned resource that is no longer the latest version **SHOULD** have its pr
 ## **3. Server Implementation Guide (The Rulebook)**
 
 ### 3.1 Advertising the Capability
-Your `GET /capabilities` endpoint **MUST** include `dev.ocs.resource.versioning@1.0` to signal to all clients that they must be prepared to handle the versioning contract.
+Your `GET /capabilities` endpoint **MUST** include `dev.ocp.resource.versioning@1.0` to signal to all clients that they must be prepared to handle the versioning contract.
 
 ### 3.2 Resource IDs: A Critical Best Practice
 Resource IDs **MUST** be unique and non-sequential for each new version. Using predictable suffixes like `_v1`, `_v2` is an anti-pattern that leaks information.
@@ -176,17 +176,17 @@ Your SSE handler must be version-aware.
 
     ```javascript
     // Hypothetical SDK that hides the complexity
-    let order = await ocsClient.getOrder('order_abc1');
+    let order = await ocpClient.getOrder('order_abc1');
     order = await order.performAction('change_address', { ... });
     console.log(order.id); // --> "order_def2"
     ```
 
 ### 4.4 Advanced Topic: GraphQL
-While OCS is a REST-based standard, these principles are directly applicable to GraphQL. A mutation like `changeOrderAddress` would return the *new* `Order` type. The client would then be responsible for updating its Apollo/Relay cache to replace the old object with the new one, using the new `id`. The core principle of returning a new identity remains the same.
+While OCP is a REST-based standard, these principles are directly applicable to GraphQL. A mutation like `changeOrderAddress` would return the *new* `Order` type. The client would then be responsible for updating its Apollo/Relay cache to replace the old object with the new one, using the new `id`. The core principle of returning a new identity remains the same.
 
 **(Continuing the Official Guide)**
 
-## **5. Integration with Core OCS Concepts**
+## **5. Integration with Core OCP Concepts**
 
 An immutable versioning system must be deeply integrated with the standard's other core concepts, particularly authentication, authorization, and error handling. It also needs a clear strategy for how it interacts with evolving schemas.
 
@@ -231,7 +231,7 @@ A robust system plans for failure. The versioning process can fail in several wa
     **Error Response Body:**
     ```json
     {
-      "type": "https://schemas.ocs.dev/errors/stale-version",
+      "type": "https://schemas.OCP.dev/errors/stale-version",
       "title": "Stale Version",
       "status": 409,
       "detail": "The resource version you are trying to modify has been superseded. Please fetch the latest version and re-apply your changes.",
@@ -246,7 +246,7 @@ A robust system plans for failure. The versioning process can fail in several wa
     **Error Response Body:**
     ```json
     {
-      "type": "https://schemas.ocs.dev/errors/action-not-permitted",
+      "type": "https://schemas.OCP.dev/errors/action-not-permitted",
       "title": "Action Not Permitted",
       "status": 403,
       "detail": "You do not have permission to perform the 'cancel' action on this order."

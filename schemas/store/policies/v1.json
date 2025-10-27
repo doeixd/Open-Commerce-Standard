@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for store policies capability (dev.ocs.store.policies@1.0), providing URLs to various store policies.",
+  "description": "Schema for store policies capability (dev.ocp.store.policies@1.0), providing URLs to various store policies.",
   "properties": {
     "returnPolicy": {
       "type": "string",

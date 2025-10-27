@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "array",
-  "description": "Schema for advertising discoverable promotions (dev.ocs.promotions.discoverable@1.0).",
+  "description": "Schema for advertising discoverable promotions (dev.ocp.promotions.discoverable@1.0).",
   "items": {
     "type": "object",
     "properties": {

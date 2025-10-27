@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for real-time delivery driver tracking (dev.ocs.order.delivery_tracking@1.0).",
+  "description": "Schema for real-time delivery driver tracking (dev.ocp.order.delivery_tracking@1.0).",
   "properties": {
     "driver": {
       "type": "object",

@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://schemas.ocs.dev/capabilities/discovery/v1.json",
-  "title": "OCS Discovery Capability",
-  "description": "Defines standardized discovery metadata for OCS endpoints via HTML meta tags, JSON-LD blocks, HTTP headers, and .well-known URLs.",
+  "$id": "https://schemas.OCP.dev/capabilities/discovery/v1.json",
+  "title": "OCP Discovery Capability",
+  "description": "Defines standardized discovery metadata for OCP endpoints via HTML meta tags, JSON-LD blocks, HTTP headers, and .well-known URLs.",
   "type": "object",
   "properties": {
     "_version": {
@@ -13,8 +13,8 @@
     "wellKnownUrl": {
       "type": "string",
       "format": "uri",
-      "description": "URL of the .well-known/ocs discovery endpoint",
-      "example": "https://shop.example.com/.well-known/ocs"
+      "description": "URL of the .well-known/ocp discovery endpoint",
+      "example": "https://shop.example.com/.well-known/ocp"
     },
     "htmlMetaEnabled": {
       "type": "boolean",
@@ -28,7 +28,7 @@
     },
     "httpHeadersEnabled": {
       "type": "boolean",
-      "description": "Whether OCS-Discovery HTTP headers are included in responses",
+      "description": "Whether OCP-Discovery HTTP headers are included in responses",
       "default": true
     }
   },
@@ -37,7 +37,7 @@
   "examples": [
     {
       "_version": "1.0",
-      "wellKnownUrl": "https://shop.example.com/.well-known/ocs",
+      "wellKnownUrl": "https://shop.example.com/.well-known/ocp",
       "htmlMetaEnabled": true,
       "jsonLdEnabled": true,
       "httpHeadersEnabled": true

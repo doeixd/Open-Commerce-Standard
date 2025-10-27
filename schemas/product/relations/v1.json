@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "array",
-  "description": "Schema for defining relationships to other products (dev.ocs.product.relations@1.0).",
+  "description": "Schema for defining relationships to other products (dev.ocp.product.relations@1.0).",
   "items": {
     "type": "object",
     "properties": {

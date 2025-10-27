@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.ocs.dev/order/errors/v1.json",
+  "$id": "https://schemas.OCP.dev/order/errors/v1.json",
   "title": "Order Error Schema (RFC 9457 Compliant)",
   "description": "Standard problem details for order operations, aligned with RFC 9457 for consistent HTTP API error handling.",
   "type": "object",
@@ -8,7 +8,7 @@
     "type": {
       "type": "string",
       "format": "uri",
-      "description": "URI reference identifying the problem type (e.g., https://schemas.ocs.dev/errors/order-not-found)"
+      "description": "URI reference identifying the problem type (e.g., https://schemas.OCP.dev/errors/order-not-found)"
     },
     "title": {
       "type": "string",
@@ -77,7 +77,7 @@
   "required": ["type", "title"],
   "examples": [
     {
-      "type": "https://schemas.ocs.dev/errors/order-not-found",
+      "type": "https://schemas.OCP.dev/errors/order-not-found",
       "title": "Order Not Found",
       "status": 404,
       "detail": "The requested order does not exist.",
@@ -85,7 +85,7 @@
       "timestamp": "2023-10-23T12:00:00Z"
     },
     {
-      "type": "https://schemas.ocs.dev/errors/order-not-cancellable",
+      "type": "https://schemas.OCP.dev/errors/order-not-cancellable",
       "title": "Order Not Cancellable",
       "status": 400,
       "detail": "Order cannot be cancelled in its current state.",

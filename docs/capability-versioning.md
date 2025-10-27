@@ -1,6 +1,6 @@
-# OCS Capability Versioning Guide
+# OCP Capability Versioning Guide
 
-This document defines the versioning strategy for Open Commerce Standard (OCS) capabilities, ensuring backward compatibility and smooth evolution of the standard.
+This document defines the versioning strategy for Open Commerce Protocol (OCP) capabilities, ensuring backward compatibility and smooth evolution of the standard.
 
 ## Table of Contents
 
@@ -14,16 +14,16 @@ This document defines the versioning strategy for Open Commerce Standard (OCS) c
 
 ## Version Format
 
-OCS capabilities use semantic versioning with a `major.minor` format:
+OCP capabilities use semantic versioning with a `major.minor` format:
 
 ```
-dev.ocs.{domain}.{feature}@{major}.{minor}
+dev.ocp.{domain}.{feature}@{major}.{minor}
 ```
 
 **Examples:**
-- `dev.ocs.product.variants@1.0`
-- `dev.ocs.product.variants@1.1`
-- `dev.ocs.product.variants@2.0`
+- `dev.ocp.product.variants@1.0`
+- `dev.ocp.product.variants@1.1`
+- `dev.ocp.product.variants@2.0`
 
 **Version Components:**
 - **Major version**: Breaking changes that require client updates
@@ -117,15 +117,15 @@ Servers MAY advertise multiple versions of the same capability simultaneously:
 {
   "capabilities": [
     {
-      "id": "dev.ocs.product.variants@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/product/variants/v1.json",
+      "id": "dev.ocp.product.variants@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/product/variants/v1.json",
       "status": "deprecated",
       "sunset": "2026-06-01",
-      "migrationGuide": "https://docs.ocs.dev/migrations/variants-v1-to-v2"
+      "migrationGuide": "https://docs.OCP.dev/migrations/variants-v1-to-v2"
     },
     {
-      "id": "dev.ocs.product.variants@2.0",
-      "schemaUrl": "https://schemas.ocs.dev/product/variants/v2.json",
+      "id": "dev.ocp.product.variants@2.0",
+      "schemaUrl": "https://schemas.OCP.dev/product/variants/v2.json",
       "status": "stable"
     }
   ]
@@ -139,12 +139,12 @@ Servers MAY advertise multiple versions of the same capability simultaneously:
 
 ## Client Negotiation
 
-Clients specify preferred capability versions via the `Accept-OCS-Capabilities` header:
+Clients specify preferred capability versions via the `Accept-OCP-Capabilities` header:
 
 ```http
 GET /catalogs/123
-Accept: application/ocs+json; version=1.0
-Accept-OCS-Capabilities: dev.ocs.product.variants@1.0, dev.ocs.order.tracking@2.1
+Accept: application/ocp+json; version=1.0
+Accept-OCP-Capabilities: dev.ocp.product.variants@1.0, dev.ocp.order.tracking@2.1
 ```
 
 **Header Format:**
@@ -156,18 +156,18 @@ Accept-OCS-Capabilities: dev.ocs.product.variants@1.0, dev.ocs.order.tracking@2.
 ```javascript
 // Client specifies preferred versions
 const headers = {
-  'Accept': 'application/ocs+json; version=1.0',
-  'Accept-OCS-Capabilities': 'dev.ocs.product.variants@1.0'
+  'Accept': 'application/ocp+json; version=1.0',
+  'Accept-OCP-Capabilities': 'dev.ocp.product.variants@1.0'
 };
 
 const response = await fetch('/catalogs/123', { headers });
 const catalog = await response.json();
 
 // Check which version was actually used
-const variantsMetadata = catalog.metadata['dev.ocs.product.variants@1.0'];
+const variantsMetadata = catalog.metadata['dev.ocp.product.variants@1.0'];
 if (variantsMetadata) {
   // Server returned v1.0 format
-} else if (catalog.metadata['dev.ocs.product.variants@2.0']) {
+} else if (catalog.metadata['dev.ocp.product.variants@2.0']) {
   // Server only supports v2.0, client needs to adapt
 }
 ```
@@ -181,7 +181,7 @@ The metadata key ALWAYS includes the version actually used by the server:
   "id": "prod_123",
   "name": "Blue T-Shirt",
   "metadata": {
-    "dev.ocs.product.variants@1.0": {
+    "dev.ocp.product.variants@1.0": {
       "options": ["Size", "Color"],
       "variants": [...]
     }
@@ -210,8 +210,8 @@ When deprecating a capability version, servers MUST:
 HTTP/1.1 200 OK
 Sunset: Sat, 01 Jun 2026 00:00:00 GMT
 Deprecation: true
-Link: <https://docs.ocs.dev/migrations/variants-v1-to-v2>; rel="deprecation"
-Content-Type: application/ocs+json; version=1.0
+Link: <https://docs.OCP.dev/migrations/variants-v1-to-v2>; rel="deprecation"
+Content-Type: application/ocp+json; version=1.0
 ```
 
 ### Capability Status Lifecycle
@@ -238,15 +238,15 @@ beta → stable → deprecated → removed
 ```json
 // Capability announcement
 {
-  "id": "dev.ocs.product.variants@1.1",
-  "schemaUrl": "https://schemas.ocs.dev/product/variants/v1.1.json",
+  "id": "dev.ocp.product.variants@1.1",
+  "schemaUrl": "https://schemas.OCP.dev/product/variants/v1.1.json",
   "status": "stable"
 }
 
 // Response includes new field
 {
   "metadata": {
-    "dev.ocs.product.variants@1.1": {
+    "dev.ocp.product.variants@1.1": {
       "options": ["Size", "Color"],
       "variants": [...],
       "defaultVariantId": "var_medium_blue"  // New field
@@ -269,13 +269,13 @@ beta → stable → deprecated → removed
 {
   "capabilities": [
     {
-      "id": "dev.ocs.product.variants@1.0",
+      "id": "dev.ocp.product.variants@1.0",
       "status": "stable"
     },
     {
-      "id": "dev.ocs.product.variants@2.0",
+      "id": "dev.ocp.product.variants@2.0",
       "status": "beta",
-      "migrationGuide": "https://docs.ocs.dev/migrations/variants-v1-to-v2"
+      "migrationGuide": "https://docs.OCP.dev/migrations/variants-v1-to-v2"
     }
   ]
 }
@@ -287,13 +287,13 @@ beta → stable → deprecated → removed
 {
   "capabilities": [
     {
-      "id": "dev.ocs.product.variants@1.0",
+      "id": "dev.ocp.product.variants@1.0",
       "status": "deprecated",
       "sunset": "2026-06-01",
-      "migrationGuide": "https://docs.ocs.dev/migrations/variants-v1-to-v2"
+      "migrationGuide": "https://docs.OCP.dev/migrations/variants-v1-to-v2"
     },
     {
-      "id": "dev.ocs.product.variants@2.0",
+      "id": "dev.ocp.product.variants@2.0",
       "status": "stable"
     }
   ]
@@ -306,7 +306,7 @@ beta → stable → deprecated → removed
 {
   "capabilities": [
     {
-      "id": "dev.ocs.product.variants@2.0",
+      "id": "dev.ocp.product.variants@2.0",
       "status": "stable"
     }
   ]
@@ -318,8 +318,8 @@ beta → stable → deprecated → removed
 ```javascript
 // Phase 1: Detect available versions
 const capabilities = await fetch('/capabilities').then(r => r.json());
-const v1 = capabilities.capabilities.find(c => c.id === 'dev.ocs.product.variants@1.0');
-const v2 = capabilities.capabilities.find(c => c.id === 'dev.ocs.product.variants@2.0');
+const v1 = capabilities.capabilities.find(c => c.id === 'dev.ocp.product.variants@1.0');
+const v2 = capabilities.capabilities.find(c => c.id === 'dev.ocp.product.variants@2.0');
 
 if (v1?.status === 'deprecated') {
   console.warn(`v1.0 will be removed on ${v1.sunset}. Migration guide: ${v1.migrationGuide}`);
@@ -327,17 +327,17 @@ if (v1?.status === 'deprecated') {
 
 // Phase 2: Update client to support both versions
 function parseVariants(metadata) {
-  if (metadata['dev.ocs.product.variants@2.0']) {
-    return parseVariantsV2(metadata['dev.ocs.product.variants@2.0']);
-  } else if (metadata['dev.ocs.product.variants@1.0']) {
-    return parseVariantsV1(metadata['dev.ocs.product.variants@1.0']);
+  if (metadata['dev.ocp.product.variants@2.0']) {
+    return parseVariantsV2(metadata['dev.ocp.product.variants@2.0']);
+  } else if (metadata['dev.ocp.product.variants@1.0']) {
+    return parseVariantsV1(metadata['dev.ocp.product.variants@1.0']);
   }
   throw new Error('Variants not supported');
 }
 
 // Phase 3: After all servers support v2.0, remove v1.0 parsing
 function parseVariants(metadata) {
-  return parseVariantsV2(metadata['dev.ocs.product.variants@2.0']);
+  return parseVariantsV2(metadata['dev.ocp.product.variants@2.0']);
 }
 ```
 
@@ -348,17 +348,17 @@ function parseVariants(metadata) {
 ```javascript
 // Client specifies it can handle v1.0
 const headers = {
-  'Accept-OCS-Capabilities': 'dev.ocs.product.variants@1.0'
+  'Accept-OCP-Capabilities': 'dev.ocp.product.variants@1.0'
 };
 
 const response = await fetch('/catalogs/123', { headers });
 const catalog = await response.json();
 
 // Server returns v2.0 (only version it supports)
-if (catalog.metadata['dev.ocs.product.variants@2.0']) {
+if (catalog.metadata['dev.ocp.product.variants@2.0']) {
   // Client's v1.0 parser won't work - need to upgrade client
   if (canHandleV2()) {
-    parseVariantsV2(catalog.metadata['dev.ocs.product.variants@2.0']);
+    parseVariantsV2(catalog.metadata['dev.ocp.product.variants@2.0']);
   } else {
     // Fallback or error
     console.error('Server no longer supports v1.0. Please update client.');
@@ -381,7 +381,7 @@ if (catalog.metadata['dev.ocs.product.variants@2.0']) {
 
 1. **Check Capabilities**: Always fetch `/capabilities` to discover available versions
 2. **Handle Unknown Fields**: Ignore unknown fields gracefully for forward compatibility
-3. **Specify Preferences**: Use `Accept-OCS-Capabilities` header to request specific versions
+3. **Specify Preferences**: Use `Accept-OCP-Capabilities` header to request specific versions
 4. **Check Response Versions**: Verify which version was actually returned in metadata keys
 5. **Monitor Deprecations**: Watch for `status: deprecated` and `sunset` dates
 6. **Plan Upgrades**: Update client code before sunset dates to avoid breakage
@@ -398,9 +398,9 @@ if (catalog.metadata['dev.ocs.product.variants@2.0']) {
 **A:** No. The server will return exactly one version per capability. Specify your preferred version, and the server will return the closest compatible version it supports.
 
 ### Q: How do I know which version a server returned?
-**A:** Check the metadata key in the response. It always includes the version (e.g., `dev.ocs.product.variants@2.0`).
+**A:** Check the metadata key in the response. It always includes the version (e.g., `dev.ocp.product.variants@2.0`).
 
-### Q: What happens if I don't send `Accept-OCS-Capabilities` header?
+### Q: What happens if I don't send `Accept-OCP-Capabilities` header?
 **A:** The server will use the latest stable version of each capability by default.
 
 ### Q: Can minor versions add required fields?
@@ -410,4 +410,4 @@ if (catalog.metadata['dev.ocs.product.variants@2.0']) {
 
 **Document Version:** 1.0
 **Last Updated:** 2025-10-22
-**Maintainer:** Open Commerce Standard Working Group
+**Maintainer:** Open Commerce Protocol Working Group

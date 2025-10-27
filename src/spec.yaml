@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Open Commerce Standard (OCS)
+  title: Open Commerce Protocol (OCP)
   version: 1.0.0
   description: |
     An open, minimal, and extensible standard for all forms of digital commerce.
@@ -15,7 +15,7 @@ info:
 
     ## Rate Limiting
 
-    OCS servers SHOULD implement rate limiting to prevent abuse. Rate limiting MUST be communicated via standard headers.
+    OCP servers SHOULD implement rate limiting to prevent abuse. Rate limiting MUST be communicated via standard headers.
 
     ### Headers
 
@@ -45,7 +45,7 @@ info:
     Content-Type: application/problem+json
 
     {
-      "type": "https://schemas.ocs.dev/errors/rate-limit-exceeded",
+      "type": "https://schemas.OCP.dev/errors/rate-limit-exceeded",
       "title": "Rate Limit Exceeded",
       "status": 429,
       "detail": "Rate limit of 100 requests per minute exceeded",
@@ -57,12 +57,12 @@ info:
 
     ### Discoverable Rate Limits
 
-    Servers MAY advertise rate limit policies via the `dev.ocs.server.rate_limits@1.0` capability:
+    Servers MAY advertise rate limit policies via the `dev.ocp.server.rate_limits@1.0` capability:
 
     ```json
     {
-      "id": "dev.ocs.server.rate_limits@1.0",
-      "schemaUrl": "https://schemas.ocs.dev/server/rate_limits/v1.json",
+      "id": "dev.ocp.server.rate_limits@1.0",
+      "schemaUrl": "https://schemas.OCP.dev/server/rate_limits/v1.json",
       "metadata": {
         "authenticated": {
           "limit": 1000,
@@ -101,17 +101,17 @@ tags:
     description: Server-to-server event notification subscription management.
 
 paths:
-  /.well-known/ocs:
+  /.well-known/ocp:
     get:
       tags: [Discovery]
-      summary: OCS Discovery Endpoint
+      summary: OCP Discovery Endpoint
       description: |
-        RFC 8615-compliant discovery endpoint that provides the canonical location of OCS API resources.
+        RFC 8615-compliant discovery endpoint that provides the canonical location of OCP API resources.
         This is the primary discovery mechanism for clients to locate the capabilities endpoint and other
         core API resources. Servers SHOULD include CORS headers and cache directives on this endpoint.
       responses:
         "200":
-          description: OCS discovery metadata
+          description: OCP discovery metadata
           headers:
             Cache-Control:
               schema:
@@ -126,13 +126,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OCSDiscoveryResponse"
+                $ref: "#/components/schemas/ocpDiscoveryResponse"
               example:
-                ocs:
-                  capabilities: "https://shop.example.com/ocs/capabilities"
+                OCP:
+                  capabilities: "https://shop.example.com/OCP/capabilities"
                   version: "1.0"
-                  context: "https://schemas.ocs.dev/context.jsonld"
-                  payment: "https://shop.example.com/ocs/payment"
+                  context: "https://schemas.OCP.dev/context.jsonld"
+                  payment: "https://shop.example.com/OCP/payment"
         "404":
           description: Discovery endpoint not implemented
         "500":
@@ -143,14 +143,14 @@ paths:
       tags: [Discovery]
       summary: Discover Server Capabilities
       description: |
-        Returns a list of all OCS Capability Modules supported by this server.
+        Returns a list of all OCP Capability Modules supported by this server.
         Clients can use this information to understand which optional features are enabled,
         what metadata schemas to expect, and how to adapt their UI and behavior accordingly.
       responses:
         "200":
           description: A list of supported capabilities.
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/CapabilitiesResponse"
         "500":
@@ -168,7 +168,7 @@ paths:
         "200":
           description: Paginated list of stores
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/StoresResponse"
         "500":
@@ -190,7 +190,7 @@ paths:
         "200":
           description: Paginated list of catalogs
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/CatalogsResponse"
         "500":
@@ -210,7 +210,7 @@ paths:
         "200":
           description: The full catalog with all products
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/Catalog"
         "404":
@@ -229,14 +229,14 @@ paths:
       requestBody:
         required: true
         content:
-          application/ocs+json; version=1.0:
+          application/ocp+json; version=1.0:
             schema:
               $ref: "#/components/schemas/CreateCartRequest"
       responses:
         "201":
           description: Cart created successfully
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/Cart"
         "400":
@@ -264,7 +264,7 @@ paths:
         "200":
           description: The cart object
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/Cart"
         "401":
@@ -276,7 +276,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                type: "https://schemas.ocs.dev/errors/cart-not-found"
+                type: "https://schemas.OCP.dev/errors/cart-not-found"
                 title: "Cart Not Found"
                 status: 404
                 detail: "Cart does not exist or has been submitted"
@@ -289,7 +289,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
               example:
-                type: "https://schemas.ocs.dev/errors/cart-expired"
+                type: "https://schemas.OCP.dev/errors/cart-expired"
                 title: "Cart Expired"
                 status: 410
                 detail: "Cart expired after 3600 seconds of inactivity"
@@ -319,14 +319,14 @@ paths:
       requestBody:
         required: true
         content:
-          application/ocs+json; version=1.0:
+          application/ocp+json; version=1.0:
             schema:
               $ref: "#/components/schemas/CartItemRequest"
       responses:
         "200":
           description: Item added, updated cart returned
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/Cart"
         "400":
@@ -359,14 +359,14 @@ paths:
       requestBody:
         required: true
         content:
-          application/ocs+json; version=1.0:
+          application/ocp+json; version=1.0:
             schema:
               $ref: "#/components/schemas/UpdateCartItemRequest"
       responses:
         "200":
           description: Item updated, updated cart returned
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/Cart"
         "400":
@@ -399,7 +399,7 @@ paths:
         "200":
           description: Item removed, updated cart returned
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/Cart"
         "401":
@@ -426,7 +426,7 @@ paths:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         content:
-        application/ocs+json; version=1.0:
+        application/ocp+json; version=1.0:
           schema:
             type: object
             properties:
@@ -435,12 +435,12 @@ paths:
         "200":
           description: The cancellation was successful. The updated Order object is returned with status 'cancelled'.
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema: { $ref: "#/components/schemas/Order" }
         "403":
           description: The order is not in a state where it can be cancelled.
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema: { $ref: "#/components/schemas/Error" }
 
   /orders:
@@ -464,7 +464,7 @@ paths:
         "200":
           description: Paginated list of orders
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/OrdersResponse"
         "401":
@@ -488,20 +488,20 @@ paths:
       requestBody:
         required: true
         content:
-          application/ocs+json; version=1.0:
+          application/ocp+json; version=1.0:
             schema:
               $ref: "#/components/schemas/CreateOrderRequest"
       responses:
         "201":
           description: |
             The order(s) were successfully created. The response will contain a single Order object by default.
-            If the `dev.ocs.order.fulfillment_intent@1.0` capability was used and resulted in multiple fulfillment groups, this response will contain an array of the created Order objects.
+            If the `dev.ocp.order.fulfillment_intent@1.0` capability was used and resulted in multiple fulfillment groups, this response will contain an array of the created Order objects.
           headers:
             X-PAYMENT-RESPONSE:
               schema:
                 type: string
               description: Base64-encoded JSON `SettlementResponse` containing payment settlement details.
-          application/ocs+json; version=1.0:
+          application/ocp+json; version=1.0:
             oneOf:
               - $ref: "#/components/schemas/Order"
               - type: array
@@ -514,7 +514,7 @@ paths:
             "402":
               description: Payment is required to proceed. The body contains payment requirements as per the x402 protocol.
               content:
-                application/ocs+json; version=1.0:
+                application/ocp+json; version=1.0:
                 schema:
                   $ref: "#/components/schemas/X402PaymentRequiredResponse"
             "403":
@@ -543,7 +543,7 @@ paths:
         "200":
           description: The order object.
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/Order"
         "401":
@@ -568,7 +568,7 @@ paths:
             **Events:**
             - `order.patch`: The `data` field will contain a JSON array of patch operations conforming to RFC 6902 (JSON Patch). This event is sent whenever the order object is updated.
               - Patches to the core `/status` field represent changes to the order's programmatic state category.
-              - Patches to `/metadata/dev.ocs.order.detailed_status@1.0` represent changes to the rich, human-readable status meant for display.
+              - Patches to `/metadata/dev.ocp.order.detailed_status@1.0` represent changes to the rich, human-readable status meant for display.
               - The server will bundle related status changes into a single message to ensure atomic updates.
             - `close`: Indicates the order has reached a terminal state (`completed`, `cancelled`). The server will close the connection after sending this event.
       parameters:
@@ -609,14 +609,14 @@ paths:
       requestBody:
         required: true
         content:
-          application/ocs+json; version=1.0:
+          application/ocp+json; version=1.0:
             schema:
               $ref: "#/components/schemas/RatingRequest"
       responses:
         "201":
           description: The ratings were successfully submitted.
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema: { $ref: "#/components/schemas/Order" }
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -647,14 +647,14 @@ paths:
       requestBody:
         required: true
         content:
-          application/ocs+json; version=1.0:
+          application/ocp+json; version=1.0:
             schema:
               $ref: "#/components/schemas/PromotionRequest"
       responses:
         "200":
           description: The promotion was successfully applied. The updated Cart object is returned.
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema: { $ref: "#/components/schemas/Cart" }
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -683,7 +683,7 @@ paths:
         "200":
           description: Paginated list of webhook subscriptions
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/WebhookSubscriptionsResponse"
         "401":
@@ -705,14 +705,14 @@ paths:
       requestBody:
         required: true
         content:
-          application/ocs+json; version=1.0:
+          application/ocp+json; version=1.0:
             schema:
               $ref: "#/components/schemas/CreateWebhookSubscriptionRequest"
       responses:
         "201":
           description: Webhook subscription successfully created
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/WebhookSubscription"
         "400":
@@ -744,7 +744,7 @@ paths:
         "200":
           description: The webhook subscription object
           content:
-            application/ocs+json; version=1.0:
+            application/ocp+json; version=1.0:
               schema:
                 $ref: "#/components/schemas/WebhookSubscription"
         "401":
@@ -780,13 +780,13 @@ paths:
 components:
   schemas:
     # --- Discovery Schemas ---
-    OCSDiscoveryResponse:
+    ocpDiscoveryResponse:
       type: object
       description: |
-        RFC 8615-compliant discovery response providing the canonical locations of OCS API resources.
+        RFC 8615-compliant discovery response providing the canonical locations of OCP API resources.
         This is the authoritative source for API endpoint discovery.
       properties:
-        ocs:
+        OCP:
           type: object
           required:
             - capabilities
@@ -796,21 +796,21 @@ components:
               type: string
               format: uri
               description: "URI of the /capabilities endpoint"
-              example: "https://shop.example.com/ocs/capabilities"
+              example: "https://shop.example.com/OCP/capabilities"
             version:
               type: string
-              description: "Highest supported OCS core specification version"
+              description: "Highest supported OCP core specification version"
               example: "1.0"
             context:
               type: string
               format: uri
               description: "URI of the JSON-LD context document"
-              example: "https://schemas.ocs.dev/context.jsonld"
+              example: "https://schemas.OCP.dev/context.jsonld"
             payment:
               type: string
               format: uri
               description: "URI of the payment or x402 endpoint"
-              example: "https://shop.example.com/ocs/payment"
+              example: "https://shop.example.com/OCP/payment"
 
     # --- Capability Discovery Schemas ---
     CapabilitiesResponse:
@@ -826,12 +826,12 @@ components:
         id:
           type: string
           description: "The unique, versioned identifier for the capability."
-          example: "dev.ocs.product.variants@1.0"
+          example: "dev.ocp.product.variants@1.0"
         schemaUrl:
           type: string
           format: uri
           description: "The URL pointing to the JSON Schema that defines the structure for this capability's metadata."
-          example: "https://schemas.ocs.dev/product/variants/v1.json"
+          example: "https://schemas.OCP.dev/product/variants/v1.json"
         status:
           type: string
           enum: ["beta", "stable", "deprecated"]
@@ -849,7 +849,7 @@ components:
           type: string
           format: uri
           description: "URL to documentation explaining how to migrate from this capability version to a newer version. Typically present when status is 'deprecated'."
-          example: "https://docs.ocs.dev/migrations/product-variants-v1-to-v2"
+          example: "https://docs.OCP.dev/migrations/product-variants-v1-to-v2"
         metadata:
           type: object
           description: "Optional metadata providing implementation-specific details for this capability, such as endpoint URLs or configuration options."
@@ -918,7 +918,7 @@ components:
           $ref: "#/components/schemas/PaginationMeta"
       required: [orders, pagination]
 
-    # --- OCS Core Schemas ---
+    # --- OCP Core Schemas ---
     Money:
       type: object
       properties:
@@ -958,8 +958,8 @@ components:
             by schemas discoverable at the `/capabilities` endpoint. Each capability
             uses its base ID as a key, with a "_version" field inside.
             Examples:
-            - "dev.ocs.restaurant.profile": { "_version": "1.0", ... }
-            - "dev.ocs.store.constraints": { "_version": "1.0", ... }
+            - "dev.ocp.restaurant.profile": { "_version": "1.0", ... }
+            - "dev.ocp.store.constraints": { "_version": "1.0", ... }
       required: [id, name, location]
 
     CatalogSummary:
@@ -988,7 +988,7 @@ components:
         by schemas discoverable at the `/capabilities` endpoint. Each capability
         uses its base ID as a key, with a "_version" field inside.
         Examples:
-        - "dev.ocs.promotions.discoverable": { "_version": "1.0", ... }
+        - "dev.ocp.promotions.discoverable": { "_version": "1.0", ... }
       required: [items]
 
     CatalogItem:
@@ -1010,12 +1010,12 @@ components:
             by schemas discoverable at the `/capabilities` endpoint. Each capability
             uses its base ID as a key, with a "_version" field inside.
              Examples:
-             - "dev.ocs.product.variants": { "_version": "1.0", ... }
-             - "dev.ocs.product.customization": { "_version": "1.0", ... }
-             - "dev.ocs.product.addons": { "_version": "1.0", ... }
-             - "dev.ocs.product.physical_properties": { "_version": "1.0", ... }
-             - "dev.ocs.order.preorder": { "_version": "1.0", ... }
-             - "dev.ocs.service.scheduling": { "_version": "1.0", ... }
+             - "dev.ocp.product.variants": { "_version": "1.0", ... }
+             - "dev.ocp.product.customization": { "_version": "1.0", ... }
+             - "dev.ocp.product.addons": { "_version": "1.0", ... }
+             - "dev.ocp.product.physical_properties": { "_version": "1.0", ... }
+             - "dev.ocp.order.preorder": { "_version": "1.0", ... }
+             - "dev.ocp.service.scheduling": { "_version": "1.0", ... }
         fulfillmentComponents:
           type: array
           description: "For hybrid fulfillment items, specifies the individual components that make up this product."
@@ -1090,7 +1090,7 @@ components:
         total: { $ref: "#/components/schemas/Money" }
         stores:
           type: array
-          description: "List of stores represented in this cart. Only present if the server supports multi-store carts (dev.ocs.cart.multi_store@1.0 capability)."
+          description: "List of stores represented in this cart. Only present if the server supports multi-store carts (dev.ocp.cart.multi_store@1.0 capability)."
           items:
             type: object
             properties:
@@ -1109,7 +1109,7 @@ components:
             required: [storeId, itemCount, subtotal]
         guestInfo:
           type: object
-          description: "Temporary customer information for guest checkouts. Only present if the server supports dev.ocs.cart.guest@1.0 capability."
+          description: "Temporary customer information for guest checkouts. Only present if the server supports dev.ocp.cart.guest@1.0 capability."
           properties:
             email:
               {
@@ -1167,14 +1167,14 @@ components:
           description: "An optional billing address for payment processing. Required if the payment method demands it (discoverable via x402 metadata)."
         consentGiven:
           type: boolean
-          description: "Indicates if the user has given consent for data collection/storage, as per dev.ocs.store.policies@1.0 dataPolicy."
+          description: "Indicates if the user has given consent for data collection/storage, as per dev.ocp.store.policies@1.0 dataPolicy."
         notes: { type: string }
         metadata: { type: object }
       required: [orderType, cartId]
 
     CreateDirectOrderRequest:
       type: object
-      description: "The request to create an order directly from a list of items, bypassing the cart. Only available if the server advertises the dev.ocs.order.direct@1.0 capability."
+      description: "The request to create an order directly from a list of items, bypassing the cart. Only available if the server advertises the dev.ocp.order.direct@1.0 capability."
       properties:
         orderType:
           type: string
@@ -1193,7 +1193,7 @@ components:
           description: "An optional billing address for payment processing. Required if the payment method demands it (discoverable via x402 metadata)."
         consentGiven:
           type: boolean
-          description: "Indicates if the user has given consent for data collection/storage, as per dev.ocs.store.policies@1.0 dataPolicy."
+          description: "Indicates if the user has given consent for data collection/storage, as per dev.ocp.store.policies@1.0 dataPolicy."
         notes: { type: string }
         promotionCode:
           {
@@ -1250,12 +1250,12 @@ components:
           type: string
           format: uri
           description: "The HTTPS URL where webhook events will be sent via HTTP POST."
-          example: "https://api.thirdparty.com/webhooks/ocs"
+          example: "https://api.thirdparty.com/webhooks/OCP"
         events:
           type: array
           items:
             type: string
-          description: "Array of event types to subscribe to. Must be a subset of the supportedEvents advertised in the dev.ocs.server.webhooks@1.0 capability."
+          description: "Array of event types to subscribe to. Must be a subset of the supportedEvents advertised in the dev.ocp.server.webhooks@1.0 capability."
           example: ["order.created", "order.shipped", "order.completed"]
         description:
           type: string
@@ -1324,10 +1324,10 @@ components:
       description: |
         The payload structure sent to webhook subscription URLs via HTTP POST.
         The request will include the following headers:
-        - X-OCS-Webhook-Signature: HMAC-SHA256 signature of the request body
-        - X-OCS-Webhook-Event: The event type (e.g., "order.created")
-        - X-OCS-Webhook-ID: Unique identifier for this webhook delivery attempt
-        - X-OCS-Webhook-Timestamp: Unix timestamp of when the event was generated
+        - X-OCP-Webhook-Signature: HMAC-SHA256 signature of the request body
+        - X-OCP-Webhook-Event: The event type (e.g., "order.created")
+        - X-OCP-Webhook-ID: Unique identifier for this webhook delivery attempt
+        - X-OCP-Webhook-Timestamp: Unix timestamp of when the event was generated
       properties:
         id:
           type: string
@@ -1393,7 +1393,7 @@ components:
           description: |
             A required, standardized status code representing the programmatic state category of the order.
             This is intended for client-side logic (e.g., state machines), NOT for direct display to the user.
-            For rich, human-readable status, clients should check for the 'dev.ocs.order.detailed_status@1.0' capability.
+            For rich, human-readable status, clients should check for the 'dev.ocp.order.detailed_status@1.0' capability.
           enum:
             - pending # Order created, but not yet confirmed by the system (e.g., awaiting inventory check).
             - confirmed # The order is accepted and will be processed.
@@ -1403,7 +1403,7 @@ components:
               A list of actions the client can perform on this order in its current state.
               The presence of an action indicates the user should be shown the corresponding UI control.
 
-              If the server advertises dev.ocs.hypermedia.schema_aware_actions@1.0 capability,
+              If the server advertises dev.ocp.hypermedia.schema_aware_actions@1.0 capability,
               actions will include schema references for request/response validation and dynamic form generation.
             items:
               $ref: "#/components/schemas/Action"
@@ -1424,13 +1424,13 @@ components:
             by schemas discoverable at the `/capabilities` endpoint. Each capability
             uses its base ID as a key, with a "_version" field inside.
              Examples:
-             - "dev.ocs.order.shipment_tracking": { "_version": "1.0", ... }
-             - "dev.ocs.order.kitchen_status": { "_version": "1.0", ... }
-             - "dev.ocs.order.delivery_tracking": { "_version": "1.0", ... }
-             - "dev.ocs.order.tipping": { "_version": "1.0", ... }
-             - "dev.ocs.order.digital_access": { "_version": "1.0", ... }
-             - "dev.ocs.order.detailed_status": { "_version": "1.0", ... }
-              - "dev.ocs.order.subscription": { "_version": "1.0", ... }
+             - "dev.ocp.order.shipment_tracking": { "_version": "1.0", ... }
+             - "dev.ocp.order.kitchen_status": { "_version": "1.0", ... }
+             - "dev.ocp.order.delivery_tracking": { "_version": "1.0", ... }
+             - "dev.ocp.order.tipping": { "_version": "1.0", ... }
+             - "dev.ocp.order.digital_access": { "_version": "1.0", ... }
+             - "dev.ocp.order.detailed_status": { "_version": "1.0", ... }
+              - "dev.ocp.order.subscription": { "_version": "1.0", ... }
           required: [id, status, items, total, createdAt, updatedAt]
 
     InitiateReturnRequest:
@@ -1655,7 +1655,7 @@ components:
       type: object
       description: |
         Represents a hypermedia action that can be performed on a resource.
-        When dev.ocs.hypermedia.schema_aware_actions@1.0 is enabled, includes schema references
+        When dev.ocp.hypermedia.schema_aware_actions@1.0 is enabled, includes schema references
         for request/response validation and dynamic client generation.
       properties:
         id:
@@ -1699,7 +1699,7 @@ components:
         errorSchemas:
           type: array
           description: |
-            Possible error responses for this action. All errors follow the OCS Error structure
+            Possible error responses for this action. All errors follow the OCP Error structure
             with code, message, userMessage, and nextActions fields.
           items:
             type: object
@@ -1710,7 +1710,7 @@ components:
                 example: 400
               errorCodes:
                 type: array
-                description: "Specific OCS error codes that may be returned (from Error.code enum)"
+                description: "Specific OCP error codes that may be returned (from Error.code enum)"
                 items:
                   type: string
                 example:
@@ -1720,7 +1720,7 @@ components:
                 description: "Human-readable explanation of when this error occurs"
                 example: "Returned when the order cannot be cancelled because the cancellation window has expired or the order is already fulfilled"
               schema:
-                description: "Schema for this error response. Typically references the standard OCS Error schema."
+                description: "Schema for this error response. Typically references the standard OCP Error schema."
                 oneOf:
                   - type: object
                     properties:
@@ -1768,9 +1768,9 @@ components:
         title: "Cancel Order"
         description: "Cancel this order if it hasn't been fulfilled yet. Refunds will be processed within 5-7 business days."
         requestSchema:
-          $ref: "https://schemas.ocs.dev/order/actions/cancel_request/v1.json"
+          $ref: "https://schemas.OCP.dev/order/actions/cancel_request/v1.json"
         responseSchema:
-          $ref: "https://schemas.ocs.dev/order/v1.json"
+          $ref: "https://schemas.OCP.dev/order/v1.json"
         errorSchemas:
           - statusCode: 400
             errorCodes:
@@ -1808,13 +1808,13 @@ components:
         - required: [$ref]
         - required: [inline]
       example:
-        $ref: "https://schemas.ocs.dev/order/actions/cancel_request/v1.json"
+        $ref: "https://schemas.OCP.dev/order/actions/cancel_request/v1.json"
 
     # --- Web Payments & SPC Schemas ---
     WebPaymentsMetadata:
       type: object
       description: |
-        Metadata for the dev.ocs.payment.web_payments@1.0 capability, enabling W3C Payment Request API integration.
+        Metadata for the dev.ocp.payment.web_payments@1.0 capability, enabling W3C Payment Request API integration.
         This capability allows servers to advertise support for native browser payment UIs with saved payment methods.
         See: https://www.w3.org/TR/payment-request/
       properties:
@@ -1865,7 +1865,7 @@ components:
     SecurePaymentConfirmationMetadata:
       type: object
       description: |
-        Metadata for the dev.ocs.payment.spc@1.0 capability, enabling W3C Secure Payment Confirmation integration.
+        Metadata for the dev.ocp.payment.spc@1.0 capability, enabling W3C Secure Payment Confirmation integration.
         SPC provides biometric authentication for payments using WebAuthn, reducing fraud and improving UX.
         See: https://www.w3.org/TR/secure-payment-confirmation/
       properties:
@@ -2127,7 +2127,7 @@ components:
           method: "GET"
           endpoint: "/orders"
           description: "Check if cart was already converted to order"
-      relatedCapabilities: ["dev.ocs.cart"]
+      relatedCapabilities: ["dev.ocp.cart"]
 
     cart_expired:
       httpStatus: 410
@@ -2143,9 +2143,9 @@ components:
           method: "POST"
           endpoint: "/carts"
           description: "Create a new cart with the same items"
-      relatedCapabilities: ["dev.ocs.cart"]
+      relatedCapabilities: ["dev.ocp.cart"]
       metadataKeys:
-        - "Check dev.ocs.cart capability metadata.lifetimeSeconds for expiration policy"
+        - "Check dev.ocp.cart capability metadata.lifetimeSeconds for expiration policy"
 
     cart_already_submitted:
       httpStatus: 409
@@ -2161,7 +2161,7 @@ components:
           method: "GET"
           endpoint: "/orders"
           description: "Retrieve the existing order"
-      relatedCapabilities: ["dev.ocs.cart"]
+      relatedCapabilities: ["dev.ocp.cart"]
 
     cart_empty:
       httpStatus: 400
@@ -2175,7 +2175,7 @@ components:
           method: "POST"
           endpoint: "/carts/{cartId}/items"
           description: "Add items to the cart"
-      relatedCapabilities: ["dev.ocs.cart"]
+      relatedCapabilities: ["dev.ocp.cart"]
 
     cart_multi_store_limit_exceeded:
       httpStatus: 400
@@ -2192,9 +2192,9 @@ components:
           method: "POST"
           endpoint: "/carts"
           description: "Create a separate cart for items from the other store"
-      relatedCapabilities: ["dev.ocs.cart", "dev.ocs.cart.multi_store"]
+      relatedCapabilities: ["dev.ocp.cart", "dev.ocp.cart.multi_store"]
       metadataKeys:
-        - "Check dev.ocs.cart.multi_store capability for multi-store cart policies"
+        - "Check dev.ocp.cart.multi_store capability for multi-store cart policies"
 
     # --- Product Errors ---
     product_unavailable:
@@ -2216,7 +2216,7 @@ components:
       category: "validation"
       retryable: true
       retryStrategy: "Correct customization parameters and retry"
-      relatedCapabilities: ["dev.ocs.product.customization"]
+      relatedCapabilities: ["dev.ocp.product.customization"]
 
     # --- Promotion Errors ---
     promotion_invalid:
@@ -2250,7 +2250,7 @@ components:
       description: "This promotion cannot be combined with other promotions already applied."
       category: "business_logic"
       retryable: false
-      relatedCapabilities: ["dev.ocs.promotions.policies"]
+      relatedCapabilities: ["dev.ocp.promotions.policies"]
 
     # --- Fulfillment Errors ---
     delivery_address_required:
@@ -2276,7 +2276,7 @@ components:
       category: "validation"
       retryable: true
       retryStrategy: "Complete all required fulfillment details"
-      relatedCapabilities: ["dev.ocs.order.fulfillment_intent"]
+      relatedCapabilities: ["dev.ocp.order.fulfillment_intent"]
 
     fulfillment_intent_duplicate_item:
       httpStatus: 400
@@ -2285,7 +2285,7 @@ components:
       category: "validation"
       retryable: true
       retryStrategy: "Ensure each cart item appears in exactly one fulfillment group"
-      relatedCapabilities: ["dev.ocs.order.fulfillment_intent"]
+      relatedCapabilities: ["dev.ocp.order.fulfillment_intent"]
 
     fulfillment_method_invalid:
       httpStatus: 400
@@ -2311,7 +2311,7 @@ components:
           description: "For cart-based orders, provide orderType='from_cart' and cartId only"
         - action: "use_direct_order"
           description: "For direct orders, provide orderType='direct' and items only"
-      relatedCapabilities: ["dev.ocs.cart", "dev.ocs.order.direct"]
+      relatedCapabilities: ["dev.ocp.cart", "dev.ocp.order.direct"]
 
     # --- Payment Errors ---
     payment_failed:
@@ -2334,7 +2334,7 @@ components:
       description: "The order can no longer be cancelled because it has progressed beyond the cancellation window."
       category: "business_logic"
       retryable: false
-      relatedCapabilities: ["dev.ocs.order.cancellation"]
+      relatedCapabilities: ["dev.ocp.order.cancellation"]
 
     return_policy_violated:
       httpStatus: 403
@@ -2346,7 +2346,7 @@ components:
         - "Return window has expired"
         - "Item is not eligible for return"
         - "Item condition does not meet return requirements"
-      relatedCapabilities: ["dev.ocs.order.returns"]
+      relatedCapabilities: ["dev.ocp.order.returns"]
 
     # --- Rate Limiting Errors ---
     rate_limit_exceeded:
@@ -2374,9 +2374,9 @@ components:
           schema: { type: integer }
           description: "Unix timestamp when the rate limit resets."
       relatedCapabilities:
-        - "dev.ocs.server.rate_limits"
+        - "dev.ocp.server.rate_limits"
       metadataKeys:
-        - "Check dev.ocs.server.rate_limits capability for rate limit policies."
+        - "Check dev.ocp.server.rate_limits capability for rate limit policies."
 
     order_items_unavailable:
       httpStatus: 409
@@ -2399,7 +2399,7 @@ components:
           endpoint: "/carts/{cartId}/items/{itemId}"
           description: "Reduce quantities of partially available items."
       relatedCapabilities:
-        - "dev.ocs.cart"
+        - "dev.ocp.cart"
       details:
         type: array
         description: "List of unavailable items with specific reasons."
@@ -2536,7 +2536,7 @@ components:
 
         **Behavior**:
         - Server should use this to select appropriate locale for translated content
-        - If server supports dev.ocs.i18n@1.0, it must negotiate locale from supportedLocales
+        - If server supports dev.ocp.i18n@1.0, it must negotiate locale from supportedLocales
         - If not supported or no match found, server uses defaultLocale
         - Server must respond with Content-Language header indicating selected locale
 
@@ -2553,7 +2553,7 @@ components:
 
         **Behavior**:
         - Must be included when response contains translated strings
-        - Should match one of the supportedLocales from dev.ocs.i18n@1.0 capability
+        - Should match one of the supportedLocales from dev.ocp.i18n@1.0 capability
         - Clients should use this to determine text direction and formatting
 
         **Example**: `fr-FR`
@@ -2568,7 +2568,7 @@ components:
       schema: { type: string }
       description: The cursor for the next page of results.
     AcceptOCSCapabilities:
-      name: Accept-OCS-Capabilities
+      name: Accept-OCP-Capabilities
       in: header
       required: false
       schema: { type: string }
@@ -2577,7 +2577,7 @@ components:
 
         **Format**: `capability-id@version[, capability-id@version, ...]`
 
-        **Example**: `dev.ocs.product.variants@1.0, dev.ocs.order.tracking@2.1`
+        **Example**: `dev.ocp.product.variants@1.0, dev.ocp.order.tracking@2.1`
 
         **Behavior**:
         - If omitted, server uses latest stable version of each capability
@@ -2587,12 +2587,12 @@ components:
         **Use Case**: Allows clients to request specific capability versions for backward compatibility during server upgrades.
 
   headers:
-    Accept-OCS-Capabilities:
+    Accept-OCP-Capabilities:
       schema:
         type: string
       description: |
         Comma-separated list of capability IDs with versions.
-        Example: dev.ocs.product.variants@2.0,dev.ocs.order.tracking@1.0
+        Example: dev.ocp.product.variants@2.0,dev.ocp.order.tracking@1.0
         If omitted, server uses default versions.
         Value: Makes evolution explicit. Servers can innovate without breaking existing clients.
 
@@ -2600,7 +2600,7 @@ components:
     BadRequest:
       description: The request was malformed or invalid.
       content:
-        application/ocs+json; version=1.0:
+        application/ocp+json; version=1.0:
           schema: { $ref: "#/components/schemas/Error" }
     Unauthorized:
       description: Authentication credentials are required and are missing or invalid.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "description": "Schema for product variants capability (dev.ocs.product.variants@1.0)",
+  "description": "Schema for product variants capability (dev.ocp.product.variants@1.0)",
   "properties": {
     "options": {
       "type": "array",
