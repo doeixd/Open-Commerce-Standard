@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/product/inventory/v1.json",
+  "title": "Product Inventory and Availability",
+  "description": "Schema for communicating detailed inventory and availability information (dev.ocp.product.inventory@1.0).",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "const": "1.0"
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["product", "variant"],
+      "description": "Defines whether the inventory information applies to the product as a whole or to specific variants."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["in_stock", "out_of_stock", "low_stock", "pre_order", "backorder", "made_to_order", "discontinued"],
+      "description": "A high-level availability status for UI display."
+    },
+    "stockTracking": {
+      "type": "boolean",
+      "description": "If false, the product is considered to have infinite stock (e.g., digital goods)."
+    },
+    "availableQuantity": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The total quantity currently available for sale across all locations. Only present if stockTracking is true."
+    },
+    "fulfillmentLeadTime": {
+      "type": "string",
+      "description": "Estimated time to prepare an item for shipment or pickup, in ISO 8601 duration format (e.g., 'P3D' for 3 days)."
+    },
+    "restockDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The estimated date when an out_of_stock item will be available again."
+    },
+    "locations": {
+      "type": "array",
+      "description": "For multi-location inventory, a breakdown of stock by location (e.g., store, warehouse).",
+      "items": {
+        "type": "object",
+        "properties": {
+          "locationId": {
+            "type": "string",
+            "description": "A unique identifier for the location (e.g., a store ID)."
+          },
+          "variantId": {
+            "type": "string",
+            "description": "Required if scope is 'variant', linking this stock to a specific variant."
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["locationId", "quantity", "updatedAt"]
+      }
+    }
+  },
+  "required": ["_version", "scope", "status", "stockTracking"]
+}

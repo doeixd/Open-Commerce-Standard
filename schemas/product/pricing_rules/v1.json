@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/product/pricing_rules/v1.json",
+  "title": "Dynamic Pricing Rules",
+  "description": "Schema for communicating dynamic pricing rules for a product (dev.ocp.product.pricing_rules@1.0).",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "const": "1.0"
+    },
+    "currency": {
+      "type": "string",
+      "description": "The ISO 4217 currency code that all rules in this block apply to."
+    },
+    "rules": {
+      "type": "array",
+      "description": "An ordered list of pricing rules. The first applicable rule in the list should be considered active.",
+      "items": {
+        "$ref": "#/$defs/pricingRule"
+      }
+    }
+  },
+  "required": ["_version", "currency", "rules"],
+  "$defs": {
+    "pricingRule": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["volume", "tiered", "time_based", "user_group"]
+        },
+        "description": {
+          "type": "string",
+          "description": "A human-readable explanation of the rule (e.g., '10% off for orders of 5 or more')."
+        },
+        "conditions": {
+          "type": "object",
+          "description": "The conditions that must be met for this rule to apply."
+        },
+        "adjustment": {
+          "description": "The price adjustment to apply if the conditions are met."
+        }
+      },
+      "required": ["type", "description", "conditions", "adjustment"],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "volume"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "conditions": {
+                "$ref": "#/$defs/volumeConditions"
+              },
+              "adjustment": {
+                "$ref": "#/$defs/priceAdjustment"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "tiered"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "conditions": {
+                "$ref": "#/$defs/tieredConditions"
+              },
+              "adjustment": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "time_based"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "conditions": {
+                "$ref": "#/$defs/timeBasedConditions"
+              },
+              "adjustment": {
+                "$ref": "#/$defs/priceAdjustment"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "user_group"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "conditions": {
+                "$ref": "#/$defs/userGroupConditions"
+              },
+              "adjustment": {
+                "$ref": "#/$defs/priceAdjustment"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "volumeConditions": {
+      "type": "object",
+      "properties": {
+        "minQuantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxQuantity": {
+          "type": "integer"
+        }
+      },
+      "required": ["minQuantity"]
+    },
+    "tieredConditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "minQuantity": {
+            "type": "integer"
+          },
+          "pricePerUnit": {
+            "type": "string"
+          }
+        },
+        "required": ["minQuantity", "pricePerUnit"]
+      }
+    },
+    "timeBasedConditions": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["start", "end"]
+    },
+    "userGroupConditions": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string",
+          "description": "Identifier for a user group (e.g., 'wholesale', 'premium_members')."
+        }
+      },
+      "required": ["groupId"]
+    },
+    "priceAdjustment": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["fixed_price", "percentage_discount", "fixed_discount"]
+        },
+        "value": {
+          "type": "string",
+          "description": "For fixed types, a decimal string. For percentage, a number from 0-100."
+        }
+      },
+      "required": ["type", "value"]
+    }
+  }
+}

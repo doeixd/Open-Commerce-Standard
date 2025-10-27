@@ -45,6 +45,308 @@ const store = {
       available: true,
       description: 'PDF guide to implementing OCP',
     },
+    {
+      id: 'ocp_tshirt',
+      name: 'OCP Logo T-Shirt',
+      price: { amount: '22.50', currency: 'USD' },
+      fulfillmentType: 'physical',
+      available: true,
+      description: 'A comfortable t-shirt featuring the official OCP logo.',
+      metadata: {
+        'dev.ocp.product.variants@1.0': {
+          _version: '1.0',
+          options: ['Size', 'Color'],
+          variants: [
+            {
+              id: 'tshirt_m_black',
+              values: ['Medium', 'Black'],
+              price: { amount: '22.50', currency: 'USD' },
+              stock: 50
+            },
+            {
+              id: 'tshirt_l_black',
+              values: ['Large', 'Black'],
+              price: { amount: '22.50', currency: 'USD' },
+              stock: 30
+            },
+            {
+              id: 'tshirt_l_white',
+              values: ['Large', 'White'],
+              price: { amount: '24.00', currency: 'USD' },
+              stock: 15
+            }
+          ]
+        },
+        'dev.ocp.product.identifiers@1.0': [
+          {
+            type: 'SKU',
+            value: 'OCP-TEE-STYLE-01',
+            scope: 'product'
+          },
+          {
+            type: 'UPC',
+            value: '123456789012',
+            scope: 'variant',
+            variantId: 'tshirt_m_black'
+          },
+          {
+            type: 'GTIN-13',
+            value: '0123456789012',
+            scope: 'variant',
+            variantId: 'tshirt_l_black'
+          },
+          {
+            type: 'GTIN-13',
+            value: '0123456789013',
+            scope: 'variant',
+            variantId: 'tshirt_l_white'
+          }
+        ],
+        'dev.ocp.product.links@1.0': [
+          {
+            rel: 'canonical',
+            href: 'https://ocp.dev/products/ocp-logo-tshirt',
+            title: 'Official OCP T-Shirt Page'
+          },
+          {
+            rel: 'manufacturer',
+            href: 'https://ocp.dev',
+            title: 'Open Commerce Protocol'
+          },
+          {
+            rel: 'reviews',
+            href: 'https://ocp.dev/products/ocp-logo-tshirt/reviews',
+            title: 'Customer Reviews'
+          },
+          {
+            rel: 'gallery',
+            href: 'https://ocp.dev/products/ocp-logo-tshirt/gallery',
+            title: 'Product Images'
+          },
+          {
+            rel: 'video',
+            href: 'https://youtube.com/watch?v=example',
+            title: 'Product Video',
+            type: 'text/html'
+          }
+        ],
+        'dev.ocp.product.rich_info@1.0': {
+          _version: '1.0',
+          lastModified: '2025-10-26T10:00:00Z',
+          authorRef: 'user_cms_admin',
+          publicationStatus: 'published',
+          names: {
+            short: 'OCP Tee',
+            customerFacing: 'Official OCP Logo T-Shirt - Premium Cotton',
+            backend: 'OCP-TEE-STYLE-01'
+          },
+          descriptions: {
+            short: 'Comfortable t-shirt featuring the official OCP logo, available in multiple sizes and colors.',
+            longHtml: '<p>Show your support for the <strong>Open Commerce Protocol</strong> with this premium t-shirt.</p><ul><li>100% premium cotton</li><li>Screen-printed logo</li><li>Available in black and white</li></ul>'
+          },
+          keyFeatures: [
+            '100% premium cotton fabric',
+            'Official OCP logo design',
+            'Available in multiple sizes',
+            'Comfortable regular fit',
+            'Machine washable'
+          ],
+          variants: [
+            {
+              variantId: 'tshirt_m_black',
+              descriptions: {
+                short: 'Medium Black OCP Tee - Perfect everyday fit with bold logo on black.'
+              },
+              imageGallery: [
+                {
+                  alt: 'OCP Logo T-Shirt - Medium Black',
+                  sources: [
+                    {
+                      url: 'https://cdn.ocp.dev/tshirt-m-black.webp',
+                      type: 'image/webp'
+                    }
+                  ],
+                  fallbackUrl: 'https://cdn.ocp.dev/tshirt-m-black.jpg'
+                }
+              ]
+            },
+            {
+              variantId: 'tshirt_l_white',
+              descriptions: {
+                short: 'Large White OCP Tee - Clean design on premium white cotton.'
+              },
+              imageGallery: [
+                {
+                  alt: 'OCP Logo T-Shirt - Large White',
+                  sources: [
+                    {
+                      url: 'https://cdn.ocp.dev/tshirt-l-white.webp',
+                      type: 'image/webp'
+                    }
+                  ],
+                  fallbackUrl: 'https://cdn.ocp.dev/tshirt-l-white.jpg'
+                }
+              ],
+              keyFeatures: [
+                '100% premium white cotton',
+                'Contrast black logo print',
+                'Large size for relaxed fit'
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      id: 'prod_artist_tee',
+      name: 'Organic Cotton Artist Tee',
+      price: { amount: '75.00', currency: 'USD' },
+      fulfillmentType: 'physical',
+      available: true,
+      description: 'A limited edition t-shirt designed by a famous artist, made from 100% GOTS-certified organic cotton.',
+      metadata: {
+        'dev.ocp.product.links@1.0': [
+          {
+            rel: 'canonical',
+            href: `http://localhost:${PORT}/products/prod_artist_tee`
+          },
+          {
+            rel: 'manufacturer',
+            href: 'http://localhost:3000/brands/eco-threads',
+            title: 'Eco Threads Inc.'
+          },
+          {
+            rel: 'describedby',
+            href: `http://localhost:${PORT}/products/prod_artist_tee.jsonld`,
+            type: 'application/ld+json'
+          }
+        ],
+        'dev.ocp.product.semantic_relations@1.0': [
+          {
+            predicate: 'https://schema.org/material',
+            object: {
+              type: 'uri',
+              value: 'http://purl.obolibrary.org/obo/CHEBI_25364' // URI for "cotton"
+            }
+          },
+          {
+            predicate: 'https://schema.org/brand',
+            object: {
+              type: 'uri',
+              value: 'http://localhost:3000/brands/eco-threads'
+            }
+          },
+          {
+            predicate: 'https://schema.org/slogan',
+            object: {
+              type: 'literal',
+              value: 'Wearable Art, Sustainably Made.',
+              lang: 'en-US'
+            }
+          },
+          {
+            predicate: 'http://localhost:3000/vocab#collectionYear',
+            object: {
+              type: 'literal',
+              value: '2025',
+              datatype: 'http://www.w3.org/2001/XMLSchema#gYear'
+            }
+          },
+          {
+            predicate: 'http://localhost:3000/vocab#isLimitedEdition',
+            object: {
+              type: 'literal',
+              value: 'true',
+              datatype: 'http://www.w3.org/2001/XMLSchema#boolean'
+            }
+          }
+        ]
+      }
+    },
+    {
+      id: 'prod_premium_headphones',
+      name: 'Premium Wireless Headphones',
+      price: { amount: '249.99', currency: 'USD' },
+      fulfillmentType: 'physical',
+      available: true,
+      description: 'High-quality wireless headphones with active noise cancellation.',
+      metadata: {
+        'dev.ocp.product.rich_info@1.0': {
+          _version: '1.0',
+          lastModified: '2025-10-25T14:30:00Z',
+          authorRef: 'user_marketing_jane',
+          publicationStatus: 'published',
+          names: {
+            short: 'Premium Headphones',
+            customerFacing: 'AcousticPro Premium Wireless Headphones with Active Noise Cancellation',
+            backend: 'SKU-AUDIO-HP-PRO-BLK'
+          },
+          descriptions: {
+            short: 'Premium wireless headphones featuring industry-leading active noise cancellation, 30-hour battery life, and studio-quality sound.',
+            longText: 'Experience audio like never before with the AcousticPro Premium Wireless Headphones. Featuring cutting-edge active noise cancellation technology, these headphones create a personal sound sanctuary wherever you go. The 40mm drivers deliver rich, balanced audio across all frequencies, while the adaptive EQ automatically tunes the music to the shape of your ear. With an impressive 30-hour battery life and quick-charge capability (5 minutes of charging = 3 hours of playback), these headphones are perfect for long commutes, flights, or focused work sessions. The premium memory foam cushions and adjustable headband ensure all-day comfort, while the foldable design and included hard case make them ideal for travel.',
+            longHtml: '<h2>Immersive Sound, Uninterrupted</h2><p>Experience audio like never before with the <strong>AcousticPro Premium Wireless Headphones</strong>. Featuring cutting-edge <em>active noise cancellation</em> technology, these headphones create a personal sound sanctuary wherever you go.</p><h3>Premium Audio Engineering</h3><ul><li>40mm custom drivers for rich, balanced sound</li><li>Adaptive EQ that tunes to your ear shape</li><li>Support for high-resolution audio codecs (aptX HD, LDAC)</li></ul><h3>All-Day Comfort</h3><p>The premium memory foam cushions and adjustable headband ensure comfort during extended listening sessions. The foldable design and included hard case make them perfect for travel.</p>'
+          },
+          seo: {
+            metaTitle: 'AcousticPro Premium Wireless Headphones | 30-Hour Battery',
+            metaDescription: 'Shop the AcousticPro Premium Wireless Headphones with active noise cancellation, 30-hour battery, and studio-quality sound. Free shipping.',
+            slug: 'acousticpro-premium-wireless-headphones'
+          },
+          keyFeatures: [
+            'Industry-leading active noise cancellation',
+            '30-hour battery life with quick-charge support',
+            '40mm custom drivers for studio-quality sound',
+            'Adaptive EQ automatically tunes to your ears',
+            'Premium memory foam ear cushions',
+            'Foldable design with hard travel case included',
+            'Multipoint Bluetooth connectivity',
+            'Built-in voice assistant support'
+          ],
+          imageGallery: [
+            {
+              alt: 'AcousticPro Premium Wireless Headphones - Front View',
+              title: 'Premium Headphones Main Image',
+              sources: [
+                {
+                  url: 'https://cdn.example.com/headphones-front-800w.webp',
+                  type: 'image/webp',
+                  srcset: 'https://cdn.example.com/headphones-front-400w.webp 400w, https://cdn.example.com/headphones-front-800w.webp 800w, https://cdn.example.com/headphones-front-1200w.webp 1200w',
+                  sizes: '(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 800px'
+                },
+                {
+                  url: 'https://cdn.example.com/headphones-front-800w.jpg',
+                  type: 'image/jpeg',
+                  srcset: 'https://cdn.example.com/headphones-front-400w.jpg 400w, https://cdn.example.com/headphones-front-800w.jpg 800w'
+                }
+              ],
+              fallbackUrl: 'https://cdn.example.com/headphones-front-800w.jpg'
+            },
+            {
+              alt: 'AcousticPro Premium Wireless Headphones - Side Profile',
+              title: 'Side view showing ear cup design',
+              sources: [
+                {
+                  url: 'https://cdn.example.com/headphones-side-800w.webp',
+                  type: 'image/webp',
+                  srcset: 'https://cdn.example.com/headphones-side-400w.webp 400w, https://cdn.example.com/headphones-side-800w.webp 800w'
+                }
+              ],
+              fallbackUrl: 'https://cdn.example.com/headphones-side-800w.jpg'
+            },
+            {
+              alt: 'AcousticPro Premium Wireless Headphones - Folded in Case',
+              title: 'Portable design with included hard case',
+              sources: [
+                {
+                  url: 'https://cdn.example.com/headphones-case-800w.webp',
+                  type: 'image/webp'
+                }
+              ],
+              fallbackUrl: 'https://cdn.example.com/headphones-case-800w.jpg'
+            }
+          ]
+        }
+      }
+    },
   ],
   orders: [],
   carts: [],
@@ -132,6 +434,50 @@ app.get('/capabilities', (req, res) => {
       {
         id: 'dev.ocp.resource.versioning@1.0',
         schemaUrl: 'https://schemas.OCP.dev/resource/versioning/v1.json',
+      },
+      {
+        id: 'dev.ocp.product.variants@1.0',
+        schemaUrl: 'https://schemas.ocp.dev/product/variants/v1.json',
+      },
+      {
+        id: 'dev.ocp.product.identifiers@1.0',
+        schemaUrl: 'https://schemas.ocp.dev/product/identifiers/v1.json',
+      },
+      {
+        id: 'dev.ocp.product.search@1.0',
+        schemaUrl: 'https://schemas.ocp.dev/product/search/v1.json',
+        metadata: {
+          urlTemplate: `http://localhost:${PORT}/search?q={query}`,
+          searchableIdentifierTypes: ["SKU", "UPC", "GTIN-13"]
+        }
+      },
+      {
+        id: 'dev.ocp.product.links@1.0',
+        schemaUrl: 'https://schemas.ocp.dev/product/links/v1.json',
+      },
+      {
+        id: 'dev.ocp.server.vocabularies@1.0',
+        schemaUrl: 'https://schemas.ocp.dev/server/vocabularies/v1.json',
+        metadata: [
+          {
+            prefix: 'schema',
+            namespace: 'https://schema.org/',
+            predicates: ['material', 'designer', 'slogan', 'brand']
+          },
+          {
+            prefix: 'mybrand',
+            namespace: `http://localhost:${PORT}/vocab#`,
+            predicates: ['collectionYear', 'isLimitedEdition']
+          }
+        ]
+      },
+      {
+        id: 'dev.ocp.product.semantic_relations@1.0',
+        schemaUrl: 'https://schemas.ocp.dev/product/semantic_relations/v1.json',
+      },
+      {
+        id: 'dev.ocp.product.rich_info@1.0',
+        schemaUrl: 'https://schemas.ocp.dev/product/rich_info/v1.json',
       },
     ],
   });

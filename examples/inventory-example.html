@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCP Product Inventory and Availability Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.6;
+    }
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      background: #f9f9f9;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .status-in_stock { background: #d4edda; color: #155724; }
+    .status-out_of_stock { background: #f8d7da; color: #721c24; }
+    .status-low_stock { background: #fff3cd; color: #856404; }
+    .status-pre_order { background: #cce5ff; color: #004085; }
+    .status-backorder { background: #e2e3e5; color: #383d41; }
+    .status-made_to_order { background: #d1ecf1; color: #0c5460; }
+    .status-discontinued { background: #f5c6cb; color: #721c24; }
+    .inventory-info {
+      margin: 15px 0;
+      padding: 10px;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #eee;
+    }
+    .quantity-display {
+      font-size: 18px;
+      font-weight: bold;
+      color: #007bff;
+    }
+    .lead-time {
+      color: #666;
+      font-size: 14px;
+    }
+    .locations-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .locations-table th, .locations-table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    .locations-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+    }
+    .variant-selector {
+      margin: 15px 0;
+    }
+    select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-left: 10px;
+    }
+    .add-to-cart {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 15px;
+    }
+    .add-to-cart:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+    .pre-order-notice {
+      background: #cce5ff;
+      border: 1px solid #b3d7ff;
+      border-radius: 4px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>📦 OCP Product Inventory and Availability Demo</h1>
+  <p>
+    This example demonstrates how <code>dev.ocp.product.inventory@1.0</code> provides
+    detailed stock information, multi-location inventory, and various availability statuses.
+    Clients can display rich availability information and handle different purchasing scenarios.
+  </p>
+
+  <!-- Simple Product with Stock -->
+  <div class="product-card">
+    <h2>OCP Coffee Mug</h2>
+    <p>A high-quality ceramic coffee mug with OCP branding.</p>
+    <div class="status-badge status-in_stock">In Stock</div>
+
+    <div class="inventory-info">
+      <div class="quantity-display">157 in stock</div>
+      <div class="lead-time">Ships in 1 day</div>
+    </div>
+
+    <button class="add-to-cart">Add to Cart</button>
+  </div>
+
+  <!-- Variant Product with Multi-Location -->
+  <div class="product-card">
+    <h2>Pro T-Shirt</h2>
+    <p>Comfortable technical t-shirt available in multiple sizes and colors.</p>
+    <div class="status-badge status-in_stock">In Stock</div>
+
+    <div class="variant-selector">
+      <label>Select Size:</label>
+      <select id="tshirt-size" onchange="updateVariantStock()">
+        <option value="tshirt_m_black">Medium - Black</option>
+        <option value="tshirt_l_black">Large - Black</option>
+        <option value="tshirt_xl_black">XL - Black</option>
+      </select>
+    </div>
+
+    <div class="inventory-info">
+      <div id="variant-stock">70 in stock</div>
+      <div class="lead-time">Ships in 2-3 days</div>
+
+      <table class="locations-table">
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>Quantity</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody id="location-details">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <button class="add-to-cart">Add to Cart</button>
+  </div>
+
+  <!-- Pre-Order Product -->
+  <div class="product-card">
+    <h2>AeroDrone Pro v3</h2>
+    <p>Next-generation professional drone with 4K camera and autonomous flight.</p>
+    <div class="status-badge status-pre_order">Pre-Order</div>
+
+    <div class="pre-order-notice">
+      <strong>Pre-Order Now!</strong> This item is not yet in stock but will be available starting March 1, 2026.
+      Orders will ship within 14 days of release.
+    </div>
+
+    <div class="inventory-info">
+      <div class="quantity-display">Pre-order available</div>
+      <div class="lead-time">Ships 14 days after release</div>
+    </div>
+
+    <button class="add-to-cart">Pre-Order Now</button>
+  </div>
+
+  <!-- Out of Stock with Restock Date -->
+  <div class="product-card">
+    <h2>Limited Edition Widget</h2>
+    <p>A special edition widget that's extremely popular.</p>
+    <div class="status-badge status-out_of_stock">Out of Stock</div>
+
+    <div class="inventory-info">
+      <div class="quantity-display">Currently out of stock</div>
+      <div class="lead-time">Expected restock: December 15, 2025</div>
+    </div>
+
+    <button class="add-to-cart" disabled>Add to Cart</button>
+  </div>
+
+  <!-- Digital Product (Infinite Stock) -->
+  <div class="product-card">
+    <h2>OCP API Documentation PDF</h2>
+    <p>Complete API documentation in PDF format.</p>
+    <div class="status-badge status-in_stock">Digital Download</div>
+
+    <div class="inventory-info">
+      <div class="quantity-display">Always available</div>
+      <div class="lead-time">Instant download</div>
+    </div>
+
+    <button class="add-to-cart">Download Now</button>
+  </div>
+
+  <script>
+    // Sample inventory data for the variant product
+    const variantInventory = {
+      "tshirt_m_black": {
+        total: 70,
+        locations: [
+          { locationId: "warehouse_east", quantity: 50, updatedAt: "2025-10-25T10:30:00Z" },
+          { locationId: "warehouse_west", quantity: 20, updatedAt: "2025-10-25T09:15:00Z" }
+        ]
+      },
+      "tshirt_l_black": {
+        total: 65,
+        locations: [
+          { locationId: "warehouse_east", quantity: 0, updatedAt: "2025-10-25T08:45:00Z" },
+          { locationId: "warehouse_west", quantity: 65, updatedAt: "2025-10-25T11:00:00Z" }
+        ]
+      },
+      "tshirt_xl_black": {
+        total: 0,
+        locations: [
+          { locationId: "warehouse_east", quantity: 0, updatedAt: "2025-10-25T07:20:00Z" },
+          { locationId: "warehouse_west", quantity: 0, updatedAt: "2025-10-25T07:20:00Z" }
+        ]
+      }
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      updateVariantStock();
+    });
+
+    // Update variant stock display
+    function updateVariantStock() {
+      const selectedVariant = document.getElementById('tshirt-size').value;
+      const data = variantInventory[selectedVariant];
+
+      document.getElementById('variant-stock').textContent = `${data.total} in stock`;
+
+      const tbody = document.getElementById('location-details');
+      tbody.innerHTML = '';
+
+      data.locations.forEach(location => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${location.locationId.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+          <td>${location.quantity}</td>
+          <td>${new Date(location.updatedAt).toLocaleString()}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      // Update add to cart button
+      const addButton = document.querySelector('.product-card:nth-child(2) .add-to-cart');
+      if (data.total > 0) {
+        addButton.disabled = false;
+        addButton.textContent = 'Add to Cart';
+      } else {
+        addButton.disabled = true;
+        addButton.textContent = 'Out of Stock';
+      }
+    }
+  </script>
+</body>
+</html>

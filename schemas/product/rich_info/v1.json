@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/product/rich_info/v1.json",
+  "title": "Rich Product Information",
+  "description": "Schema for providing comprehensive presentation and SEO content for a product (dev.ocp.product.rich_info@1.0).",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "The version of this rich_info schema."
+    },
+    "lastModified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this content was last updated."
+    },
+    "authorRef": {
+      "type": "string",
+      "description": "An opaque reference to the user or system that last modified the content."
+    },
+    "publicationStatus": {
+      "type": "string",
+      "enum": ["published", "draft", "archived", "coming_soon", "pre_order"],
+      "description": "The marketing or presentation status of the product content. This complements the transactional 'available' flag on the core object."
+    },
+    "names": {
+      "type": "object",
+      "description": "A collection of names for different contexts.",
+      "properties": {
+        "short": {
+          "type": "string",
+          "description": "Short name for cart, checkout, and related product carousels."
+        },
+        "customerFacing": {
+          "type": "string",
+          "description": "Main product title for product detail pages."
+        },
+        "backend": {
+          "type": "string",
+          "description": "Internal name for admin panels and backend systems."
+        }
+      }
+    },
+    "descriptions": {
+      "type": "object",
+      "description": "A collection of descriptions for different rendering needs.",
+      "properties": {
+        "short": {
+          "type": "string",
+          "description": "Short description for product list pages and category views."
+        },
+        "longText": {
+          "type": "string",
+          "description": "Long plain text description for contexts that don't support HTML."
+        },
+        "longHtml": {
+          "type": "string",
+          "description": "Long HTML description for product detail pages. MUST be sanitized by clients before rendering."
+        }
+      }
+    },
+    "seo": {
+      "type": "object",
+      "description": "Content specifically for search engine optimization.",
+      "properties": {
+        "metaTitle": {
+          "type": "string",
+          "description": "SEO-optimized title for browser tabs and search results (recommended: under 60 characters)."
+        },
+        "metaDescription": {
+          "type": "string",
+          "description": "SEO-optimized description for search result snippets (recommended: under 160 characters)."
+        },
+        "slug": {
+          "type": "string",
+          "description": "URL-friendly identifier for the product (e.g., 'organic-cotton-artist-tee')."
+        }
+      }
+    },
+    "keyFeatures": {
+      "type": "array",
+      "description": "A list of key selling points, ideal for rendering as a bulleted list.",
+      "items": { "type": "string" }
+    },
+    "imageGallery": {
+      "type": "array",
+      "description": "An ordered list of images for a product carousel or gallery. Structure supports responsive images and modern formats.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "alt": {
+            "type": "string",
+            "description": "Alt text for accessibility and SEO."
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional title attribute for the image."
+          },
+          "sources": {
+            "type": "array",
+            "description": "Array of source elements for responsive images and modern formats (maps to HTML <source> tags).",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "URL of the image source."
+                },
+                "type": {
+                  "type": "string",
+                  "description": "MIME type (e.g., 'image/webp', 'image/avif')."
+                },
+                "srcset": {
+                  "type": "string",
+                  "description": "Srcset attribute value for responsive images (e.g., 'image-400w.webp 400w, image-800w.webp 800w')."
+                },
+                "sizes": {
+                  "type": "string",
+                  "description": "Sizes attribute value (e.g., '(max-width: 600px) 100vw, 50vw')."
+                }
+              },
+              "required": ["url"]
+            }
+          },
+          "fallbackUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Fallback image URL for browsers that don't support <picture> (maps to <img src>)."
+          },
+          "variantId": {
+            "type": "string",
+            "description": "Optional: links this image to a specific variant from dev.ocp.product.variants@1.0."
+          }
+        },
+        "required": ["alt", "fallbackUrl"]
+      }
+    },
+    "variants": {
+      "type": "array",
+      "description": "Variant-specific rich info that overrides product-level content for specific variants.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "variantId": {
+            "type": "string",
+            "description": "Must match the 'id' of a variant defined in the 'dev.ocp.product.variants@1.0' capability."
+          },
+          "names": {
+            "type": "object",
+            "description": "Variant-specific names that override product-level names.",
+            "properties": {
+              "short": { "type": "string" },
+              "customerFacing": { "type": "string" },
+              "backend": { "type": "string" }
+            }
+          },
+          "descriptions": {
+            "type": "object",
+            "description": "Variant-specific descriptions.",
+            "properties": {
+              "short": { "type": "string" },
+              "longText": { "type": "string" },
+              "longHtml": { "type": "string" }
+            }
+          },
+          "imageGallery": {
+            "type": "array",
+            "description": "Variant-specific images that replace or augment product-level images.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "alt": { "type": "string" },
+                "title": { "type": "string" },
+                "sources": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "url": { "type": "string", "format": "uri" },
+                      "type": { "type": "string" },
+                      "srcset": { "type": "string" },
+                      "sizes": { "type": "string" }
+                    },
+                    "required": ["url"]
+                  }
+                },
+                "fallbackUrl": { "type": "string", "format": "uri" }
+              },
+              "required": ["alt", "fallbackUrl"]
+            }
+          },
+          "keyFeatures": {
+            "type": "array",
+            "description": "Variant-specific key features that override or augment product-level features.",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["variantId"]
+      }
+    }
+  },
+  "required": ["_version", "lastModified"],
+  "additionalProperties": false
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/product/identifiers/v1.json",
+  "title": "Product Identifiers",
+  "description": "Schema for defining a list of external product identifiers (dev.ocp.product.identifiers@1.0).",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "description": "The type of the identifier.",
+        "enum": [
+          "ASIN",
+          "CatalogNumber",
+          "CUSIP",
+          "DOI",
+          "EAN",
+          "EAN-13",
+          "EAN-8",
+          "ePID",
+          "GCID",
+          "GS1",
+          "GTIN",
+          "GTIN-12",
+          "GTIN-13",
+          "GTIN-14",
+          "GTIN-8",
+          "ICAO",
+          "IMEI",
+          "ISBN",
+          "ISBN-10",
+          "ISBN-13",
+          "ISIN",
+          "ISMN",
+          "ISSN",
+          "ITF-14",
+          "JAN",
+          "LCCN",
+          "MAC",
+          "ModelNumber",
+          "MPN",
+          "NDC",
+          "OCLC",
+          "other",
+          "PartNumber",
+          "PLU",
+          "PZN",
+          "RIC",
+          "SerialNumber",
+          "SKU",
+          "SSCC",
+          "TSIN",
+          "UPC",
+          "UPC-A",
+          "UPC-E",
+          "VIN"
+        ]
+      },
+      "customType": {
+        "type": "string",
+        "description": "Specifies the identifier type when 'type' is 'other'. It is recommended to use a namespaced format, e.g., 'your-domain:id-name'."
+      },
+      "value": {
+        "type": "string",
+        "description": "The value of the identifier."
+      },
+      "scope": {
+        "type": "string",
+        "enum": ["product", "variant"],
+        "description": "'product' applies to the base product and all its variants (e.g., an ISBN for a book). 'variant' applies only to a specific variant (e.g., a UPC for a size/color combination)."
+      },
+      "variantId": {
+        "type": "string",
+        "description": "Required if scope is 'variant'. Must match the 'id' of a variant defined in the 'dev.ocp.product.variants@1.0' capability."
+      }
+    },
+    "required": ["type", "value", "scope"],
+    "if": {
+      "properties": { "scope": { "const": "variant" } }
+    },
+    "then": {
+      "required": ["variantId"]
+    }
+  }
+}

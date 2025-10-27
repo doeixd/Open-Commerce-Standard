@@ -339,6 +339,222 @@ async function revisionExample() {
   }
 }
 
+// --- Example: Working with Rich Product Info ---
+
+async function richInfoExample() {
+  console.log('📄 Rich product info example\n');
+  try {
+    const products = await browseProducts('main');
+
+    // Find a product with rich_info
+    const productWithRichInfo = products.find(
+      p => p.metadata && p.metadata['dev.ocp.product.rich_info@1.0']
+    );
+
+    if (!productWithRichInfo) {
+      console.log('No products with rich info found in the "main" catalog.');
+      return;
+    }
+
+    console.log(`Product: "${productWithRichInfo.name}"`);
+
+    const richInfo = productWithRichInfo.metadata['dev.ocp.product.rich_info@1.0'];
+
+    // Demonstrate fallback logic (progressive enhancement)
+    const displayName = richInfo?.names?.customerFacing || productWithRichInfo.name;
+    const shortName = richInfo?.names?.short || productWithRichInfo.name;
+
+    console.log(`\n📝 Names:`);
+    console.log(`  Customer-Facing: "${displayName}"`);
+    console.log(`  Short (for cart): "${shortName}"`);
+    console.log(`  Backend: "${richInfo?.names?.backend || 'N/A'}"`);
+
+    console.log(`\n📋 Descriptions:`);
+    console.log(`  Short: "${richInfo?.descriptions?.short?.substring(0, 60)}..."`);
+
+    console.log(`\n🔍 SEO:`);
+    if (richInfo?.seo) {
+      console.log(`  Meta Title: "${richInfo.seo.metaTitle}"`);
+      console.log(`  Slug: "${richInfo.seo.slug}"`);
+    }
+
+    console.log(`\n✨ Key Features:`);
+    richInfo?.keyFeatures?.forEach((feature, i) => {
+      console.log(`  ${i + 1}. ${feature}`);
+    });
+
+    console.log(`\n🖼️  Image Gallery: ${richInfo?.imageGallery?.length || 0} images`);
+
+    console.log(`\n📅 Content Info:`);
+    console.log(`  Last Modified: ${richInfo.lastModified}`);
+    console.log(`  Author: ${richInfo.authorRef}`);
+    console.log(`  Status: ${richInfo.publicationStatus}`);
+
+    // Check for variant-specific rich info
+    if (richInfo.variants && richInfo.variants.length > 0) {
+      console.log(`\n🎨 Variant-Specific Rich Info:`);
+      const variants = productWithRichInfo.metadata['dev.ocp.product.variants@1.0']?.variants;
+      richInfo.variants.forEach(vri => {
+        const variant = variants?.find(v => v.id === vri.variantId);
+        const variantName = variant ? variant.values.join('/') : vri.variantId;
+        console.log(`  - ${variantName}:`);
+        if (vri.descriptions?.short) {
+          console.log(`    Description: "${vri.descriptions.short}"`);
+        }
+        if (vri.imageGallery) {
+          console.log(`    Images: ${vri.imageGallery.length} variant-specific`);
+        }
+        if (vri.keyFeatures) {
+          console.log(`    Features: ${vri.keyFeatures.length} variant-specific`);
+        }
+      });
+    }
+
+    console.log('\n✨ Rich info example complete!');
+
+  } catch (error) {
+    console.error('❌ Error in rich info example:', error.message);
+  }
+}
+
+// --- Example: Consuming Semantic Relations ---
+
+async function semanticExample() {
+  console.log('🧠 Semantic relations example\n');
+  try {
+    // 1. Discover server vocabularies
+    const capabilities = await getCapabilities();
+    const vocabData = capabilities.find(c => c.id === 'dev.ocp.server.vocabularies@1.0');
+    if (vocabData) {
+      console.log('Server advertises the following vocabularies:');
+      vocabData.metadata.forEach(vocab => {
+        console.log(`  - ${vocab.prefix}: ${vocab.namespace} (${vocab.predicates?.length || 0} predicates)`);
+      });
+    }
+
+    // 2. Find a product with semantic relations
+    const products = await browseProducts('main');
+    const productWithSemantics = products.find(
+      p => p.metadata && p.metadata['dev.ocp.product.semantic_relations@1.0']
+    );
+
+    if (!productWithSemantics) {
+      console.log('No products with semantic relations found.');
+      return;
+    }
+
+    console.log(`\nFound semantic data for product: "${productWithSemantics.name}"`);
+
+    // 3. Find its canonical URL (its identity)
+    const links = productWithSemantics.metadata['dev.ocp.product.links@1.0'];
+    const canonicalLink = links?.find(l => l.rel === 'canonical');
+    const subjectURI = canonicalLink ? canonicalLink.href : `urn:ocp:product:${productWithSemantics.id}`;
+    console.log(`  Subject URI (Identity): ${subjectURI}`);
+
+    // 4. Parse and display the relations in a human-friendly way
+    console.log('\nStatements (Triples):');
+    const relations = productWithSemantics.metadata['dev.ocp.product.semantic_relations@1.0'];
+    for (const rel of relations) {
+      const predicateName = rel.predicate.split(/#|\//).pop();
+      let objectDisplay = '';
+      if (rel.object.type === 'uri') {
+        objectDisplay = `<${rel.object.value}>`;
+      } else {
+        objectDisplay = `"${rel.object.value}"`;
+        if (rel.object.lang) objectDisplay += `@${rel.object.lang}`;
+        if (rel.object.datatype) objectDisplay += `^^<${rel.object.datatype.split('#').pop()}>`;
+      }
+      console.log(`  - ${predicateName}: ${objectDisplay}`);
+    }
+
+    console.log('\n✨ Semantic example complete!');
+
+  } catch (error) {
+    console.error('❌ Error in semantic example:', error.message);
+  }
+}
+
+// --- Example: Working with Product Links ---
+
+async function linksExample() {
+  console.log('🔗 Product links example\n');
+  try {
+    const products = await browseProducts('main');
+
+    // Find a product with links
+    const productWithLinks = products.find(
+      p => p.metadata && p.metadata['dev.ocp.product.links@1.0']
+    );
+
+    if (!productWithLinks) {
+      console.log('No products with links found in the "main" catalog.');
+      return;
+    }
+
+    console.log(`Product: "${productWithLinks.name}" (ID: ${productWithLinks.id})`);
+
+    const links = productWithLinks.metadata['dev.ocp.product.links@1.0'];
+
+    console.log('\nFound Links:');
+    for (const link of links) {
+      console.log(`  - [${link.rel}] ${link.title || link.rel}`);
+      console.log(`    ${link.href}`);
+      if (link.type) {
+        console.log(`    Type: ${link.type}`);
+      }
+      if (link.hreflang) {
+        console.log(`    Language: ${link.hreflang}`);
+      }
+    }
+
+    console.log('\n✨ Links example complete!');
+
+  } catch (error) {
+    console.error('❌ Error in links example:', error.message);
+  }
+}
+
+// --- Example: Working with Product Identifiers ---
+
+async function identifierExample() {
+  console.log('🆔 Product identifiers example\n');
+  try {
+    const products = await browseProducts('main');
+
+    // Find a product with identifiers
+    const productWithIds = products.find(
+      p => p.metadata && p.metadata['dev.ocp.product.identifiers@1.0']
+    );
+
+    if (!productWithIds) {
+      console.log('No products with identifiers found in the "main" catalog.');
+      return;
+    }
+
+    console.log(`Product: "${productWithIds.name}" (ID: ${productWithIds.id})`);
+
+    const identifiers = productWithIds.metadata['dev.ocp.product.identifiers@1.0'];
+    const variants = productWithIds.metadata['dev.ocp.product.variants@1.0']?.variants;
+
+    console.log('\nFound Identifiers:');
+    for (const id of identifiers) {
+      if (id.scope === 'product') {
+        console.log(`  - [Product-wide] ${id.type}: ${id.value}`);
+      } else if (id.scope === 'variant') {
+        // Find the matching variant to give a human-friendly description
+        const variant = variants?.find(v => v.id === id.variantId);
+        const variantName = variant ? `(${variant.values.join('/')})` : `(Unknown Variant)`;
+        console.log(`  - [Variant ${variantName}] ${id.type}: ${id.value}`);
+      }
+    }
+
+    console.log('\n✨ Identifier example complete!');
+
+  } catch (error) {
+    console.error('❌ Error in identifier example:', error.message);
+  }
+}
+
 // --- Example: Client-Only (Stateless) Cart Simulation ---
 
 // For client-only carts, errors are handled locally without server persistence
@@ -409,6 +625,10 @@ if (typeof module !== 'undefined' && module.exports) {
     checkOrderStatus,
     cartBasedFlow,
     variantExample,
+    richInfoExample,
+    semanticExample,
+    linksExample,
+    identifierExample,
     revisionExample,
     subscribeToOrderUpdates,
     simulateClientOnlyCart,
@@ -421,6 +641,10 @@ if (typeof module !== 'undefined' && module.exports) {
 // main();
 // cartBasedFlow();
 // variantExample();
+// richInfoExample();
+// semanticExample();
+// linksExample();
+// identifierExample();
 // revisionExample();
 
 // Example: Subscribe to order updates

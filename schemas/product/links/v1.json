@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/product/links/v1.json",
+  "title": "Product Links",
+  "description": "Schema for defining a list of related web links for a product (dev.ocp.product.links@1.0).",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "rel": {
+        "type": "string",
+        "description": "Describes the relationship of the linked resource. Aligns with IANA link relations.",
+        "enum": [
+          "canonical",
+          "manufacturer",
+          "reviews",
+          "documentation",
+          "support",
+          "gallery",
+          "alternate",
+          "related",
+          "video",
+          "manual",
+          "datasheet",
+          "warranty",
+          "comparison",
+          "blog",
+          "describedby"
+        ]
+      },
+      "href": {
+        "type": "string",
+        "format": "uri",
+        "description": "The URL of the linked resource."
+      },
+      "title": {
+        "type": "string",
+        "description": "A human-readable title for the link."
+      },
+      "type": {
+        "type": "string",
+        "description": "The MIME type of the linked resource (e.g., 'text/html', 'application/pdf')."
+      },
+      "hreflang": {
+        "type": "string",
+        "description": "The language of the linked resource (e.g., 'en', 'es', 'fr')."
+      }
+    },
+    "required": ["rel", "href"]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/server/vocabularies/v1.json",
+  "title": "Vocabulary Advertisement",
+  "description": "Advertises the semantic vocabularies and predicates used by the server (dev.ocp.server.vocabularies@1.0).",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "prefix": { "type": "string", "description": "The short prefix for the vocabulary (e.g., 'schema')." },
+      "namespace": { "type": "string", "format": "uri", "description": "The base URI for the vocabulary." },
+      "predicates": {
+        "type": "array",
+        "description": "An optional list of specific predicates from this vocabulary that the server commonly uses.",
+        "items": { "type": "string" }
+      }
+    },
+    "required": ["prefix", "namespace"]
+  }
+}

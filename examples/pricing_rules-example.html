@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCP Dynamic Pricing Rules Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.6;
+    }
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      background: #f9f9f9;
+    }
+    .price-display {
+      font-size: 24px;
+      font-weight: bold;
+      color: #007bff;
+      margin: 10px 0;
+    }
+    .original-price {
+      text-decoration: line-through;
+      color: #666;
+      font-size: 18px;
+    }
+    .discount-badge {
+      background: #28a745;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: inline-block;
+      margin-left: 10px;
+    }
+    .quantity-input {
+      margin: 15px 0;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    input[type="number"] {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100px;
+    }
+    .rules-list {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #eee;
+    }
+    .rule-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .rule-item:last-child {
+      border-bottom: none;
+    }
+    .rule-description {
+      font-weight: 500;
+      color: #333;
+    }
+    .rule-active {
+      background: #e8f5e8;
+      border-left: 4px solid #28a745;
+    }
+    .total-calculation {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛒 OCP Dynamic Pricing Rules Demo</h1>
+  <p>
+    This example demonstrates how <code>dev.ocp.product.pricing_rules@1.0</code> enables
+    client-side price calculations for volume discounts, tiered pricing, and other dynamic pricing models.
+    The client can instantly update prices as the user changes quantity, reducing API calls.
+  </p>
+
+  <div class="product-card">
+    <h2 id="product-name">Bulk Widget</h2>
+    <p id="product-description">A high-quality widget perfect for bulk orders.</p>
+
+    <div class="quantity-input">
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" min="1" value="1" onchange="updatePrice()">
+    </div>
+
+    <div class="price-display">
+      <span id="price-amount">$10.00</span> each
+      <span id="discount-badge" style="display: none;" class="discount-badge">10% OFF</span>
+    </div>
+
+    <div id="total-display" class="total-calculation">
+      Total: <strong>$10.00</strong>
+    </div>
+
+    <div class="rules-list">
+      <h3>Available Pricing Rules:</h3>
+      <div id="rules-container">
+        <!-- Rules will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <div class="product-card">
+    <h2>Tiered API Call Credits</h2>
+    <p>Usage-based billing with tiered pricing.</p>
+
+    <div class="quantity-input">
+      <label for="tiered-quantity">Quantity:</label>
+      <input type="number" id="tiered-quantity" min="1" value="1" onchange="updateTieredPrice()">
+    </div>
+
+    <div class="price-display">
+      <span id="tiered-price-amount">$5.00</span> each
+    </div>
+
+    <div id="tiered-total-display" class="total-calculation">
+      Total: <strong>$5.00</strong>
+    </div>
+
+    <div class="rules-list">
+      <h3>Pricing Tiers:</h3>
+      <ul>
+        <li>1-10 credits: $5.00 each</li>
+        <li>11-50 credits: $4.00 each</li>
+        <li>51+ credits: $3.00 each</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Sample product data with pricing rules (from the proposal)
+    const productData = {
+      id: "prod_bulk_widget",
+      name: "Bulk Widget",
+      price: { amount: "10.00", currency: "USD" },
+      metadata: {
+        "dev.ocp.product.pricing_rules@1.0": {
+          "_version": "1.0",
+          "currency": "USD",
+          "rules": [
+            {
+              "type": "volume",
+              "description": "Buy 10 or more for $8.00 each",
+              "conditions": { "minQuantity": 10 },
+              "adjustment": { "type": "fixed_price", "value": "8.00" }
+            },
+            {
+              "type": "volume",
+              "description": "Buy 5-9 for $9.00 each",
+              "conditions": { "minQuantity": 5, "maxQuantity": 9 },
+              "adjustment": { "type": "fixed_price", "value": "9.00" }
+            }
+          ]
+        }
+      }
+    };
+
+    const tieredProductData = {
+      id: "prod_tiered_api_call",
+      name: "API Call Credit",
+      price: { amount: "5.00", currency: "USD" },
+      metadata: {
+        "dev.ocp.product.pricing_rules@1.0": {
+          "_version": "1.0",
+          "currency": "USD",
+          "rules": [
+            {
+              "type": "tiered",
+              "description": "Tiered pricing based on quantity",
+              "conditions": [
+                { "minQuantity": 1, "pricePerUnit": "5.00" },
+                { "minQuantity": 11, "pricePerUnit": "4.00" },
+                { "minQuantity": 51, "pricePerUnit": "3.00" }
+              ],
+              "adjustment": null
+            }
+          ]
+        }
+      }
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      renderRules();
+      updatePrice();
+      updateTieredPrice();
+    });
+
+    // Render pricing rules
+    function renderRules() {
+      const container = document.getElementById('rules-container');
+      const rules = productData.metadata["dev.ocp.product.pricing_rules@1.0"].rules;
+
+      rules.forEach((rule, index) => {
+        const ruleDiv = document.createElement('div');
+        ruleDiv.className = 'rule-item';
+        ruleDiv.id = `rule-${index}`;
+
+        const desc = document.createElement('div');
+        desc.className = 'rule-description';
+        desc.textContent = rule.description;
+
+        ruleDiv.appendChild(desc);
+        container.appendChild(ruleDiv);
+      });
+    }
+
+    // Update price based on quantity and rules
+    function updatePrice() {
+      const quantity = parseInt(document.getElementById('quantity').value) || 1;
+      const rules = productData.metadata["dev.ocp.product.pricing_rules@1.0"].rules;
+      const basePrice = parseFloat(productData.price.amount);
+
+      // Find applicable rule (first matching in order)
+      let applicableRule = null;
+      let effectivePrice = basePrice;
+
+      for (const rule of rules) {
+        if (rule.type === 'volume') {
+          const minQty = rule.conditions.minQuantity;
+          const maxQty = rule.conditions.maxQuantity;
+
+          if (quantity >= minQty && (maxQty === undefined || quantity <= maxQty)) {
+            applicableRule = rule;
+            effectivePrice = parseFloat(rule.adjustment.value);
+            break;
+          }
+        }
+      }
+
+      // Update UI
+      document.getElementById('price-amount').textContent = `$${effectivePrice.toFixed(2)}`;
+
+      const total = effectivePrice * quantity;
+      document.getElementById('total-display').innerHTML = `Total: <strong>$${total.toFixed(2)}</strong>`;
+
+      // Show discount badge if discounted
+      const discountBadge = document.getElementById('discount-badge');
+      if (effectivePrice < basePrice) {
+        discountBadge.style.display = 'inline-block';
+        const discountPercent = Math.round((1 - effectivePrice / basePrice) * 100);
+        discountBadge.textContent = `${discountPercent}% OFF`;
+      } else {
+        discountBadge.style.display = 'none';
+      }
+
+      // Highlight active rule
+      document.querySelectorAll('.rule-item').forEach((el, index) => {
+        el.classList.remove('rule-active');
+      });
+
+      if (applicableRule) {
+        const ruleIndex = rules.indexOf(applicableRule);
+        document.getElementById(`rule-${ruleIndex}`).classList.add('rule-active');
+      }
+    }
+
+    // Update tiered price
+    function updateTieredPrice() {
+      const quantity = parseInt(document.getElementById('tiered-quantity').value) || 1;
+      const rules = tieredProductData.metadata["dev.ocp.product.pricing_rules@1.0"].rules;
+      const tieredRule = rules.find(r => r.type === 'tiered');
+
+      if (!tieredRule) return;
+
+      const tiers = tieredRule.conditions;
+      let total = 0;
+      let remainingQty = quantity;
+
+      // Calculate tiered pricing
+      for (const tier of tiers) {
+        const minQty = tier.minQuantity;
+        const price = parseFloat(tier.pricePerUnit);
+
+        if (remainingQty <= 0) break;
+
+        let tierQty = 0;
+        if (remainingQty >= minQty) {
+          // For the first tier, take all up to the next tier
+          const nextMin = tiers[tiers.indexOf(tier) + 1]?.minQuantity;
+          if (nextMin) {
+            tierQty = Math.min(remainingQty, nextMin - minQty);
+          } else {
+            tierQty = remainingQty;
+          }
+        }
+
+        total += tierQty * price;
+        remainingQty -= tierQty;
+      }
+
+      const effectivePrice = total / quantity;
+
+      document.getElementById('tiered-price-amount').textContent = `$${effectivePrice.toFixed(2)}`;
+      document.getElementById('tiered-total-display').innerHTML = `Total: <strong>$${total.toFixed(2)}</strong>`;
+    }
+  </script>
+</body>
+</html>

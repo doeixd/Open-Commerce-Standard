@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/product/semantic_relations/v1.json",
+  "title": "Semantic Relations",
+  "description": "Schema for expressing arbitrary, semantic relationships for a product, analogous to RDF triples (dev.ocp.product.semantic_relations@1.0).",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "description": "A single statement about the product (the implicit subject).",
+    "properties": {
+      "predicate": {
+        "type": "string",
+        "format": "uri",
+        "description": "The relationship type, expressed as a URI from a well-known vocabulary (e.g., schema.org, Dublin Core, custom)."
+      },
+      "object": {
+        "type": "object",
+        "description": "The target of the relationship, which can be a literal value or another resource.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["uri", "literal"],
+            "description": "Specifies if the object is a resource (identified by a URI) or a simple value."
+          },
+          "value": {
+            "type": "string",
+            "description": "The URI of the resource or the literal string value."
+          },
+          "datatype": {
+            "type": "string",
+            "format": "uri",
+            "description": "For literals, the XSD datatype URI (e.g., 'http://www.w3.org/2001/XMLSchema#date')."
+          },
+          "lang": {
+            "type": "string",
+            "description": "For string literals, the BCP 47 language tag (e.g., 'en', 'fr-CA')."
+          }
+        },
+        "required": ["type", "value"]
+      }
+    },
+    "required": ["predicate", "object"]
+  }
+}

@@ -1,36 +1,64 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/order/fulfillment_intent/v1.0",
+  "title": "Order Fulfillment Intent",
+  "description": "Schema for a client to declare an explicit fulfillment plan for an order, supporting mixed-fulfillment from a single cart (dev.ocp.order.fulfillment_intent@1.0).",
   "type": "array",
-  "description": "Schema for declaring explicit fulfillment intent (dev.ocp.order.fulfillment_intent@1.0). Allows for splitting a single cart into multiple fulfillment methods.",
   "items": {
     "type": "object",
     "properties": {
-      "method": {
+      "fulfillmentType": {
         "type": "string",
-        "enum": ["delivery", "pickup"],
+        "enum": ["physical", "pickup"],
         "description": "The fulfillment method for this group of items."
       },
-      "cartItemIds": {
+      "itemRefs": {
         "type": "array",
-        "items": { "type": "string", "format": "uuid" },
-        "description": "An array of the unique `cartItemId`s that belong to this fulfillment group."
+        "description": "References to the cart items and quantities for this group.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "cartItemId": {
+              "type": "string"
+            },
+            "quantity": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": ["cartItemId", "quantity"]
+        }
       },
-      "deliveryAddress": {
-        "$ref": "https://raw.githubusercontent.com/doeixd/Open-Commerce-Protocol/main/src/spec.yaml#/components/schemas/Location",
-        "description": "Required if, and only if, the method for this group is 'delivery'."
+      "deliveryDetails": {
+        "type": "object",
+        "description": "Required if fulfillmentType is 'physical'.",
+        "properties": {
+          "deliveryAddress": {
+            "$ref": "https://raw.githubusercontent.com/doeixd/Open-Commerce-Protocol/main/src/spec.yaml#/components/schemas/Location"
+          },
+          "shippingMethodId": {
+            "type": "string",
+            "description": "The 'id' of the shipping method chosen from dev.ocp.store.shipping@1.0."
+          }
+        },
+        "required": ["deliveryAddress", "shippingMethodId"]
       },
       "pickupDetails": {
         "type": "object",
         "properties": {
+          "locationId": {
+            "type": "string",
+            "description": "The 'id' of the store or pickup location."
+          },
           "pickupAt": {
             "type": "string",
             "format": "date-time",
             "description": "An optional, specific time for the scheduled pickup."
           }
         },
-        "description": "Optional details relevant to a 'pickup' method."
+        "required": ["locationId"]
       }
     },
-    "required": ["method", "cartItemIds"]
+    "required": ["fulfillmentType", "itemRefs"]
   }
 }
