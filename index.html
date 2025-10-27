@@ -2952,6 +2952,12 @@ app.get('/catalogs/:id', (req, res) => {
                                   <td>Defines common custom fields for international commerce, tax, and customs purposes.</td>
                                   <td>[order/customer_fields/v1.json](./schemas/order/customer_fields/v1.json)</td>
                               </tr>
+                              <tr>
+                                  <td><span class="inline-code">dev.ocs.server.webhooks@1.0</span></td>
+                                  <td>Server-wide</td>
+                                  <td>Enables server-to-server event notifications via webhooks. Servers advertise supported events and provide subscription management endpoints for asynchronous backend system integrations (inventory, shipping, ERP, AI agents, etc.).</td>
+                                  <td>[server/webhooks/v1.json](./schemas/server/webhooks/v1.json)</td>
+                              </tr>
                           </tbody>
                     </table>
                 </div>
@@ -3153,6 +3159,128 @@ app.get('/catalogs/:id', (req, res) => {
                      </div>
                      <div class="endpoint-body">
                          <p>Get the status of a specific return.</p>
+                     </div>
+                 </div>
+
+                 <h3>Webhooks</h3>
+
+                 <p>Webhooks enable server-to-server event notifications, allowing external systems to receive real-time updates when events occur in your OCS implementation. Unlike client-pull mechanisms (like <span class="inline-code">actions</span>) or client-initiated streams (like SSE), webhooks are <strong>server-push</strong>: your OCS server proactively sends HTTP POST requests to registered URLs when specific events happen.</p>
+
+                 <div class="card" style="margin: 1.5rem 0; background: var(--bg-tertiary); border-left: 4px solid var(--primary);">
+                     <h4 style="margin-bottom: 1rem;">Why Webhooks?</h4>
+
+                     <p><strong>Webhooks solve integration problems that are impossible or inefficient with polling:</strong></p>
+
+                     <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                         <li><strong>Inventory Management:</strong> A centralized inventory system needs instant notifications when orders are placed to decrement stock across multiple stores. Polling every few seconds would be inefficient and create race conditions.</li>
+
+                         <li><strong>Shipping & Fulfillment:</strong> Third-party logistics (3PL) providers need to know immediately when an order is confirmed so they can start picking and packing. A webhook triggers their fulfillment workflow automatically.</li>
+
+                         <li><strong>Accounting Systems:</strong> When an order completes or a refund is issued, your accounting software (QuickBooks, Xero, etc.) needs to create invoices and ledger entries. Webhooks eliminate manual data entry and sync delays.</li>
+
+                         <li><strong>Agentic Checkout (AI Agents):</strong> AI shopping agents (like OpenAI's agent framework) need to be notified when order status changes to <span class="inline-code">shipped</span> or <span class="inline-code">delivered</span>—long after the initial checkout conversation ended. Webhooks wake up the agent's backend to take action.</li>
+
+                         <li><strong>Fraud Detection:</strong> Security systems can receive order creation events in real-time to perform risk analysis and automatically cancel suspicious orders before fulfillment begins.</li>
+
+                         <li><strong>Customer Notifications:</strong> External notification services (SendGrid, Twilio) can be triggered to send order confirmations, shipping updates, and delivery alerts via email or SMS.</li>
+
+                         <li><strong>Analytics & Business Intelligence:</strong> Data warehouses and analytics platforms can ingest events as they happen, ensuring dashboards and reports always reflect current state without polling delays.</li>
+                     </ul>
+
+                     <p style="margin-top: 1rem;"><strong>Security:</strong> All webhook payloads are signed with HMAC-SHA256. Subscribers verify the signature using a shared secret to ensure requests genuinely come from your OCS server and haven't been tampered with.</p>
+                 </div>
+
+                 <div class="card" style="margin: 1.5rem 0;">
+                     <h4 style="margin-bottom: 0.5rem;">Webhooks vs. Other Communication Patterns</h4>
+                     <div class="table-container">
+                         <table>
+                             <thead>
+                                 <tr>
+                                     <th>Feature</th>
+                                     <th><span class="inline-code">actions</span> (Hypermedia)</th>
+                                     <th>SSE (<span class="inline-code">/orders/{id}/updates</span>)</th>
+                                     <th>Webhooks</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                                 <tr>
+                                     <td><strong>Direction</strong></td>
+                                     <td>Server → Client</td>
+                                     <td>Server → Client</td>
+                                     <td><strong>Server → Server</strong></td>
+                                 </tr>
+                                 <tr>
+                                     <td><strong>Initiator</strong></td>
+                                     <td>Client (by making request)</td>
+                                     <td>Client (by opening connection)</td>
+                                     <td><strong>Server (by pushing event)</strong></td>
+                                 </tr>
+                                 <tr>
+                                     <td><strong>Primary Use Case</strong></td>
+                                     <td>Interactive UIs & agents navigating the API</td>
+                                     <td>Real-time UI updates for a single resource</td>
+                                     <td><strong>Backend system integration</strong></td>
+                                 </tr>
+                                 <tr>
+                                     <td><strong>State</strong></td>
+                                     <td>Synchronous</td>
+                                     <td>Asynchronous (Streaming)</td>
+                                     <td>Asynchronous (Event-based)</td>
+                                 </tr>
+                                 <tr>
+                                     <td><strong>Example</strong></td>
+                                     <td>"Order is confirmed. You can cancel it by POSTing to this URL."</td>
+                                     <td>"Order 123's status changed to <span class="inline-code">shipped</span>."</td>
+                                     <td>"Hey, Shipping System! Order 456 was just created. Process it."</td>
+                                 </tr>
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+
+                 <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Webhook Management Endpoints</h4>
+
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-get">GET</span>
+                         <span class="endpoint-path">/webhooks</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>List all active webhook subscriptions for the authenticated user or system (paginated).</p>
+                     </div>
+                 </div>
+
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-post">POST</span>
+                         <span class="endpoint-path">/webhooks</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>Create a new webhook subscription for specified events. Server will send HTTP POST requests to the provided URL when events occur. Returns a shared secret for HMAC-SHA256 signature verification.</p>
+                     </div>
+                 </div>
+
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-get">GET</span>
+                         <span class="endpoint-path">/webhooks/{id}</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>Get details of a specific webhook subscription by ID.</p>
+                     </div>
+                 </div>
+
+                 <div class="endpoint-card">
+                     <div class="endpoint-header">
+                         <span class="http-method http-delete">DELETE</span>
+                         <span class="endpoint-path">/webhooks/{id}</span>
+                         <span class="badge badge-warning">Auth Required</span>
+                     </div>
+                     <div class="endpoint-body">
+                         <p>Delete a webhook subscription. No further events will be sent to the subscription URL.</p>
                      </div>
                  </div>
              </section>

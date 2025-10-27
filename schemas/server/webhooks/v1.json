@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "Webhook Support",
+  "description": "Schema for the dev.ocs.server.webhooks@1.0 capability. Describes the server's webhook capabilities for server-to-server event notifications.",
+  "properties": {
+    "supportedEvents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "A list of event types that can be subscribed to via webhooks.",
+      "examples": [
+        [
+          "order.created",
+          "order.updated",
+          "order.confirmed",
+          "order.processing",
+          "order.shipped",
+          "order.in_transit",
+          "order.completed",
+          "order.cancelled",
+          "refund.created",
+          "refund.processed",
+          "cart.abandoned",
+          "inventory.low_stock"
+        ]
+      ]
+    },
+    "signatureMechanism": {
+      "type": "string",
+      "enum": ["hmac-sha256"],
+      "description": "The cryptographic algorithm used to sign webhook payloads for security verification. Subscribers must verify signatures using the shared secret.",
+      "default": "hmac-sha256"
+    },
+    "managementEndpoint": {
+      "type": "string",
+      "format": "uri",
+      "description": "The base URL for managing webhook subscriptions. Typically points to /webhooks endpoint.",
+      "examples": [
+        "https://api.example.com/webhooks"
+      ]
+    },
+    "retryPolicy": {
+      "type": "object",
+      "description": "Optional retry policy information for failed webhook deliveries.",
+      "properties": {
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of delivery attempts for a webhook event.",
+          "default": 3
+        },
+        "backoffStrategy": {
+          "type": "string",
+          "enum": ["exponential", "linear", "fixed"],
+          "description": "The backoff strategy used between retry attempts.",
+          "default": "exponential"
+        },
+        "retryIntervalSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Initial retry interval in seconds. For exponential backoff, this is the base interval.",
+          "default": 60
+        }
+      }
+    },
+    "deliveryTimeout": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Timeout in seconds for webhook delivery requests. If the subscriber doesn't respond within this time, the delivery is considered failed.",
+      "default": 30
+    }
+  },
+  "required": ["supportedEvents", "signatureMechanism", "managementEndpoint"]
+}

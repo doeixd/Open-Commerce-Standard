@@ -97,6 +97,8 @@ tags:
     description: Operations for creating and managing a shopping cart.
   - name: Ordering
     description: Endpoints for placing and managing orders, including real-time updates.
+  - name: Webhooks
+    description: Server-to-server event notification subscription management.
 
 paths:
   /.well-known/ocs:
@@ -667,6 +669,114 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
+  /webhooks:
+    get:
+      tags: [Webhooks]
+      summary: List webhook subscriptions
+      description: Returns a paginated list of all active webhook subscriptions for the authenticated user or system.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: Paginated list of webhook subscriptions
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: "#/components/schemas/WebhookSubscriptionsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+    post:
+      tags: [Webhooks]
+      summary: Create a webhook subscription
+      description: |
+        Creates a new webhook subscription for the specified events. The server will send HTTP POST requests
+        to the provided URL when any of the subscribed events occur. A shared secret is returned for HMAC
+        signature verification of incoming webhook payloads.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/ocs+json; version=1.0:
+            schema:
+              $ref: "#/components/schemas/CreateWebhookSubscriptionRequest"
+      responses:
+        "201":
+          description: Webhook subscription successfully created
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: "#/components/schemas/WebhookSubscription"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /webhooks/{id}:
+    get:
+      tags: [Webhooks]
+      summary: Get a webhook subscription by ID
+      description: Retrieves details of a specific webhook subscription. Note that the secret is not included in GET responses for security reasons.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: The webhook subscription object
+          content:
+            application/ocs+json; version=1.0:
+              schema:
+                $ref: "#/components/schemas/WebhookSubscription"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+    delete:
+      tags: [Webhooks]
+      summary: Delete a webhook subscription
+      description: Removes a webhook subscription. No further events will be sent to the subscription URL.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Webhook subscription successfully deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
 components:
   schemas:
     # --- Discovery Schemas ---
@@ -1130,6 +1240,115 @@ components:
         comment:
           type: string
           description: "Optional text comment from the customer."
+
+    # --- Webhook Schemas ---
+    CreateWebhookSubscriptionRequest:
+      type: object
+      description: Request body for creating a new webhook subscription.
+      properties:
+        url:
+          type: string
+          format: uri
+          description: "The HTTPS URL where webhook events will be sent via HTTP POST."
+          example: "https://api.thirdparty.com/webhooks/ocs"
+        events:
+          type: array
+          items:
+            type: string
+          description: "Array of event types to subscribe to. Must be a subset of the supportedEvents advertised in the dev.ocs.server.webhooks@1.0 capability."
+          example: ["order.created", "order.shipped", "order.completed"]
+        description:
+          type: string
+          description: "Optional human-readable description of this webhook subscription."
+          example: "Production order notifications for fulfillment system"
+        metadata:
+          type: object
+          description: "Optional metadata for application-specific use."
+      required: [url, events]
+
+    WebhookSubscription:
+      type: object
+      description: Represents an active webhook subscription.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Unique identifier for this webhook subscription."
+        url:
+          type: string
+          format: uri
+          description: "The HTTPS URL where webhook events are sent."
+        events:
+          type: array
+          items:
+            type: string
+          description: "Array of subscribed event types."
+        description:
+          type: string
+          description: "Human-readable description of this subscription."
+        secret:
+          type: string
+          description: "Shared secret for HMAC-SHA256 signature verification. Only included in the response to POST /webhook_subscriptions. Not returned in GET responses."
+          example: "whsec_1a2b3c4d5e6f7g8h9i0j"
+        active:
+          type: boolean
+          description: "Whether this subscription is currently active and receiving events."
+          default: true
+        createdAt:
+          type: string
+          format: date-time
+          description: "ISO 8601 timestamp when the subscription was created."
+        updatedAt:
+          type: string
+          format: date-time
+          description: "ISO 8601 timestamp when the subscription was last modified."
+        metadata:
+          type: object
+          description: "Application-specific metadata."
+      required: [id, url, events, active, createdAt]
+
+    WebhookSubscriptionsResponse:
+      type: object
+      description: Paginated response for GET /webhook_subscriptions
+      properties:
+        subscriptions:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebhookSubscription"
+        pagination:
+          $ref: "#/components/schemas/PaginationMeta"
+      required: [subscriptions, pagination]
+
+    WebhookEvent:
+      type: object
+      description: |
+        The payload structure sent to webhook subscription URLs via HTTP POST.
+        The request will include the following headers:
+        - X-OCS-Webhook-Signature: HMAC-SHA256 signature of the request body
+        - X-OCS-Webhook-Event: The event type (e.g., "order.created")
+        - X-OCS-Webhook-ID: Unique identifier for this webhook delivery attempt
+        - X-OCS-Webhook-Timestamp: Unix timestamp of when the event was generated
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Unique identifier for this webhook event delivery."
+        event:
+          type: string
+          description: "The event type that triggered this webhook."
+          example: "order.created"
+        timestamp:
+          type: string
+          format: date-time
+          description: "ISO 8601 timestamp when the event occurred."
+        data:
+          type: object
+          description: "The event payload. Structure depends on the event type. Typically contains the full resource object (e.g., Order, Cart) that triggered the event."
+        previousData:
+          type: object
+          description: "Optional. For update events, contains the previous state of the resource before the update."
+      required: [id, event, timestamp, data]
+
     ValidationIssue:
       type: object
       description: "Details a failed validation rule on a specific field."

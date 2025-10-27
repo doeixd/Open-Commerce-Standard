@@ -687,6 +687,7 @@ Capabilities are the heart of OCS's extensibility. The following standard capabi
 | **`dev.ocs.service.scheduling@1.0`** | Product (`CatalogItem`) | Defines scheduling information for service-based items like appointments, including time slots and booking constraints. | [service/scheduling/v1.json](./schemas/service/scheduling/v1.json) |
 | **`dev.ocs.resource.versioning@1.0`** | All Resources | Enables immutable versioning for resources, creating a full audit trail of changes where each mutation creates a new resource version. See [Immutable Resource Versioning Guide](./docs/immutable-resource-versioning.md). | [resource/versioning/v1.json](./schemas/resource/versioning/v1.json)[Immutable Resource Versioning Guide](./docs/immutable-resource-versioning.md) |
 | **`dev.ocs.hypermedia.schema_aware_actions@1.0`** | Actions | Extends hypermedia actions to include request/response schema references, enabling dynamic client generation, form building, and truly self-documenting APIs. See [Schema-Aware Actions Guide](./docs/schema-aware-actions.md). | [hypermedia/schema_aware_actions/v1.json](./schemas/hypermedia/schema_aware_actions/v1.json) |
+| **`dev.ocs.server.webhooks@1.0`** | Server-wide | Enables server-to-server event notifications via webhooks. Servers advertise supported events and provide subscription management endpoints for asynchronous backend system integrations (inventory, shipping, ERP, etc.). | [server/webhooks/v1.json](./schemas/server/webhooks/v1.json) |
 
 <br />
 
@@ -739,8 +740,11 @@ OCS is a living standard. The future direction includes:
 | `/orders/{id}` | `GET` | Get the current state of an order. | Yes |
 | `/orders/{id}/updates` | `GET` | **Subscribe to real-time order updates via SSE.** | Yes |
 | `/orders/{id}/cancel` | `POST` | Request to cancel an order. | Yes |
-
 | `/carts/{cartId}/promotions` | `POST` | Apply or validate a promotion on a cart. | Yes |
+| `/webhooks` | `GET` | List all webhook subscriptions. | Yes |
+| `/webhooks` | `POST` | Create a new webhook subscription. | Yes |
+| `/webhooks/{id}` | `GET` | Get a webhook subscription by ID. | Yes |
+| `/webhooks/{id}` | `DELETE` | Delete a webhook subscription. | Yes |
 
 <br />
 
