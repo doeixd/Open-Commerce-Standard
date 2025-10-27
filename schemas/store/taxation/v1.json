@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/store/taxation/v1.json",
+  "title": "Store Taxation Policies",
+  "description": "Schema for defining a store's tax calculation methods and compliance requirements (dev.ocp.store.taxation@1). Provides rules for client-side estimation and declares the authoritative calculation method.",
+  "type": "object",
+  "properties": {
+    "_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "taxModel": {
+      "type": "string",
+      "enum": ["destination", "origin"],
+      "description": "Determines the basis for tax calculation. 'destination' means tax is based on the shipping/delivery address. 'origin' means it's based on the seller's location."
+    },
+    "taxIncludedInPrice": {
+      "type": "boolean",
+      "description": "True if the prices listed on products already include tax (e.g., VAT pricing in EU/UK). False if tax is added separately at checkout (e.g., sales tax in US)."
+    },
+    "calculationMethod": {
+      "type": "string",
+      "enum": ["table_rates", "real_time_provider"],
+      "default": "table_rates",
+      "description": "Indicates how the authoritative tax is calculated. 'table_rates' means the server provides rates for client-side estimation. 'real_time_provider' signals that the final tax will be calculated authoritatively by the server at checkout via a third-party service, and client estimates may not be possible."
+    },
+    "supportedRegions": {
+      "type": "array",
+      "description": "A list of regions where the store is registered to collect tax, with specific rules for estimation.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "regionCode": {
+            "type": "string",
+            "description": "ISO 3166-2 code for the region (e.g., 'US-CA' for California, 'DE' for Germany)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for the region (e.g., 'California', 'Germany')."
+          },
+          "taxType": {
+            "type": "string",
+            "enum": ["SALES_TAX", "VAT", "GST", "PST", "HST"],
+            "description": "The type of tax collected in this region."
+          },
+          "rate": {
+            "type": "number",
+            "description": "The standard tax rate for this region as a percentage (e.g., 7.25 for 7.25%). This is for client-side estimation only; the server's calculation is always authoritative."
+          },
+          "taxOnShipping": {
+            "type": "boolean",
+            "description": "True if shipping costs are also subject to tax in this region."
+          },
+          "requiresTaxIdForExemption": {
+            "type": "boolean",
+            "description": "True if business customers can be exempt from tax by providing a valid Tax ID (e.g., a VAT number)."
+          }
+        },
+        "required": ["regionCode", "taxType"]
+      }
+    },
+    "productTaxCodes": {
+      "type": "array",
+      "description": "A list of special tax categories for products that are not taxed at the standard rate.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "taxCode": {
+            "type": "string",
+            "description": "A unique identifier for the tax category (e.g., 'TXCD_92010', 'FOOD-EXEMPT', 'LUXURY-GOODS')."
+          },
+          "description": {
+            "type": "string",
+            "description": "A human-readable explanation of the tax category (e.g., 'Non-prepared food items', 'Clothing under $110', 'Luxury goods surcharge')."
+          },
+          "rate": {
+            "type": "number",
+            "description": "The tax rate as a percentage for products assigned this code. A rate of 0 indicates tax-exempt."
+          }
+        },
+        "required": ["taxCode", "rate"]
+      }
+    }
+  },
+  "required": ["_version", "taxModel", "taxIncludedInPrice"]
+}

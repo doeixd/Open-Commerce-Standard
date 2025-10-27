@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCP Taxation Example - Client-Side Tax Estimation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        .section {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .product {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        .tax-breakdown {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .tax-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        .total {
+            font-weight: bold;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .code {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>OCP Taxation Example</h1>
+    <p>This example demonstrates client-side tax estimation using the <code>dev.ocp.store.taxation@1.1</code> capability, combined with product-specific tax codes from <code>dev.ocp.product.taxation@1.0</code>.</p>
+
+    <div class="container">
+        <div class="section">
+            <h2>Store Taxation Policy (v1.1)</h2>
+            <div class="code" id="storeTaxationCode">
+{
+  "_version": "1.1",
+  "taxModel": "destination",
+  "taxIncludedInPrice": false,
+  "calculationMethod": "table_rates",
+  "supportedRegions": [
+    {
+      "regionCode": "US-CA",
+      "name": "California",
+      "taxType": "SALES_TAX",
+      "rate": 8.25,
+      "taxOnShipping": true
+    },
+    {
+      "regionCode": "US-NY",
+      "name": "New York",
+      "taxType": "SALES_TAX",
+      "rate": 8.875,
+      "taxOnShipping": false
+    }
+  ],
+  "productTaxCodes": [
+    {
+      "taxCode": "FOOD-EXEMPT",
+      "description": "Prepared food items",
+      "rate": 0
+    },
+    {
+      "taxCode": "LUXURY-GOODS",
+      "description": "Luxury goods surcharge",
+      "rate": 2.5
+    }
+  ]
+}
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Product Catalog with Tax Codes</h2>
+            <div id="products">
+                <div class="product">
+                    <h3>Classic OCP T-Shirt</h3>
+                    <p>Price: $25.00</p>
+                    <p>Tax Code: Standard (8.25% in CA)</p>
+                </div>
+                <div class="product">
+                    <h3>Prepared Sandwich</h3>
+                    <p>Price: $12.00</p>
+                    <p>Tax Code: FOOD-EXEMPT (0% tax)</p>
+                </div>
+                <div class="product">
+                    <h3>Luxury Watch</h3>
+                    <p>Price: $500.00</p>
+                    <p>Tax Code: LUXURY-GOODS (2.5% surcharge)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Client-Side Tax Calculation Demo</h2>
+        <p>Select your region and see how taxes are calculated:</p>
+
+        <label for="region">Shipping Region:</label>
+        <select id="region">
+            <option value="US-CA">California (8.25% sales tax)</option>
+            <option value="US-NY">New York (8.875% sales tax)</option>
+        </select>
+
+        <div class="tax-breakdown">
+            <h3>Cart Total: $537.00</h3>
+            <div id="taxCalculation">
+                <div class="tax-row">
+                    <span>Subtotal:</span>
+                    <span>$537.00</span>
+                </div>
+                <div class="tax-row">
+                    <span>Sales Tax (8.25%):</span>
+                    <span>$44.30</span>
+                </div>
+                <div class="tax-row">
+                    <span>Luxury Goods Surcharge (2.5%):</span>
+                    <span>$12.50</span>
+                </div>
+                <div class="tax-row">
+                    <span>Shipping Tax (8.25%):</span>
+                    <span>$4.13</span>
+                </div>
+                <div class="tax-row total">
+                    <span>Total:</span>
+                    <span>$597.93</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Client Implementation</h2>
+        <p>The client discovers taxation capabilities and calculates taxes locally:</p>
+
+        <div class="code">
+// 1. Discover store taxation capability
+const capabilities = await fetch('/capabilities');
+const taxationCap = capabilities.capabilities.find(
+  c => c.id === 'dev.ocp.store.taxation@1.1'
+);
+
+// 2. Get taxation policy
+const taxationPolicy = await fetch(taxationCap.schemaUrl);
+
+// 3. For each product, check tax code
+const products = await fetch('/catalogs/default');
+products.items.forEach(item => {
+  const taxCode = item.metadata?.['dev.ocp.product.taxation@1.0']?.taxCode;
+  // Use taxCode to look up rate from taxationPolicy.productTaxCodes
+});
+
+// 4. Calculate taxes client-side
+function calculateTax(subtotal, shipping, regionCode, taxCodes) {
+  const region = taxationPolicy.supportedRegions.find(r => r.regionCode === regionCode);
+  const baseTaxRate = region.rate / 100;
+
+  let totalTax = 0;
+
+  // Apply product-specific tax rates
+  taxCodes.forEach(({code, amount}) => {
+    const taxCode = taxationPolicy.productTaxCodes.find(tc => tc.taxCode === code);
+    const rate = taxCode ? taxCode.rate / 100 : baseTaxRate;
+    totalTax += amount * rate;
+  });
+
+  // Add shipping tax if applicable
+  if (region.taxOnShipping) {
+    totalTax += shipping * baseTaxRate;
+  }
+
+  return totalTax;
+}
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Key Benefits</h2>
+        <ul>
+            <li><strong>Client-Side Estimation:</strong> Users see final prices immediately without server round-trips</li>
+            <li><strong>Product-Specific Rates:</strong> Different tax treatment for food, luxury goods, etc.</li>
+            <li><strong>Regional Compliance:</strong> Automatic handling of different tax jurisdictions</li>
+            <li><strong>Real-Time Updates:</strong> Tax calculations update as users change shipping addresses</li>
+            <li><strong>Server Authority:</strong> Final tax calculation still performed server-side for accuracy</li>
+        </ul>
+    </div>
+
+    <script>
+        // Simple demo of tax calculation
+        const regionSelect = document.getElementById('region');
+        const taxCalculation = document.getElementById('taxCalculation');
+
+        // Mock cart data
+        const cart = {
+            subtotal: 537.00,
+            shipping: 5.00,
+            items: [
+                { name: 'T-Shirt', amount: 25.00, taxCode: null },
+                { name: 'Sandwich', amount: 12.00, taxCode: 'FOOD-EXEMPT' },
+                { name: 'Watch', amount: 500.00, taxCode: 'LUXURY-GOODS' }
+            ]
+        };
+
+        // Mock taxation policy
+        const taxationPolicy = {
+            supportedRegions: [
+                { regionCode: 'US-CA', rate: 8.25, taxOnShipping: true },
+                { regionCode: 'US-NY', rate: 8.875, taxOnShipping: false }
+            ],
+            productTaxCodes: [
+                { taxCode: 'FOOD-EXEMPT', rate: 0 },
+                { taxCode: 'LUXURY-GOODS', rate: 2.5 }
+            ]
+        };
+
+        function calculateTax() {
+            const regionCode = regionSelect.value;
+            const region = taxationPolicy.supportedRegions.find(r => r.regionCode === regionCode);
+
+            let productTax = 0;
+            let luxurySurcharge = 0;
+
+            cart.items.forEach(item => {
+                if (item.taxCode === 'FOOD-EXEMPT') {
+                    // No tax
+                } else if (item.taxCode === 'LUXURY-GOODS') {
+                    luxurySurcharge += item.amount * (taxationPolicy.productTaxCodes[1].rate / 100);
+                    productTax += item.amount * (region.rate / 100);
+                } else {
+                    productTax += item.amount * (region.rate / 100);
+                }
+            });
+
+            const shippingTax = region.taxOnShipping ? cart.shipping * (region.rate / 100) : 0;
+            const totalTax = productTax + luxurySurcharge + shippingTax;
+            const total = cart.subtotal + cart.shipping + totalTax;
+
+            taxCalculation.innerHTML = `
+                <div class="tax-row">
+                    <span>Subtotal:</span>
+                    <span>$${cart.subtotal.toFixed(2)}</span>
+                </div>
+                <div class="tax-row">
+                    <span>Sales Tax (${region.rate}%):</span>
+                    <span>$${productTax.toFixed(2)}</span>
+                </div>
+                <div class="tax-row">
+                    <span>Luxury Goods Surcharge (2.5%):</span>
+                    <span>$${luxurySurcharge.toFixed(2)}</span>
+                </div>
+                <div class="tax-row">
+                    <span>Shipping Tax (${region.taxOnShipping ? region.rate + '%' : '0%'}):</span>
+                    <span>$${shippingTax.toFixed(2)}</span>
+                </div>
+                <div class="tax-row total">
+                    <span>Total:</span>
+                    <span>$${total.toFixed(2)}</span>
+                </div>
+            `;
+        }
+
+        regionSelect.addEventListener('change', calculateTax);
+        calculateTax(); // Initial calculation
+    </script>
+</body>
+</html>

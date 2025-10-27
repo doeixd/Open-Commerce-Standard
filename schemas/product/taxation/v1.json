@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ocp.dev/product/taxation/v1.json",
+  "title": "Product Tax Code",
+  "description": "Assigns a specific tax code to a product, linking it to the rules defined in the dev.ocp.store.taxation capability (dev.ocp.product.taxation@1).",
+  "type": "object",
+  "properties": {
+    "taxCode": {
+      "type": "string",
+      "description": "The tax code for this product. This value must correspond to a 'taxCode' defined in the store's 'productTaxCodes' array."
+    }
+  },
+  "required": ["taxCode"]
+}

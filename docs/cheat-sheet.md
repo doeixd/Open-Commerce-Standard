@@ -135,6 +135,10 @@ GET /capabilities
 | `dev.ocp.cart@1.0` | Shopping cart support |
 | `dev.ocp.order.direct@1.0` | Direct orders (no cart) |
 | `dev.ocp.product.variants@1.0` | Size/color options |
+| `dev.ocp.product.identifiers@1.0` | Product codes (UPC, SKU, ISBN, etc.) |
+| `dev.ocp.product.links@1.0` | Related web links |
+| `dev.ocp.product.rich_info@1.0` | Marketing content, SEO, responsive images |
+| `dev.ocp.product.semantic_relations@1.0` | RDF-style product knowledge graph |
 | `dev.ocp.order.shipment_tracking@1.0` | Track deliveries |
 | `dev.ocp.discovery@1.0` | Discovery mechanisms |
 | `dev.ocp.i18n@1.0` | Internationalization |
@@ -160,9 +164,146 @@ GET /capabilities
           "stock": 15
         }
       ]
+    },
+    "dev.ocp.product.identifiers@1.0": [
+      {
+        "type": "SKU",
+        "value": "TSHIRT-BLK",
+        "scope": "product"
+      },
+      {
+        "type": "UPC",
+        "value": "885909457994",
+        "scope": "variant",
+        "variantId": "tshirt_L_black"
+      }
+    ],
+    "dev.ocp.product.links@1.0": [
+      {
+        "rel": "canonical",
+        "href": "https://store.example.com/products/tshirt",
+        "title": "Official Product Page"
+      },
+      {
+        "rel": "reviews",
+        "href": "https://store.example.com/products/tshirt/reviews",
+        "title": "Customer Reviews"
+      },
+      {
+        "rel": "gallery",
+        "href": "https://store.example.com/products/tshirt/gallery",
+        "title": "Product Images"
+      }
+    ]
+  }
+}
+```
+
+## Product with Rich Info (Marketing Content)
+
+```json
+{
+  "id": "headphones",
+  "name": "Premium Headphones",
+  "price": { "amount": "249.99", "currency": "USD" },
+  "metadata": {
+    "dev.ocp.product.rich_info@1.0": {
+      "_version": "1.0",
+      "lastModified": "2025-10-25T14:30:00Z",
+      "authorRef": "user_marketing_jane",
+      "publicationStatus": "published",
+      "names": {
+        "short": "Premium Headphones",
+        "customerFacing": "AcousticPro Premium Wireless Headphones",
+        "backend": "SKU-AUDIO-HP-PRO-BLK"
+      },
+      "descriptions": {
+        "short": "Premium wireless headphones with 30-hour battery.",
+        "longHtml": "<h2>Immersive Sound</h2><p>Experience audio like never before...</p>"
+      },
+      "seo": {
+        "metaTitle": "AcousticPro Headphones | 30-Hour Battery",
+        "metaDescription": "Shop premium wireless headphones...",
+        "slug": "acousticpro-premium-headphones"
+      },
+      "keyFeatures": [
+        "Active noise cancellation",
+        "30-hour battery life",
+        "Studio-quality sound"
+      ],
+      "imageGallery": [
+        {
+          "alt": "Headphones - Front View",
+          "sources": [
+            {
+              "url": "https://cdn.example.com/hp-800w.webp",
+              "type": "image/webp",
+              "srcset": "...400w.webp 400w, ...800w.webp 800w",
+              "sizes": "(max-width: 600px) 100vw, 50vw"
+            }
+          ],
+          "fallbackUrl": "https://cdn.example.com/hp-800w.jpg"
+        }
+      ]
     }
   }
 }
+```
+
+### Progressive Enhancement Pattern
+
+```javascript
+// ALWAYS fall back to core fields if rich_info is absent
+const richInfo = product.metadata?.['dev.ocp.product.rich_info@1.0'];
+const displayName = richInfo?.names?.customerFacing || product.name;
+const description = richInfo?.descriptions?.short || product.description;
+
+// Use context-appropriate content
+function getProductName(product, context) {
+  const richInfo = product.metadata?.['dev.ocp.product.rich_info@1.0'];
+  switch (context) {
+    case 'product_page':
+      return richInfo?.names?.customerFacing || product.name;
+    case 'cart':
+      return richInfo?.names?.short || product.name;
+    case 'admin':
+      return richInfo?.names?.backend || product.name;
+    default:
+      return product.name;
+  }
+}
+```
+
+### HTML Sanitization (REQUIRED)
+
+```javascript
+import DOMPurify from 'dompurify';
+
+// NEVER render HTML directly - ALWAYS sanitize
+const richInfo = product.metadata?.['dev.ocp.product.rich_info@1.0'];
+const cleanHtml = DOMPurify.sanitize(richInfo?.descriptions?.longHtml || '');
+
+// Now safe to render
+<div dangerouslySetInnerHTML={{ __html: cleanHtml }} />
+```
+
+### Responsive Images
+
+```jsx
+// Render modern responsive images from imageGallery
+{richInfo?.imageGallery?.map((img, i) => (
+  <picture key={i}>
+    {img.sources?.map((src, j) => (
+      <source
+        key={j}
+        srcSet={src.srcset}
+        type={src.type}
+        sizes={src.sizes}
+      />
+    ))}
+    <img src={img.fallbackUrl} alt={img.alt} title={img.title} />
+  </picture>
+))}
 ```
 
 ## Order with Variant
