@@ -622,7 +622,6 @@ OCP is a living standard. The future direction includes:
 | `/orders/{id}` | `GET` | Get the current state of an order. | Yes |
 | `/orders/{id}/updates` | `GET` | **Subscribe to real-time order updates via SSE.** | Yes |
 | `/orders/{id}/cancel` | `POST` | Request to cancel an order. | Yes |
-
 | `/carts/{cartId}/promotions` | `POST` | Apply or validate a promotion on a cart. | Yes |
 
 <br />
