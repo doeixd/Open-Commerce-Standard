@@ -49,7 +49,7 @@ When a resource implements this capability, it **MUST** include the following me
 | `_version` | String | The version of this capability schema. Always `"1.0"`. |
 | `version` | Integer | A sequential, human-readable version number for the resource (e.g., 1, 2, 3). Used for display purposes; **do not** use for identity. |
 | `revises` | String \| Null | The unique ID of the resource version this one supersedes. `null` for the first version. This forms the backward link in the chain. |
-| `isLatest` | Boolean | `true` if this is the current, active version of the resource. A critical flag for clients to identify the canonical state. |
+| `isLatest` | Boolean | `true` if this is the current, active version of the resource. A critical flag for clients to identify the canonical state. **See Section 2.5 for detailed usage.** |
 | `supersededBy` | String | **(Optional)** The unique ID of the resource version that has superseded this one. Only present if `isLatest` is `false`. This forms the forward link in the chain. |
 | `revisionDetails` | Object \| Null | An audit record of the change that created this version. `null` for the first version. |
 | ↳ `actionId` | String | The `id` of the hypermedia action that triggered this revision (e.g., `change_address`). |
@@ -58,6 +58,181 @@ When a resource implements this capability, it **MUST** include the following me
 
 ### 2.4 Resource Status Convention
 A versioned resource that is no longer the latest version **SHOULD** have its primary `status` field changed to `superseded`.
+
+### 2.5 The `isLatest` Flag: Your Guide to Resource State
+
+The `isLatest` boolean field is one of the most critical elements of the immutable versioning system. It serves as the authoritative indicator of which version represents the current, canonical state of a resource.
+
+#### **Core Properties**
+- **Required Field**: Must be present in every versioned resource
+- **Boolean Type**: `true` for exactly one version per chain, `false` for all others
+- **Atomic Updates**: When a new version is created, `isLatest` transitions atomically from the old version to the new one
+- **Query Optimization**: Enables efficient "get latest" queries without complex sorting
+
+#### **Server Implementation Requirements**
+```typescript
+// When creating a new version:
+const newVersion = {
+  id: generateUniqueId(),
+  chainId: resource.chainId,
+  version: previousVersion.version + 1,
+  revises: previousVersion.id,
+  isLatest: true,  // ← Always true for new versions
+  // ... other fields
+};
+
+// When superseding the old version:
+const updatedOldVersion = {
+  ...previousVersion,
+  isLatest: false,  // ← Set to false
+  supersededBy: newVersion.id,
+  status: 'superseded'
+};
+```
+
+#### **Client Usage Patterns**
+
+**1. Identifying Current State:**
+```javascript
+// Always check isLatest when fetching a resource
+const resource = await fetch(`/orders/${orderId}`);
+if (!resource.isLatest) {
+  // This is a historical version - redirect to latest
+  const latestUrl = resource.supersededBy
+    ? `/orders/${resource.supersededBy}`
+    : await findLatestVersion(resource.chainId);
+  window.location = latestUrl;
+}
+```
+
+**2. Cache Management:**
+```javascript
+// Use isLatest for cache invalidation
+function updateCache(resource) {
+  if (resource.isLatest) {
+    // This is the canonical version - update primary cache
+    cache.set(resource.chainId, resource);
+  } else {
+    // Historical version - store separately
+    historicalCache.set(resource.id, resource);
+  }
+}
+```
+
+**3. UI State Management:**
+```javascript
+function renderResource(resource) {
+  const badge = resource.isLatest
+    ? '<span class="badge current">Current</span>'
+    : '<span class="badge historical">Historical</span>';
+
+  return `<div class="resource ${resource.isLatest ? 'current' : 'historical'}">
+    ${badge}
+    <!-- render resource content -->
+  </div>`;
+}
+```
+
+#### **Query Optimization Strategies**
+
+**Finding Latest Versions:**
+```sql
+-- Efficient query using isLatest index
+SELECT * FROM resources
+WHERE chainId = ? AND isLatest = true;
+```
+
+**Version Chain Navigation:**
+```javascript
+async function getVersionChain(chainId) {
+  // Get all versions for a chain
+  const versions = await fetch(`/resources/${chainId}/versions`);
+
+  // Find the latest (should be exactly one)
+  const latest = versions.find(v => v.isLatest);
+  const historical = versions.filter(v => !v.isLatest);
+
+  return { latest, historical };
+}
+```
+
+#### **Error Prevention**
+
+**Stale Write Prevention:**
+```javascript
+async function performAction(resourceId, action, payload) {
+  const resource = await fetch(`/resources/${resourceId}`);
+
+  if (!resource.isLatest) {
+    throw new Error('Cannot modify historical version');
+  }
+
+  // Proceed with mutation...
+}
+```
+
+**Concurrent Modification Detection:**
+```javascript
+// Include version check in mutation requests
+const response = await fetch(`/orders/${orderId}/change-address`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ...payload,
+    expectedLatest: orderId  // Server validates this matches current latest
+  })
+});
+```
+
+#### **Business Logic Integration**
+
+**Status-Based Actions:**
+```javascript
+function getAvailableActions(resource) {
+  if (!resource.isLatest) {
+    return []; // No actions on historical versions
+  }
+
+  // Return actions based on current state
+  switch (resource.status) {
+    case 'pending': return ['cancel', 'update_address'];
+    case 'confirmed': return ['add_note'];
+    case 'completed': return [];
+  }
+}
+```
+
+**Audit Trail Queries:**
+```javascript
+// Find all changes made to current state
+async function getChangeHistory(chainId) {
+  const versions = await fetch(`/resources/${chainId}/versions`);
+  const sortedVersions = versions.sort((a, b) => b.version - a.version);
+
+  return sortedVersions.map(v => ({
+    version: v.version,
+    timestamp: v.revisionDetails?.timestamp,
+    actor: v.revisionDetails?.actor,
+    changes: v.revisionDetails?.arguments,
+    isCurrent: v.isLatest
+  }));
+}
+```
+
+#### **Migration Considerations**
+
+When migrating existing mutable resources to immutable versioning:
+
+1. **Set Initial Version**: Create version 1 with `isLatest: true`
+2. **Preserve History**: If historical data exists, create additional versions with `isLatest: false`
+3. **Update References**: Ensure all foreign keys and relationships point to the latest version
+
+#### **Performance Best Practices**
+
+- **Index the Field**: Create a database index on `(chainId, isLatest)` for fast latest-version queries
+- **Cache Latest Versions**: Cache latest versions aggressively since they're read frequently
+- **Archive Old Versions**: Move non-latest versions to slower storage after retention periods
+- **Batch Updates**: When creating new versions, update `isLatest` flags in the same transaction
 
 ---
 
