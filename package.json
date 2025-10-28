@@ -1,6 +1,8 @@
 {
-  "name": "Open-Commerce-Protocol",
+  "name": "open-commerce-protocol",
   "version": "1.0.0-rc.1",
+  "main": "./dist/cjs/production/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -29,7 +31,7 @@
     "test": "vitest --run"
   },
   "private": false,
-  "description": "Open Commerce Protocol (OCP) - HTTP-native API for digital commerce [Pre-Release Candidate - Subject to Change]",
+  "description": "Open Commerce Protocol (OCP) - HTTP-native API for digital commerce [Pre-Release Reference Implementation]",
   "repository": {
     "url": "",
     "type": "git"
@@ -41,5 +43,23 @@
   "author": "",
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "hono": "^4.10.3"
+  },
+  "module": "./dist/esm/production/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "development": {
+        "require": "./dist/cjs/development/index.js",
+        "import": "./dist/esm/development/index.js"
+      },
+      "require": "./dist/cjs/production/index.js",
+      "import": "./dist/esm/production/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {}
   }
 }
